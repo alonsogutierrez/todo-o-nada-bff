@@ -4,7 +4,8 @@
   "description": "Todo o nada tatto art bff",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "nodemon src/index.js",
+    "dev": "env-cmd -f ./src/config/dev.env nodemon src/index.js",
     "test": "npm run test"
   },
   "author": "Alonso Gutiérrez",
@@ -15,6 +16,7 @@
     "validator": "^13.1.1"
   },
   "devDependencies": {
+    "env-cmd": "^10.1.0",
     "nodemon": "^2.0.4"
   }
 }

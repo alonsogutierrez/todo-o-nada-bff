@@ -1,0 +1,51 @@
+{
+  "orderNumber": "5000123",
+  "products": [
+    {
+      "name": "polera 1",
+      "category": "categoria 1",
+      "sku": "123",
+      "description": "aqui va la descripcion",
+      "specifications": [
+        {
+          "name": "spec 1",
+          "order": 1,
+          "value": "texto 1"
+        }
+      ],
+      "prices": [
+        {
+          "BasePriceSales": 10990,
+          "BasePriceReference": 13990
+        }
+      ],
+      "hasInventory": true,
+      "quantity": 15
+    }
+  ],
+  "token": "abdvasd2",
+  "inventoryState": {},
+  "paymentData": {
+    "user": {
+      "firstName": "alonso",
+      "lastName": "gg",
+      "email": "alonso.ejemplo@asd.cl",
+      "phone": "989370610",
+      "address": {
+        "country": "Chile",
+        "city": "Santiago",
+        "commune": "Ñuñoa",
+        "zip_code": "1239000",
+        "address": "Exequiel Fernandez 1575",
+        "num_address": "depto 906"
+      }
+    },
+    "state": "paid",
+    "transaction": {
+      "date": "2020-09-11",
+      "subTotal": 10990,
+      "shipping": 3500,
+      "id": 1
+    }
+  }
+}
