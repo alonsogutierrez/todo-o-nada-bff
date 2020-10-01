@@ -4,19 +4,21 @@
   "description": "Todo o nada tatto art bff",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon src/index.js",
+    "start": "node src/index.js",
     "dev": "env-cmd -f ./src/config/dev.env nodemon src/index.js",
+    "prod": "env-cmd -f ./src/config/prod.env node src/index.js",
     "test": "npm run test"
   },
   "author": "Alonso Gutiérrez",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.17.1",
+    "env-cmd": "^10.1.0",
     "mongoose": "^5.10.4",
     "validator": "^13.1.1"
   },
   "devDependencies": {
-    "env-cmd": "^10.1.0",
     "nodemon": "^2.0.4"
   }
 }

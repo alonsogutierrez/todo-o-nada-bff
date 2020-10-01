@@ -21,23 +21,6 @@ const orderSchema = new mongoose.Schema(
           type: Number,
           required: true
         },
-        description: {
-          type: String,
-          required: true
-        },
-        specifications: [
-          {
-            name: {
-              type: String
-            },
-            order: {
-              type: Number
-            },
-            value: {
-              type: String
-            }
-          }
-        ],
         prices: [
           {
             BasePriceSales: {
@@ -47,22 +30,19 @@ const orderSchema = new mongoose.Schema(
             BasePriceReference: {
               type: Number,
               required: true
+            },
+            discount: {
+              type: Number,
+              required: true
             }
           }
         ],
-        hasInventory: {
-          type: Boolean
-        },
         quantity: {
           type: Number,
           required: true
         }
       }
     ],
-    token: {
-      type: String,
-      required: true
-    },
     inventoryState: {
       reserved: {
         status: {
@@ -127,8 +107,7 @@ const orderSchema = new mongoose.Schema(
             required: true
           },
           zip_code: {
-            type: String,
-            required: true
+            type: String
           },
           address: {
             type: String,

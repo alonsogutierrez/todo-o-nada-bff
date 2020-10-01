@@ -8,7 +8,6 @@ exports.generateOrderId = async () => {
 };
 
 async function generateSerialNumber(type) {
-  console.log('type:', type);
   try {
     const counter = await UniqueIdentifiers.findOneAndUpdate(
       { _id: type },
@@ -18,7 +17,6 @@ async function generateSerialNumber(type) {
       },
       { new: true }
     );
-    console.log('counter!!: ', counter);
     return counter.count;
   } catch (error) {
     logger.error(error.message, {

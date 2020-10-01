@@ -8,7 +8,6 @@ const logger = console;
 router.post('/orders', async (req, res) => {
   //TODO: Create an orderNumber
   const orderNumber = await idBuilder.generateOrderId();
-  console.log('orderNumber: ', orderNumber);
   req.body.orderNumber = orderNumber;
   const order = new Order(req.body);
   logger.log('Order: ', order);
