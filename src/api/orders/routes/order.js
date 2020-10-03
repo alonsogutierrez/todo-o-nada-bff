@@ -13,7 +13,7 @@ router.post('/orders', async (req, res) => {
   logger.log('Order: ', order);
   try {
     await order.save();
-    logger.log('Order saved succesfully');
+    logger.log('Order saved succesfully!');
     res.status(201).send({ order });
   } catch (e) {
     logger.error('Can`t save order: ', e.message);
