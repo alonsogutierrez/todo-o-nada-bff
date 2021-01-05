@@ -27,7 +27,7 @@ router.post('/users/login', async (req, res) => {
     res.send({ user });
   } catch (e) {
     logger.error('Cant login user');
-    res.status(404).send(e.message);
+    res.status(401).send(e.message);
   }
 });
 
