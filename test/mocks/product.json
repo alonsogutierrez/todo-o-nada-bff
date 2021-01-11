@@ -1,0 +1,23 @@
+{
+  "name": "test01",
+  "category": [
+    {"name": "cat01", "code": "111"}
+  ],
+  "sku": 1111,
+  "description": "test description",
+  "sizes": [
+    {"name":"testSize01"}
+  ],
+  "specifications": [
+    {"name": "color", "order": 1, "value": "red"}
+  ],
+  "prices": [
+    {"BasePriceSales": 1000, "BasePriceReference": 10001}
+  ],
+  "hasInventory": true,
+  "hasSizes": true,
+  "quantity": 10,
+  "pictures": [
+    {"image": "image01.png", "priority": 1}
+  ]
+}
