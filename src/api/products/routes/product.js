@@ -27,7 +27,7 @@ router.get('/product', async (req, res) => {
     }
 })
 
-router.get('/product/:sku', async (req, res) => {
+router.get('/product/sku/:sku', async (req, res) => {
     try {
         const { sku } = req.params
         const product = await Product.findOne({sku: parseInt(sku)})
@@ -39,12 +39,24 @@ router.get('/product/:sku', async (req, res) => {
     }
 })
 
-router.put('/product/:sku', async (req, res) => {
+router.put('/product/sku/:sku', async (req, res) => {
     try {
         const { sku } = req.params
         const updateProduct = new Product(req.body);
         const product = await Product.findOneAndUpdate({sku: parseInt(sku)}, updateProduct)
         logger.log(`Product with sku :${sku} update successfully`);
+        res.status(201).send({ status: true , data: product })
+    } catch (e) {
+        logger.error('Can`t gets product: ', e.message);
+        res.status(500).send({status: false, error: e.message});
+    }
+})
+
+router.get('/product/category/:category', async (req, res) => {
+    try {
+        const { category } = req.params
+        const product = await Product.find({"category.code": String(category)})
+        logger.log(`Product with category :${category} update successfully`);
         res.status(201).send({ status: true , data: product })
     } catch (e) {
         logger.error('Can`t gets product: ', e.message);
