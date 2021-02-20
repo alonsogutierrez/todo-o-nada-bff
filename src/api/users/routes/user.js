@@ -23,12 +23,11 @@ router.post('/users/login', async (req, res) => {
       req.body.email,
       req.body.password
     );
-    const token = await user.generateAuthToken();
     logger.log('User succesfully login');
-    res.send({ user, token });
+    res.send({ user });
   } catch (e) {
     logger.error('Cant login user');
-    res.status(404).send(e.message);
+    res.status(401).send(e.message);
   }
 });
 
