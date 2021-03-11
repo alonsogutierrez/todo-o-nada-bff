@@ -4,7 +4,11 @@ const ORDER_NUMBER_SERIAL_ID = process.env.ORDER_NUMBER_SERIAL_ID;
 const logger = console;
 
 exports.generateOrderId = async () => {
-  return await generateSerialNumber(ORDER_NUMBER_SERIAL_ID);
+  try {
+    return await generateSerialNumber(ORDER_NUMBER_SERIAL_ID);
+  } catch (err) {
+    throw new Error(`Can't generate serial number: ${err.message}`);
+  }
 };
 
 async function generateSerialNumber(type) {
