@@ -1,0 +1,48 @@
+{
+  "name": "polera roja irezumi",
+  "category": [
+    {
+      "name": "irezumi",
+      "code": "I"
+    },
+    {
+      "name": "poleras",
+      "code": "II"
+    },
+    {
+      "name": "hombre",
+      "code": "III"
+    }
+  ],
+  "itemNumber": 122233,
+  "sku": 877654,
+  "description": "polera roja con hermosos detalles y logo de ensueño",
+  "sizes": [
+    {
+      "name": "L"
+    },
+    {
+      "name": "XL"
+    }
+  ],
+  "specifications": [
+    {
+      "name": "largo",
+      "order": 1,
+      "value": "17cm"
+    }
+  ],
+  "prices": [
+    {
+      "BasePriceSales": 19990,
+      "BasePriceReference": 25990
+    }
+  ],
+  "quantity": 50,
+  "pictures": [
+    {
+      "image": "firstImagePolera.jpg",
+      "priority": 1
+    }
+  ]
+}

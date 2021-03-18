@@ -8,6 +8,7 @@ const reportRouter = require('./api/reports/week/routes/week');
 const downloadReportRouter = require('./api/reports/betweenDates/routes/betweenDates');
 const orderReportRouter = require('./api/reports/orders/routes/orders');
 const healthRouter = require('./api/health/routes/health');
+const searchRouter = require('./api/search/routes/search');
 
 const app = express();
 
@@ -20,5 +21,6 @@ app.use(userRouter);
 app.use(reportRouter);
 app.use(downloadReportRouter);
 app.use(orderReportRouter);
+app.use(searchRouter);
 
 module.exports = app;

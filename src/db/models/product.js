@@ -8,17 +8,21 @@ const productSchema = new mongoose.Schema(
       required: true
     },
     category: [
-        {
-            name: {
-                type: String,
-                required: true
-            },
-            code: {
-                type: String,
-                required: true
-            }
+      {
+        name: {
+          type: String,
+          required: true
+        },
+        code: {
+          type: String,
+          required: true
         }
+      }
     ],
+    itemNumber: {
+      type: Number,
+      required: true
+    },
     sku: {
       type: Number,
       required: true
@@ -28,12 +32,12 @@ const productSchema = new mongoose.Schema(
       required: true
     },
     sizes: [
-        {
-            name: {
-                type: String,
-                required: true
-            }
+      {
+        name: {
+          type: String,
+          required: true
         }
+      }
     ],
     specifications: [
       {
@@ -71,16 +75,16 @@ const productSchema = new mongoose.Schema(
       required: true
     },
     pictures: [
-        {
-            image: {
-                type: String,
-                required: true
-            },
-            priority: {
-                type: Number,
-                required: true
-            }
+      {
+        image: {
+          type: String,
+          required: true
+        },
+        priority: {
+          type: Number,
+          required: true
         }
+      }
     ]
   },
   {
@@ -88,6 +92,6 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-productSchema.plugin(mongoosePaginate)
+productSchema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model('Product', productSchema);

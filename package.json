@@ -9,12 +9,13 @@
     "prod": "env-cmd -f ./src/config/prod.env node src/index.js",
     "test": "npm run test"
   },
-  "author": "Alonso Gutiérrez",
+  "author": "GG Team - Alonso Gutiérrez - Cristian Gutiérrez",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "date-fns": "^2.16.1",
+    "elasticsearch": "^16.7.2",
     "env-cmd": "^10.1.0",
     "exceljs": "^4.2.0",
     "express": "^4.17.1",
