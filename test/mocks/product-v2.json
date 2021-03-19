@@ -1,0 +1,57 @@
+{
+  "name": "test01",
+  "category": [
+    {"name": "cat01", "code": "100"},
+    {"name": "cat01", "code": "101"}
+  ],
+  "itemNumber": 1,
+  "description": "polera basica cuello V hombre",
+  "specifications": [
+    {"name": "color", "order": 1, "value": "red"}
+  ],
+  "hasInventory": true,
+  "hasSizes": true,
+  "prices": {
+    "BasePriceSales": 1000,
+    "BasePriceReference": 10001,
+    "discount": 0
+  },
+  "details": [
+    {
+      "sku": 1001,
+      "color": "rojo",
+      "availability": [
+        {"size": "s", "stock": 5},
+        {"size": "m", "stock": 3},
+        {"size": "l", "stock": 0}
+      ],
+      "pictures": [
+        {"image": "image01.png", "order": 1}
+      ]
+    },
+    {
+      "sku": 1002,
+      "color": "negro",
+      "availability": [
+        {"size": "s", "stock": 4},
+        {"size": "m", "stock": 3},
+        {"size": "l", "stock": 0}
+      ],
+      "pictures": [
+        {"image": "image01.png", "order": 1}
+      ]
+    },
+    {
+      "sku": 1003,
+      "color": "verde",
+      "pictures": [
+        {"image": "image01.png", "order": 1}
+      ],
+      "availability": [
+        {"size": "s", "stock": 7},
+        {"size": "m", "stock": 6},
+        {"size": "l", "stock": 1}
+      ]
+    }
+  ]
+}
