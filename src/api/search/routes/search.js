@@ -3,6 +3,8 @@ const elasticSearch = require('elasticsearch');
 
 const router = express.Router();
 
+const elasticSearchUrl = process.env.ELASTIC_SEARCH_URL;
+
 router.get('/search', async (req, res) => {
   try {
     const { query } = req.query;
@@ -10,7 +12,7 @@ router.get('/search', async (req, res) => {
       throw new Error('Invalid request parameters');
     }
     const elasticSearchClient = elasticSearch.Client({
-      host: 'localhost:9200'
+      host: elasticSearchUrl
     });
     await elasticSearchClient.ping(
       {
@@ -27,25 +29,19 @@ router.get('/search', async (req, res) => {
     const resp = await elasticSearchClient.search({
       index: 'products',
       type: 'product',
+      size: 10,
       body: {
         query: {
-          bool: {
-            should: [
-              {
-                match: {
-                  productName: query //Product name
-                }
-              }
-            ]
+          multi_match: {
+            query,
+            fields: ['name', 'categories', 'description']
           }
         }
       }
     });
-    const { hits } = resp.hits;
-    console.log('hits: ', hits);
     res.status(201).send({
       status: 201,
-      data: hits
+      data: resp
     });
   } catch (err) {
     res.status(500).send({

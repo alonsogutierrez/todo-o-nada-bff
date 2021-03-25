@@ -1,7 +1,10 @@
 const elasticSearch = require('elasticsearch');
 const logger = console;
 
+const elasticSearchUrl = process.env.ELASTIC_SEARCH_URL;
+
 const saveProduct = async product => {
+  // TODO: Change isValidProduct by Schema Validator
   if (isValidProduct(product)) {
     logger.log('Trying to save product');
     await product.save();
@@ -9,7 +12,7 @@ const saveProduct = async product => {
 
     logger.log('Initalizing elasticSearch client');
     const elasticSearchClient = new elasticSearch.Client({
-      host: 'localhost:9200'
+      host: elasticSearchUrl
     });
     const elasticProductIndex = await elasticSearchClient.indices.exists({
       index: 'products'
@@ -17,18 +20,32 @@ const saveProduct = async product => {
     if (!elasticProductIndex) {
       logger.log('Trying to create elasticSearch index');
       await elasticSearchClient.indices.create({
-        index: 'products'
+        index: 'products',
+        includeTypeName: true,
+        body: {
+          mappings: {
+            properties: {
+              name: {
+                type: 'text'
+              },
+              categories: {
+                type: 'array'
+              }
+            }
+          }
+        }
       });
       logger.log('Index created');
     }
+    const productToIndex = {
+      itemNumber: product.itemNumber,
+      name: product.name,
+      categories: product.category.map(category => category.name)
+    };
     await elasticSearchClient.index({
       index: 'products',
       type: 'product',
-      body: {
-        productName: product.name,
-        productCategoriesName: product.category[0].name,
-        productCategoriesCode: product.category[0].code
-      }
+      body: productToIndex
     });
     logger.log('Product well indexed in elasticSearch');
   } else {
