@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('./db/mongoose');
 const orderRouter = require('./api/orders/routes/order');
-const productRouter = require('./api/products/routes/product');
+const productRouter = require('./api/products/routes');
 const userRouter = require('./api/users/routes/user');
 const reportRouter = require('./api/reports/week/routes/week');
 const downloadReportRouter = require('./api/reports/betweenDates/routes/betweenDates');
