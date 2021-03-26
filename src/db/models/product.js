@@ -19,24 +19,29 @@ const productSchema = new mongoose.Schema(
         }
       }
     ],
-    itemNumber: {
-      type: Number,
-      required: true
-    },
-    sku: {
-      type: Number,
-      required: true
-    },
+    itemNumber: Number,
     description: {
       type: String,
       required: true
     },
-    sizes: [
+    details: [
       {
-        name: {
+        sku: {
+          type: Number,
+          required: false
+        },
+        color: {
           type: String,
-          required: true
-        }
+          required: false
+        },
+        size: String,
+        stock: Number,
+        pictures: [
+          {
+            image: String,
+            order: Number
+          }
+        ]
       }
     ],
     specifications: [
@@ -52,40 +57,27 @@ const productSchema = new mongoose.Schema(
         }
       }
     ],
-    prices: [
-      {
-        BasePriceSales: {
-          type: Number,
-          required: true
-        },
-        BasePriceReference: {
-          type: Number,
-          required: true
-        }
+    prices: {
+      BasePriceSales: {
+        type: Number,
+        required: true
+      },
+      BasePriceReference: {
+        type: Number,
+        required: true
+      },
+      discount: {
+        type: Number,
+        required: false
       }
-    ],
-    hasInventory: {
-      type: Boolean
     },
-    hasSizes: {
-      type: Boolean
+    quantity: Number,
+    published: {
+      type: Boolean,
+      default: false
     },
-    quantity: {
-      type: Number,
-      required: true
-    },
-    pictures: [
-      {
-        image: {
-          type: String,
-          required: true
-        },
-        priority: {
-          type: Number,
-          required: true
-        }
-      }
-    ]
+    hasSizes: Boolean,
+    hasInventory: Boolean
   },
   {
     timestamps: true

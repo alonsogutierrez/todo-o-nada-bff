@@ -15,14 +15,19 @@
     }
   ],
   "itemNumber": 122233,
-  "sku": 877654,
   "description": "polera roja con hermosos detalles y logo de ensueño",
-  "sizes": [
+  "details": [
     {
-      "name": "L"
-    },
-    {
-      "name": "XL"
+      "sku": 123123,
+      "color": "rojo",
+      "size": "L",
+      "stock": 30,
+      "pictures": [
+        {
+          "image": "imageBaseProduct.jpg",
+          "order": 1
+        }
+      ]
     }
   ],
   "specifications": [
@@ -30,19 +35,22 @@
       "name": "largo",
       "order": 1,
       "value": "17cm"
+    },
+    {
+      "name": "ancho",
+      "order": 2,
+      "value": "13cm"
     }
   ],
   "prices": [
     {
       "BasePriceSales": 19990,
-      "BasePriceReference": 25990
+      "BasePriceReference": 25990,
+      "discount": 0
     }
   ],
   "quantity": 50,
-  "pictures": [
-    {
-      "image": "firstImagePolera.jpg",
-      "priority": 1
-    }
-  ]
+  "published": true,
+  "hasSizes": true,
+  "hasInventory": true
 }

@@ -7,9 +7,8 @@ const logger = console;
 
 router.post('/product', async (req, res) => {
   try {
-    const product = new Product(req.body);
-    await saveProduct(product);
-    res.status(201).send({ status: true, data: product });
+    const productIndexed = await saveProduct(req.body);
+    res.status(201).send({ status: 201, data: productIndexed });
   } catch (e) {
     logger.error('Can`t save product: ', e.message);
     res.status(500).send({ status: false, error: e.message });
