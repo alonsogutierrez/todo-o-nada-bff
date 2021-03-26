@@ -2,80 +2,82 @@ const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 
 const productSchema = new mongoose.Schema(
-    {
-        name: {
-            type: String,
-            required: true
-        },
-        category: [
-            {
-                type: String,
-                required: true
-            }
-        ],
-        itemNumber: Number,
-        description: {
-            type: String,
-            required: true
-        },
-        details: [
-            {
-                sku: {
-                    type: Number,
-                    required: false
-                },
-                color: {
-                    type: String,
-                    required: false
-                },
-                size: String,
-                stock: Number,
-                pictures: {
-                    image: String,
-                    order: Number
-                }
-            }
-        ],
-        specifications: [
-            {
-                name: {
-                    type: String
-                },
-                order: {
-                    type: Number
-                },
-                value: {
-                    type: String
-                }
-            }
-        ],
-        price: {
-            BasePriceSales: {
-                type: Number,
-                required: true
-            },
-            BasePriceReference: {
-                type: Number,
-                required: true
-            },
-            discount: {
-                type: Number,
-                required: false
-            }
-        },
-        quantity: Number,
-        published: {
-            type: Boolean,
-            default: false
-        },
-        hasSizes: Boolean,
-        hasInventory: Boolean
+  {
+    category: [
+      {
+        required: true,
+        type: 'String'
+      }
+    ],
+    description: {
+      required: true,
+      type: 'String'
     },
-    {
-        timestamps: true
-    }
+    details: [
+      {
+        color: {
+          required: false,
+          type: 'String'
+        },
+        pictures: [
+          {
+            image: 'String',
+            order: 'Number'
+          }
+        ],
+        size: 'String',
+        sku: {
+          required: false,
+          type: 'Number'
+        },
+        stock: 'Number'
+      }
+    ],
+    hasInventory: 'Boolean',
+    hasSizes: 'Boolean',
+    itemNumber: 'Number',
+    name: {
+      required: true,
+      type: 'String'
+    },
+    price: {
+      BasePriceReference: {
+        required: true,
+        type: 'Number'
+      },
+      BasePriceSales: {
+        required: true,
+        type: 'Number'
+      },
+      discount: {
+        required: false,
+        type: 'Number'
+      }
+    },
+    published: {
+      default: false,
+      type: 'Boolean'
+    },
+    quantity: 'Number',
+    specifications: [
+      {
+        name: {
+          type: 'String'
+        },
+        order: {
+          type: 'Number'
+        },
+        value: {
+          type: 'String'
+        }
+      }
+    ]
+  },
+  {
+    timestamps: true
+  }
 );
 
-productSchema.plugin(mongoosePaginate)
+productSchema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model('Product', productSchema);
