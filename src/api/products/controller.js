@@ -3,6 +3,7 @@ const path = require('path')
 const Products = require('../../db/models/product')
 
 __dirname = path.resolve();
+const logger = console;
 
 const uploadAndProcessLotsProducts = async (req, res) => {
     try {
@@ -95,6 +96,19 @@ const uploadAndProcessLotsProducts = async (req, res) => {
     }
 };
 
+const findProductByItemNumber = async (req, res) => {
+    try {
+        const { itemNumber } = req.params
+        const product = await Products.findOne({ itemNumber: parseInt(itemNumber) });
+        logger.log(`Product with itemNumber :${itemNumber} find successfully`);
+        res.status(200).send(product);
+    } catch (e) {
+        logger.error('Can`t find product: ', e.message);
+        res.status(404).send();
+    }
+}
+
 module.exports = {
-    uploadAndProcessLotsProducts
+    uploadAndProcessLotsProducts,
+    findProductByItemNumber
 }

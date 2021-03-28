@@ -1,6 +1,6 @@
 const express = require('express');
 const Products = require('../../db/models/product');
-const saveProduct = require('../useCases/saveProduct');
+const saveProduct = require('./useCases/saveProduct');
 const router = new express.Router();
 const upload = require('../../middlewares/upload');
 const controller = require('./controller');
@@ -23,6 +23,8 @@ router.post('/product', async (req, res) => {
   }
 });
 
+router.get('/product/itemNumber/:itemNumber', controller.findProductByItemNumber)
+
 router.get('/product', async (req, res) => {
   try {
     const { page } = req.query;
@@ -40,44 +42,5 @@ router.get('/product', async (req, res) => {
   }
 });
 
-router.get('/product/sku/:sku', async (req, res) => {
-  try {
-    const { sku } = req.params;
-    const product = await Products.findOne({ sku: parseInt(sku) });
-    logger.log(`Product with sku :${sku} find successfully`);
-    res.status(201).send({ status: true, data: product });
-  } catch (e) {
-    logger.error('Can`t gets product: ', e.message);
-    res.status(500).send({ status: false, error: e.message });
-  }
-});
-
-router.put('/product/sku/:sku', async (req, res) => {
-  try {
-    const { sku } = req.params;
-    const updateProduct = new Product(req.body);
-    const product = await Products.findOneAndUpdate(
-      { sku: parseInt(sku) },
-      updateProduct
-    );
-    logger.log(`Product with sku :${sku} update successfully`);
-    res.status(201).send({ status: true, data: product });
-  } catch (e) {
-    logger.error('Can`t gets product: ', e.message);
-    res.status(500).send({ status: false, error: e.message });
-  }
-});
-
-router.get('/product/category/:category', async (req, res) => {
-  try {
-    const { category } = req.params;
-    const product = await Products.find({ 'category.code': String(category) });
-    logger.log(`Product with category :${category} update successfully`);
-    res.status(201).send({ status: true, data: product });
-  } catch (e) {
-    logger.error('Can`t gets product: ', e.message);
-    res.status(500).send({ status: false, error: e.message });
-  }
-});
 
 module.exports = router;
