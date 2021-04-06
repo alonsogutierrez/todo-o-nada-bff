@@ -1,6 +1,6 @@
 const express = require('express');
 const Products = require('../../db/models/product');
-const saveProduct = require('../useCases/saveProduct');
+const saveProduct = require('./useCases/saveProduct');
 const router = new express.Router();
 const upload = require('../../middlewares/upload');
 const controller = require('./controller');
