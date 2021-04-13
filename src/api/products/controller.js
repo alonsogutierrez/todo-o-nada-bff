@@ -143,9 +143,28 @@ const findProductsByParentCategory = async (req, res) => {
     }
 }
 
+const findProductsByParentChildCategory = async (req, res) => {
+    try {
+        const { category, childCategory } = req.params
+        const { page } = req.query;
+        const options = {
+            limit: 1,
+            pagination: true,
+            page: page === isNaN(page) || page === undefined ? 1 : parseInt(page)
+        };
+        const products = await Products.paginate({"category.1": childCategory, "category.0": category}, options);
+        logger.log('Products get successfully');
+        res.status(201).send({ products });
+    } catch (e) {
+        logger.error('Can`t gets product: ', e.message);
+        res.status(500).send({ status: false, error: e.message });
+    }
+}
+
 module.exports = {
     uploadAndProcessLotsProducts,
     findProductByItemNumber,
     findAllProducts,
-    findProductsByParentCategory
+    findProductsByParentCategory,
+    findProductsByParentChildCategory
 }

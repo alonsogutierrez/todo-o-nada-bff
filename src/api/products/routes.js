@@ -22,9 +22,10 @@ router.post('/product', async (req, res) => {
   }
 });
 
+router.get('/product', controller.findAllProducts);
 router.get('/product/itemNumber/:itemNumber', controller.findProductByItemNumber)
 router.get('/product/category/:category', controller.findProductsByParentCategory)
-router.get('/product', controller.findAllProducts);
+router.get('/product/category/:category/:childCategory', controller.findProductsByParentChildCategory)
 
 
 module.exports = router;
