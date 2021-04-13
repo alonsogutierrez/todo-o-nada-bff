@@ -108,7 +108,25 @@ const findProductByItemNumber = async (req, res) => {
     }
 }
 
+const findAllProducts = async (req, res) => {
+    try {
+        const { page } = req.query;
+        const options = {
+            limit: 1,
+            pagination: true,
+            page: page === isNaN(page) || page === undefined ? 1 : parseInt(page)
+        };
+        const products = await Products.paginate({}, options);
+        logger.log('Products get successfully');
+        res.status(201).send({ products });
+    } catch (e) {
+        logger.error('Can`t gets product: ', e.message);
+        res.status(500).send({ status: false, error: e.message });
+    }
+}
+
 module.exports = {
     uploadAndProcessLotsProducts,
-    findProductByItemNumber
+    findProductByItemNumber,
+    findAllProducts
 }
