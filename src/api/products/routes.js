@@ -1,5 +1,4 @@
 const express = require('express');
-const Products = require('../../db/models/product');
 const saveProduct = require('./useCases/saveProduct');
 const router = new express.Router();
 const upload = require('../../middlewares/upload');
@@ -24,6 +23,7 @@ router.post('/product', async (req, res) => {
 });
 
 router.get('/product/itemNumber/:itemNumber', controller.findProductByItemNumber)
+router.get('/product/category/:category', controller.findProductsByParentCategory)
 router.get('/product', controller.findAllProducts);
 
 
