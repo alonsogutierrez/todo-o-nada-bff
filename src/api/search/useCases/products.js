@@ -2,17 +2,13 @@ const ElasticSearchRestData = require('../../shared/infrastructure/ElasticSearch
 
 const logger = console;
 
-const getProducts = async (searchText, page, size = 10) => {
+const getProducts = async (searchText, page, size = 20) => {
   logger.log('Trying to get data from elasticsearch: ', searchText);
   const query = {
-    match_bool_prefix: {
-      name: searchText
-    },
-    match_bool_prefix: {
-      categories: searchText
-    },
-    match_bool_prefix: {
-      description: searchText
+    multi_match: {
+      query: searchText,
+      fields: ['name', 'categories', 'description'],
+      type: 'phrase_prefix'
     }
   };
   const elasticSearchResponse = await ElasticSearchRestData.SearchRequest(
@@ -22,15 +18,17 @@ const getProducts = async (searchText, page, size = 10) => {
     page,
     size
   );
-  logger.log('Request done: ', elasticSearchResponse);
+  logger.log('Request done: ', JSON.stringify(elasticSearchResponse));
 
   return elasticSearchResponse.hits;
 };
 
 const getProductsByCategory = async (categoryName, page, size = 20) => {
   const query = {
-    match_bool_prefix: {
-      categories: categoryName
+    multi_match: {
+      query: categoryName,
+      fields: ['categories'],
+      type: 'phrase_prefix'
     }
   };
   const elasticSearchResponse = await ElasticSearchRestData.SearchRequest(

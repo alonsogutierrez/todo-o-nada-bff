@@ -47,7 +47,7 @@ export async function POSTRequest(baseURL, url, query, body) {
 }
 
 export const SERVICES = {
-  BFF_TODO_NADA: config.get('api.elasticsearch_todo_nada')
+  BFF_TODO_NADA: config.get('api.bff_todo_nada')
 };
 
 export const RESOURCES = {

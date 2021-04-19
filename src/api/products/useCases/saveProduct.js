@@ -46,7 +46,9 @@ const saveProduct = async productInput => {
       categories: product.category,
       description: product.description,
       colors: product.details.map(detail => detail.color),
-      sizeDetail: product.details.map(detail => detail.size)
+      sizeDetail: product.details.map(detail => detail.size),
+      price: product.price,
+      quantity: product.quantity
     };
     await elasticSearchClient.index({
       index: 'products',
