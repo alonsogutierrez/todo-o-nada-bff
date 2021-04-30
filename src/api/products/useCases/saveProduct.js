@@ -3,45 +3,21 @@ const { validate } = require('json-schema');
 
 const productSchema = require('../schema/product');
 const Product = require('../../../db/models/product');
+const ElasticSearchRestData = require('../../shared/infrastructure/ElasticSearchRESTData');
 
 const logger = console;
-const elasticSearchUrl = process.env.ELASTIC_SEARCH_URL;
 
 const saveProduct = async productInput => {
   if (validate(productInput, productSchema)) {
     const product = new Product(productInput);
-    logger.log('Trying to save product');
+    logger.log('Trying to save product in MongoDB');
     await product.save();
-    logger.log('Product saved successfully');
+    logger.log('Product document well saved in MongoDB');
 
-    logger.log('Initalizing elasticSearch client');
-    const elasticSearchClient = new elasticSearch.Client({
-      host: elasticSearchUrl
-    });
-    const elasticProductIndex = await elasticSearchClient.indices.exists({
-      index: 'products'
-    });
-    if (!elasticProductIndex) {
-      logger.log('Trying to create elasticSearch index');
-      await elasticSearchClient.indices.create({
-        index: 'products',
-        includeTypeName: true,
-        body: {
-          mappings: {
-            properties: {
-              name: {
-                type: 'text'
-              },
-              categories: {
-                type: 'array'
-              }
-            }
-          }
-        }
-      });
-      logger.log('Index created');
-    }
     const productToIndex = {
+      id: product._id,
+      itemNumber: product.itemNumber,
+      sku: product.sku,
       name: product.name,
       categories: product.category,
       description: product.description,
@@ -50,11 +26,12 @@ const saveProduct = async productInput => {
       price: product.price,
       quantity: product.quantity
     };
-    await elasticSearchClient.index({
-      index: 'products',
-      type: 'product',
-      body: productToIndex
-    });
+    logger.log('Trying to save product document in elasticSearch');
+    await ElasticSearchRestData.CreateRequest(
+      'products',
+      'product',
+      productToIndex
+    );
     logger.log('Product well indexed in elasticSearch');
     return productToIndex;
   } else {

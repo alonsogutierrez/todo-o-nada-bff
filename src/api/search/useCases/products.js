@@ -13,7 +13,6 @@ const getProducts = async (searchText, page, size = 20) => {
   };
   const elasticSearchResponse = await ElasticSearchRestData.SearchRequest(
     'products',
-    'product',
     { query },
     page,
     size
