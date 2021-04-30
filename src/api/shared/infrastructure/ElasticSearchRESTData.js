@@ -25,7 +25,7 @@ const isClientRunning = async () => {
     try {
       elasticSearchClient.ping(
         {
-          requestTimeout: 5 * 1000
+          requestTimeout: 10 * 1000
         },
         err => {
           if (err) {
@@ -42,15 +42,26 @@ const isClientRunning = async () => {
   });
 };
 
-const SearchRequest = async (index, type, query, from = 0, size = 10) => {
+const SearchRequest = async (index, query, from = 0, size = 10) => {
   try {
     logger.log('Begin search request for: ', JSON.stringify(query));
     const isElasticSearchClientRunning = await isClientRunning();
 
+    const elasticProductIndex = await elasticSearchClient.indices.exists({
+      index: 'products'
+    });
+    if (!elasticProductIndex) {
+      logger.log('Trying to create elasticSearch index');
+      await elasticSearchClient.indices.create({
+        index: 'products',
+        includeTypeName: true
+      });
+      logger.log('Index created');
+    }
+
     if (isElasticSearchClientRunning) {
       const response = await elasticSearchClient.search({
         index,
-        type,
         body: query,
         from,
         size
