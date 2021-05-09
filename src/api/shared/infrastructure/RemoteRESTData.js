@@ -1,7 +1,9 @@
-import axios from 'axios';
-import HttpStatus from 'http-status-codes';
+const axios = require('axios');
+const HttpStatus = require('http-status-codes');
 
-export async function GETRequest(baseURL, url, query, body, headers) {
+const logger = console;
+
+async function GETRequest(baseURL, url, query, body, headers) {
   try {
     const response = await axios({
       baseURL,
@@ -24,13 +26,15 @@ export async function GETRequest(baseURL, url, query, body, headers) {
   }
 }
 
-export async function POSTRequest(baseURL, url, query, body) {
+async function POSTRequest(baseURL, url, query, body) {
   try {
+    console.log('baseurl + url : ', baseURL + url);
+    console.log('query: ', query);
+    console.log('body: ', body);
     const response = await axios({
-      baseURL,
       method: 'POST',
-      url,
-      params: query,
+      url: baseURL + url,
+      //params: query,
       data: body
     });
     return response.data;
@@ -46,14 +50,7 @@ export async function POSTRequest(baseURL, url, query, body) {
   }
 }
 
-export const SERVICES = {
-  BFF_TODO_NADA: config.get('api.bff_todo_nada')
-};
-
-export const RESOURCES = {
-  SEARCH_PRODUCTS: '/search',
-
-  SEARCH_PRODUCTS_BY_CATEGORY(categoryName) {
-    return `/search/${categoryName}`;
-  }
+module.exports = {
+  GETRequest,
+  POSTRequest
 };

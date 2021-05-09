@@ -17,7 +17,6 @@ const getProducts = async (searchText, page, size = 20) => {
     page,
     size
   );
-  logger.log('Request done: ', JSON.stringify(elasticSearchResponse));
 
   return elasticSearchResponse.hits;
 };
@@ -31,7 +30,6 @@ const getProductsByCategory = async (categoryName, page, size = 20) => {
     }
   };
   const elasticSearchResponse = await ElasticSearchRestData.SearchRequest(
-    'products',
     'products',
     { query },
     page,

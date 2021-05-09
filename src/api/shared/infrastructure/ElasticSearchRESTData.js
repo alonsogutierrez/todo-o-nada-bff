@@ -66,7 +66,6 @@ const SearchRequest = async (index, query, from = 0, size = 10) => {
         from,
         size
       });
-      logger.log('Response: ', JSON.stringify(response));
       return response;
     }
     throw new Error('ElasticSearch cluster is down');
@@ -89,7 +88,6 @@ const UpdateRequest = async (index, type, id, body) => {
           doc: body
         }
       });
-      logger.log('Response: ', response);
       return response;
     }
     throw new Error('ElasticSearch cluster is down');
@@ -121,7 +119,6 @@ const CreateRequest = async (index, type, body) => {
         type,
         body
       });
-      logger.log('response: ', response);
       return response;
     }
     throw new Error('ElasticSearch cluster is down');

@@ -12,8 +12,10 @@
   "author": "GG Team - Alonso Gutiérrez - Cristian Gutiérrez",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
+    "crypto-js": "^4.0.0",
     "date-fns": "^2.16.1",
     "elasticsearch": "^16.7.2",
     "env-cmd": "^10.1.0",
