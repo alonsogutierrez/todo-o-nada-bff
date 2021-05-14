@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-require('./db/mongoose');
+const { connectWithMongodDB } = require('./db/mongoose');
 const orderRouter = require('./api/orders/routes/order');
 const productRouter = require('./api/products/routes');
 const userRouter = require('./api/users/routes/user');
@@ -9,6 +9,12 @@ const downloadReportRouter = require('./api/reports/betweenDates/routes/betweenD
 const orderReportRouter = require('./api/reports/orders/routes/orders');
 const healthRouter = require('./api/health/routes/health');
 const searchRouter = require('./api/search/routes/search');
+
+try {
+  connectWithMongodDB();
+} catch (err) {
+  throw new Error(err.message);
+}
 
 const app = express();
 

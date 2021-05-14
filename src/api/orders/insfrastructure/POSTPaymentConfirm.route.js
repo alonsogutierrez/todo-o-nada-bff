@@ -8,7 +8,7 @@ const action = async (req, res) => {
   try {
     const { token } = req.body;
     logger.log('Validating query');
-    if (!isValidQuery({ body })) {
+    if (!isValidQuery({ token })) {
       res.status(HTTPCodes.BAD_REQUEST).send({
         error: 'Invalid params'
       });

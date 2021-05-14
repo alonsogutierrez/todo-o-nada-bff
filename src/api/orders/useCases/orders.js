@@ -24,8 +24,8 @@ const logger = console;
 const createOrderPayment = async order => {
   try {
     logger.info('Creating order payment', order);
-    order = generateOrderData(order);
-    logger.info('Generating paymentData');
+    order = await generateOrderData(order);
+    logger.info('Generating paymentData with orderData: ', order);
     const paymentData = generatePaymentData(order);
     logger.info('Signing payment message');
     const signedPaymentMessage = signMessage(paymentData);
@@ -43,7 +43,7 @@ const createOrderPayment = async order => {
     if (isValidPaymentResponse(paymentCreationResponse)) {
       const { token, url, flowOrder } = paymentCreationResponse;
       order.paymentData.apiResponse = { token, url, flowOrder };
-      logger.info('Payment well created in API');
+      logger.info('Payment well created in API: ', token, url, flowOrder);
       const orderData = await OrderRepository.save(order);
       logger.info('Order well saved in repository');
       const createOrderPaymentResponse = {
@@ -64,11 +64,12 @@ const createOrderPayment = async order => {
       );
     }
   } catch (err) {
-    throw new Error(`Can't create order payment use cases: `, err.message);
+    throw new Error(`Can't create order payment use cases: ${err.message}`);
   }
 };
 
 const confirmOrderPayment = async token => {
+  logger.info('Begin to confirm order payment');
   const objectToSign = {
     apiKey: FLOW_API_KEY,
     token
@@ -86,6 +87,7 @@ const confirmOrderPayment = async token => {
       let paidOrder = await OrderRepository.findOne({
         orderNumber: commerceOrder
       });
+      logger.info('Trying to update order: ', commerceOrder);
       if (!paidOrder) {
         return {
           code: 404,
@@ -129,6 +131,7 @@ const confirmOrderPayment = async token => {
             details
           }
         );
+        logger.info('Product well updated');
         return {
           ...product,
           inventoryState: {
@@ -146,6 +149,7 @@ const confirmOrderPayment = async token => {
           products
         }
       );
+      logger.info('Order well updated');
       console.log('paidOrder: ', paidOrder);
       //TODO: Create logic when an order is paid (validate and confirm inventory, change order state to paid)
       return {
@@ -178,23 +182,26 @@ const generateOrderData = async order => {
       address: { city }
     }
   } = paymentData;
+  let subTotal = 0;
+  products.forEach(product => {
+    subTotal +=
+      parseInt(product.price.basePriceSales, 10) *
+      parseInt(product.quantity, 10);
+  });
   paymentData.state = 'created';
   paymentData.transaction = {
     date: new Date(),
     discount: 0,
-    subTotal: products.reduce((accum, product) => {
-      return (
-        accum +
-        parseInt(product.price.BasePriceSales, 10) *
-          parseInt(product.quantity, 10)
-      );
-    }, 0),
+    subTotal: subTotal,
     shipping: getShippingAmount(city)
   };
   order.paymentData = paymentData;
   products = products.map(product => {
-    product.inventoryState = {
-      state: 'Reserved'
+    return {
+      ...product,
+      inventoryState: {
+        state: 'Reserved'
+      }
     };
   });
   order.products = products;
@@ -222,7 +229,7 @@ const generatePaymentData = order => {
 };
 
 const signMessage = objectToSign => {
-  const messageToSign = '';
+  let messageToSign = '';
   for (const key in objectToSign) {
     messageToSign += key + objectToSign[key];
   }
@@ -263,7 +270,7 @@ const generatePaymentFormData = (paymentData, signPaymentMessage) => {
 
 const isValidPaymentResponse = paymentResponse => {
   const { token, url, flowOrder } = paymentResponse;
-  const isValid = token && url && flowOrder;
+  const isValid = token && url && flowOrder ? true : false;
   return isValid;
 };
 
@@ -279,7 +286,7 @@ const getShippingAmount = region => {
     case 'IV':
       return 9000;
     case 'Región Metropolitana de Santiago':
-      return 5000;
+      return -1000;
     case 'VI':
       return 5000;
     case 'VII':
