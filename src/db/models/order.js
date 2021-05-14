@@ -37,7 +37,7 @@ const orderSchema = new mongoose.Schema(
           type: Number,
           required: true
         },
-        inventoryState = {
+        inventoryState: {
           status: {
             type: String,
             required: true
