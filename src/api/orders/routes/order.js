@@ -1,6 +1,7 @@
 const express = require('express');
 
 const POSTCreateOrderPayment = require('../insfrastructure/POSTCreateOrderPayment.route');
+const POSTPaymentConfirm = require('../insfrastructure/POSTPaymentConfirm.route');
 const Order = require('../../../db/models/order');
 
 const router = express.Router();
@@ -9,6 +10,10 @@ const logger = console;
 router[POSTCreateOrderPayment.method.toLocaleLowerCase()](
   POSTCreateOrderPayment.route,
   POSTCreateOrderPayment.action
+);
+router[POSTPaymentConfirm.method.toLocaleLowerCase()](
+  POSTPaymentConfirm.route,
+  POSTPaymentConfirm.action
 );
 
 router.get('/orders', async (req, res) => {

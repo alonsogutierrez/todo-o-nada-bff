@@ -20,59 +20,31 @@ const orderSchema = new mongoose.Schema(
           type: Number,
           required: true
         },
-        prices: [
-          {
-            basePriceSales: {
-              type: Number,
-              required: true
-            },
-            basePriceReference: {
-              type: Number,
-              required: true
-            },
-            discount: {
-              type: Number
-            }
+        price: {
+          basePriceSales: {
+            type: Number,
+            required: true
+          },
+          basePriceReference: {
+            type: Number,
+            required: true
+          },
+          discount: {
+            type: Number
           }
-        ],
+        },
         quantity: {
           type: Number,
           required: true
+        },
+        inventoryState = {
+          status: {
+            type: String,
+            required: true
+          }
         }
       }
     ],
-    inventoryState: {
-      reserved: {
-        status: {
-          type: String // confirmed, reserved, cancel
-        },
-        products: [
-          {
-            sku: {
-              type: Number
-            },
-            quantity: {
-              type: Number
-            }
-          }
-        ]
-      },
-      confirmed: {
-        status: {
-          type: String
-        },
-        products: [
-          {
-            sku: {
-              type: Number
-            },
-            quantity: {
-              type: Number
-            }
-          }
-        ]
-      }
-    },
     paymentData: {
       user: {
         firstName: {
@@ -134,6 +106,9 @@ const orderSchema = new mongoose.Schema(
           type: Number,
           required: true
         }
+      },
+      apiResponse: {
+        type: Object
       }
     }
   },

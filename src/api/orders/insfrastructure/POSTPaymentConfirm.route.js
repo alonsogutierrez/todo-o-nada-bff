@@ -1,0 +1,34 @@
+const HTTPCodes = require('http-status-codes');
+const CreateOrderPaymentUseCases = require('../useCases/orders');
+const isValidQuery = require('../adapters/POSTPaymentConfirmRequestValidation.validation');
+
+const logger = console;
+
+const action = async (req, res) => {
+  try {
+    const { token } = req.body;
+    logger.log('Validating query');
+    if (!isValidQuery({ body })) {
+      res.status(HTTPCodes.BAD_REQUEST).send({
+        error: 'Invalid params'
+      });
+      return;
+    }
+    logger.log('Begining to get payment status');
+    const confirmPaymentStatusResponse = await CreateOrderPaymentUseCases.confirmOrderPayment(
+      token
+    );
+    logger.log('Request finished: ', confirmPaymentStatusResponse);
+    res.status(HTTPCodes.OK).send(confirmPaymentStatusResponse);
+  } catch (err) {
+    res.status(HTTPCodes.INTERNAL_SERVER_ERROR).send({
+      error: `Can't confirm payment status: ${err.message}`
+    });
+  }
+};
+
+module.exports = {
+  method: 'POST',
+  route: '/orders/payment_confirm',
+  action
+};
