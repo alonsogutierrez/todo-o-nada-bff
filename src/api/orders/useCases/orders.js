@@ -9,8 +9,8 @@ const idBuilder = require('../idBuilder');
 
 const FLOW_API_SECRET_KEY = process.env.FLOW_API_SECRET_KEY;
 const FLOW_API_KEY = process.env.FLOW_API_KEY;
-const BASE_URL_FE = process.env.BASE_URL_FE
-const BASE_URL_BFF = process.env.BASE_URL_BFF
+const BASE_URL_FE = process.env.BASE_URL_FE;
+const BASE_URL_BFF = process.env.BASE_URL_BFF;
 
 const STATUS_PAYMENT_RESPONSE = {
   PAYMENT_PENDING: 1,
@@ -42,7 +42,7 @@ const createOrderPayment = async order => {
     logger.info('Trying to validate payment api response');
     if (isValidPaymentResponse(paymentCreationResponse)) {
       const { token, url, flowOrder } = paymentCreationResponse;
-      order.paymentData.apiResponse = { token, url, flowOrder }
+      order.paymentData.apiResponse = { token, url, flowOrder };
       logger.info('Payment well created in API');
       const orderData = await OrderRepository.save(order);
       logger.info('Order well saved in repository');
@@ -85,16 +85,16 @@ const confirmOrderPayment = async token => {
       console.log('commerceOrder: ', commerceOrder);
       let paidOrder = await OrderRepository.findOne({
         orderNumber: commerceOrder
-      })
+      });
       if (!paidOrder) {
         return {
           code: 404,
           message: 'Order not found in repository'
-        }
+        };
       }
-      let { products } = paidOrder
-      products = products.map(async (product) => {
-        const { itemNumber, sku, quantity } = product
+      let { products } = paidOrder;
+      products = products.map(async product => {
+        const { itemNumber, sku, quantity } = product;
         const productInDB = await ProductRepository.findOne({
           itemNumber,
           details: {
@@ -107,41 +107,46 @@ const confirmOrderPayment = async token => {
           return {
             code: 404,
             message: 'Product not found in repository'
-          }
+          };
         }
-        const { details } = productInDB
-        details = details.map((detail) => {
+        const { details } = productInDB;
+        details = details.map(detail => {
           return {
             ...detail,
             stock: detail.stock - quantity
-          }
-        })
-        await ProductRepository.updateOne({
-          itemNumber,
-          details: {
-            $elemMatch: {
-              sku
-            }
-          }
-        }, {
-          details
+          };
         });
+        await ProductRepository.updateOne(
+          {
+            itemNumber,
+            details: {
+              $elemMatch: {
+                sku
+              }
+            }
+          },
+          {
+            details
+          }
+        );
         return {
           ...product,
           inventoryState: {
             state: 'confirmed'
           }
-        }
+        };
         // TODO: Update elastic repository
       });
-      paidOrder = await OrderRepository.updateOne({
+      paidOrder = await OrderRepository.updateOne(
+        {
           orderNumber: commerceOrder
         },
         {
           status: 'paid',
           products
-        });
-      console.log('paidOrder: ', paidOrder)
+        }
+      );
+      console.log('paidOrder: ', paidOrder);
       //TODO: Create logic when an order is paid (validate and confirm inventory, change order state to paid)
       return {
         paidOrder,
@@ -164,29 +169,37 @@ const confirmOrderPayment = async token => {
   }
 };
 
-const generateOrderData = (order) => {
-    const orderNumber = await idBuilder.generateOrderId();
-    order.orderNumber = orderNumber;
-    let { paymentData, products } = order;
-    const { user: { address: { city } } } = paymentData
-    paymentData.state = 'created';
-    paymentData.transaction = {
-      date: new Date(),
-      discount: 0,
-      subTotal: products.reduce((accum, product) => {
-        return accum + parseInt(product.price.BasePriceSales, 10) * parseInt(product.quantity, 10)
-      }, 0),
-      shipping: getShippingAmount(city)
+const generateOrderData = async order => {
+  const orderNumber = await idBuilder.generateOrderId();
+  order.orderNumber = orderNumber;
+  let { paymentData, products } = order;
+  const {
+    user: {
+      address: { city }
+    }
+  } = paymentData;
+  paymentData.state = 'created';
+  paymentData.transaction = {
+    date: new Date(),
+    discount: 0,
+    subTotal: products.reduce((accum, product) => {
+      return (
+        accum +
+        parseInt(product.price.BasePriceSales, 10) *
+          parseInt(product.quantity, 10)
+      );
+    }, 0),
+    shipping: getShippingAmount(city)
+  };
+  order.paymentData = paymentData;
+  products = products.map(product => {
+    product.inventoryState = {
+      state: 'Reserved'
     };
-    order.paymentData = paymentData
-    products = products.map(product => {
-      product.inventoryState = {
-        state: 'Reserved'
-      };
-    });
-    order.products = products
-    return order
-}
+  });
+  order.products = products;
+  return order;
+};
 
 const generatePaymentData = order => {
   const { paymentData } = order;
@@ -203,8 +216,7 @@ const generatePaymentData = order => {
     email,
     payment_currency: 'CLP',
     subject: 'Creando pago para Todo o Nada Tatto Art',
-    urlConfirmation:
-      `${BASE_URL_BFF}/orders/payment_confirm`,
+    urlConfirmation: `${BASE_URL_BFF}/orders/payment_confirm`,
     urlReturn: `${BASE_URL_FE}`
   };
 };
@@ -256,7 +268,7 @@ const isValidPaymentResponse = paymentResponse => {
 };
 
 // TODO: Mofify all regions ID
-const getShippingAmount = (region) => {
+const getShippingAmount = region => {
   switch (region) {
     case 'I':
       return 12000;
@@ -281,8 +293,8 @@ const getShippingAmount = (region) => {
     case 'VII':
       return 15000;
     default:
-      throw new Error('Region unrecognized')
+      throw new Error('Region unrecognized');
   }
-}
+};
 
 module.exports = { createOrderPayment, confirmOrderPayment };
