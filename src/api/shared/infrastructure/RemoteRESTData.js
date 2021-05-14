@@ -28,13 +28,12 @@ async function GETRequest(baseURL, url, query, body, headers) {
 
 async function POSTRequest(baseURL, url, query, body) {
   try {
-    console.log('baseurl + url : ', baseURL + url);
-    console.log('query: ', query);
-    console.log('body: ', body);
     const response = await axios({
+      baseURL,
+      headers: body.getHeaders(),
       method: 'POST',
-      url: baseURL + url,
-      //params: query,
+      url,
+      params: query,
       data: body
     });
     return response.data;

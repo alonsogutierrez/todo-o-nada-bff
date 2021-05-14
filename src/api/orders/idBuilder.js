@@ -13,6 +13,7 @@ exports.generateOrderId = async () => {
 
 async function generateSerialNumber(type) {
   try {
+    logger.info('Generating orderNumber');
     const counter = await UniqueIdentifiers.findOneAndUpdate(
       { _id: type },
       {
