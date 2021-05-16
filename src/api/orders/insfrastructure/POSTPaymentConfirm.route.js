@@ -6,12 +6,9 @@ const logger = console;
 
 const action = async (req, res) => {
   try {
-    console.log('req: ', req);
-    console.log('req.query: ', req.query);
     console.log('req.body: ', req.body);
     console.log('req.params: ', req.params);
-    console.log('req.headers: ', req.headers);
-    const token = req.headers['x-request-id'];
+    const token = req.body.token ? req.body.token : req.params.token;
     console.log('token: ', token);
     logger.info('Validating query: ', token);
     if (!isValidQuery({ token })) {
