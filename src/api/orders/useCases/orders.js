@@ -237,6 +237,7 @@ const signMessage = objectToSign => {
     messageToSign,
     FLOW_API_SECRET_KEY
   ).toString();
+  logger.info('Signed message: ', signedMessage);
   return signedMessage;
 };
 
