@@ -6,8 +6,8 @@ const logger = console;
 
 const action = async (req, res) => {
   try {
-    console.log('req: ', req);
-    const { token } = req.body;
+    const token = req.headers['x-request-id'];
+    console.log('token: ', token);
     logger.info('Validating query: ', token);
     if (!isValidQuery({ token })) {
       res.status(HTTPCodes.BAD_REQUEST).send({
