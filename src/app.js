@@ -1,4 +1,5 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const cors = require('cors');
 const { connectWithMongodDB } = require('./db/mongoose');
 const orderRouter = require('./api/orders/routes/order');
@@ -18,8 +19,10 @@ try {
 
 const app = express();
 
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 app.use(express.json());
+//app.use(bodyParser.json());
 app.use(healthRouter);
 app.use(orderRouter);
 app.use(productRouter);
