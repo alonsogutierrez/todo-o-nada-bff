@@ -6,7 +6,7 @@ const logger = console;
 
 const action = async (req, res) => {
   try {
-    console.log('req: ', JSON.stringify(req));
+    console.log('req: ', req);
     const { token } = req.body;
     logger.info('Validating query: ', token);
     if (!isValidQuery({ token })) {
