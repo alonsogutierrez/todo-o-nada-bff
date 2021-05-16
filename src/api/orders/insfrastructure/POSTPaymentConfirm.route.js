@@ -6,6 +6,7 @@ const logger = console;
 
 const action = async (req, res) => {
   try {
+    console.log('req.headers: ', req.headers);
     console.log('req.url: ', req.url);
     console.log('req.query: ', req.query);
     console.log('req.body: ', req.body);
