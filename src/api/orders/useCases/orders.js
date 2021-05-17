@@ -96,6 +96,7 @@ const confirmOrderPayment = async token => {
       }
       let { products } = orderPaid;
       products = await updateStockProducts(products);
+      logger.info('Products well updated');
       const orderPaidUpdated = await updateOrderStatus(
         commerceOrder,
         products,
@@ -144,7 +145,7 @@ const updateStockProducts = async products => {
         message: 'Product not found in repository'
       };
     }
-    const { details } = productInDB;
+    let { details } = productInDB;
     details = details.map(detail => {
       return {
         ...detail,
