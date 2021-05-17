@@ -84,76 +84,28 @@ const confirmOrderPayment = async token => {
   switch (status) {
     case STATUS_PAYMENT_RESPONSE['PAYED']:
       console.log('commerceOrder: ', commerceOrder);
-      let paidOrder = await OrderRepository.findOne({
+      let orderPaid = await OrderRepository.findOne({
         orderNumber: commerceOrder
       });
       logger.info('Trying to update order: ', commerceOrder);
-      if (!paidOrder) {
+      if (!orderPaid) {
         return {
           code: 404,
           message: 'Order not found in repository'
         };
       }
-      let { products } = paidOrder;
-      products = products.map(async product => {
-        const { itemNumber, sku, quantity } = product;
-        const productInDB = await ProductRepository.findOne({
-          itemNumber,
-          details: {
-            $elemMatch: {
-              sku
-            }
-          }
-        });
-        if (!productInDB) {
-          return {
-            code: 404,
-            message: 'Product not found in repository'
-          };
-        }
-        const { details } = productInDB;
-        details = details.map(detail => {
-          return {
-            ...detail,
-            stock: detail.stock - quantity
-          };
-        });
-        await ProductRepository.updateOne(
-          {
-            itemNumber,
-            details: {
-              $elemMatch: {
-                sku
-              }
-            }
-          },
-          {
-            details
-          }
-        );
-        logger.info('Product well updated');
-        return {
-          ...product,
-          inventoryState: {
-            state: 'confirmed'
-          }
-        };
-        // TODO: Update elastic repository
-      });
-      paidOrder = await OrderRepository.updateOne(
-        {
-          orderNumber: commerceOrder
-        },
-        {
-          status: 'paid',
-          products
-        }
+      let { products } = orderPaid;
+      products = await updateStockProducts(products);
+      const orderPaidUpdated = await updateOrderStatus(
+        commerceOrder,
+        products,
+        'paid'
       );
       logger.info('Order well updated');
-      console.log('paidOrder: ', paidOrder);
+      console.log('orderPaid: ', orderPaidUpdated);
       //TODO: Create logic when an order is paid (validate and confirm inventory, change order state to paid)
       return {
-        paidOrder,
+        orderPaidUpdated,
         message: 'Order well updated'
       };
 
@@ -171,6 +123,69 @@ const confirmOrderPayment = async token => {
     default:
       throw new Error('Unrecognized payment status');
   }
+};
+
+const updateStockProducts = async products => {
+  const productsUpdated = await products.map(async product => {
+    console.log('product: ', product);
+    const { itemNumber, sku, quantity } = product;
+    const productInDB = await ProductRepository.findOne({
+      itemNumber,
+      details: {
+        $elemMatch: {
+          sku
+        }
+      }
+    });
+    console.log('productInDB: ', productInDB);
+    if (!productInDB) {
+      return {
+        code: 404,
+        message: 'Product not found in repository'
+      };
+    }
+    const { details } = productInDB;
+    details = details.map(detail => {
+      return {
+        ...detail,
+        stock: detail.stock - quantity
+      };
+    });
+    await ProductRepository.updateOne(
+      {
+        itemNumber,
+        details: {
+          $elemMatch: {
+            sku
+          }
+        }
+      },
+      {
+        details
+      }
+    );
+    logger.info('Product well updated');
+    return {
+      ...product,
+      inventoryState: {
+        state: 'confirmed'
+      }
+    };
+    // TODO: Update elastic repository
+  });
+  return productsUpdated;
+};
+
+const updateOrderStatus = async (orderNumber, products, status) => {
+  return await OrderRepository.updateOne(
+    {
+      orderNumber
+    },
+    {
+      status,
+      products
+    }
+  );
 };
 
 const generateOrderData = async order => {
