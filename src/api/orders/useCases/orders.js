@@ -96,7 +96,7 @@ const confirmOrderPayment = async token => {
       }
       let { products } = orderPaid;
       products = await updateStockProducts(products);
-      logger.info('Products well updated');
+      logger.info('Products well updated: ', products);
       const orderPaidUpdated = await updateOrderStatus(
         commerceOrder,
         products,
