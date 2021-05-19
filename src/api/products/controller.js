@@ -14,39 +14,46 @@ const uploadAndProcessLotsProducts = async (req, res) => {
     }
     let path = __dirname + '/src/uploads/' + req.file.filename;
     const productsFromExcel = [];
-    await readXlsxFile(path).then(rows => {
-      rows.shift();
-      rows.forEach(row => {
-        const [
-          itemNumber,
-          sku,
-          name,
-          description,
-          categories,
-          size,
-          color,
-          basePriceSales,
-          basePriceReference,
-          discount,
-          stock
-        ] = row;
-        const product = {
-          name,
-          description: description === null ? '' : description,
-          category: categories.split(','),
-          size,
-          color,
-          sku,
-          itemNumber,
-          price: {
-            basePriceSales: parseInt(basePriceSales),
-            basePriceReference: parseInt(basePriceReference),
-            discount: parseInt(discount)
-          },
-          stock
-        };
-        productsFromExcel.push(product);
-      });
+    let rows = [];
+    try {
+      logger.info('Going to read file');
+      rows = await readXlsxFile(path);
+      if (!rows) throw new Error(`There is not data: ${err.message}`);
+    } catch (err) {
+      throw new Error(`Error reading xlsx file: ${err.message}`);
+    }
+    logger.info('File well readed');
+    rows.shift();
+    rows.forEach(row => {
+      const [
+        itemNumber,
+        sku,
+        name,
+        description,
+        categories,
+        size,
+        color,
+        basePriceSales,
+        basePriceReference,
+        discount,
+        stock
+      ] = row;
+      const product = {
+        name,
+        description: description === null ? '' : description,
+        category: categories.split(','),
+        size,
+        color,
+        sku,
+        itemNumber,
+        price: {
+          basePriceSales: parseInt(basePriceSales),
+          basePriceReference: parseInt(basePriceReference),
+          discount: parseInt(discount)
+        },
+        stock
+      };
+      productsFromExcel.push(product);
     });
     logger.log('Procesaremos ', productsFromExcel.length, ' productos');
     for (const product of productsFromExcel) {
