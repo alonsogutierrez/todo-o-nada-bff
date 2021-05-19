@@ -145,14 +145,13 @@ const updateStockProducts = async products => {
           message: 'Product not found in repository'
         };
       }
-      let { details: productDetails } = productInDB;
+      const { details: productDetails } = productInDB;
       logger.info('Actual details: ', productDetails);
       const newProductDetails = productDetails.map(productDetail => {
         logger.info('productDetail: ', productDetail)
         logger.info('productDetail.sku === sku): ', productDetail.sku === sku)
         if (productDetail.sku === sku) {
-          let productDetailUpdated = productDetail
-          productDetailUpdated.stock = parseInt(productDetail.stock, 10) - parseInt(quantity, 10)
+          productDetail.stock = parseInt(productDetail.stock, 10) - parseInt(quantity, 10)
           logger.info('productUpdated: ', productDetailUpdated)
           return productDetailUpdated
         }
