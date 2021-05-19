@@ -126,68 +126,71 @@ const confirmOrderPayment = async token => {
   }
 };
 
-const updateStockProducts = async products => {
-  const productsUpdated = await products.map(async product => {
-    logger.info('product: ', product);
-    const { itemNumber, sku, quantity } = product;
-    let productInDB = await ProductRepository.findOne({
-      itemNumber,
-      details: {
-        $elemMatch: {
-          sku
-        }
-      }
-    });
-    logger.info('productInDB: ', productInDB);
-    if (!productInDB) {
-      return {
-        code: 404,
-        message: 'Product not found in repository'
-      };
-    }
-    let { details: productDetails } = productInDB;
-    logger.info('Actual details: ', productDetails);
-    const newProductDetails = productDetails.map(pDetail => {
-      console.log('pDetail: ', pDetail)
-      if (pDetail.sku === sku) {
-        return {
-          ...pDetail,
-          stock: parseInt(pDetail.stock, 10) - quantity
-        }
-      }
-      return pDetail
-    })
-    await ProductRepository.updateOne(
-      {
+const updateStockProducts = products => {
+  Promise.all(products.map(async product => {
+      logger.info('product: ', product);
+      const { itemNumber, sku, quantity } = product;
+      let productInDB = await ProductRepository.findOne({
         itemNumber,
         details: {
           $elemMatch: {
             sku
           }
         }
-      },
-      {
-        details: newProductDetails
+      });
+      logger.info('productInDB: ', productInDB);
+      if (!productInDB) {
+        return {
+          code: 404,
+          message: 'Product not found in repository'
+        };
       }
-    );
-    productInDBUpdated = await ProductRepository.findOne({
-      itemNumber,
-      details: {
-        $elemMatch: {
-          sku
+      let { details: productDetails } = productInDB;
+      logger.info('Actual details: ', productDetails);
+      const newProductDetails = productDetails.map(pDetail => {
+        console.log('pDetail: ', pDetail)
+        if (pDetail.sku === sku) {
+          return {
+            ...pDetail,
+            stock: parseInt(pDetail.stock, 10) - quantity
+          }
         }
-      }
-    });
-    logger.info('Product well updated: ', productInDBUpdated);
-    return {
-      ...productInDBUpdated,
-      inventoryState: {
-        state: 'confirmed'
-      }
-    };
+        return pDetail
+      })
+      await ProductRepository.updateOne(
+        {
+          itemNumber,
+          details: {
+            $elemMatch: {
+              sku
+            }
+          }
+        },
+        {
+          details: newProductDetails
+        }
+      );
+      productInDBUpdated = await ProductRepository.findOne({
+        itemNumber,
+        details: {
+          $elemMatch: {
+            sku
+          }
+        }
+      });
+      logger.info('Product well updated: ', productInDBUpdated);
+      return {
+        ...productInDBUpdated,
+        inventoryState: {
+          state: 'confirmed'
+        }
+      };
     // TODO: Update elastic repository
-  });
-  return productsUpdated;
+    })
+  )
+  logger.info('updateStockProducts: ', products)
+  
+  return products;
 };
 
 const updateOrderStatus = async (
