@@ -147,17 +147,6 @@ const updateStockProducts = async products => {
     }
     let { details } = productInDB;
     logger.info('Actual details: ', details);
-    details = details.map(detail => {
-      if (detail.sku === sku) {
-        logger.info('Updating sku stock');
-        return {
-          ...detail,
-          stock: parseInt(detail.stock, 10) - parseInt(quantity, 10)
-        };
-      }
-      return detail;
-    });
-    logger.info('Updated details: ', details);
     await ProductRepository.updateOne(
       {
         itemNumber,
@@ -168,7 +157,18 @@ const updateStockProducts = async products => {
         }
       },
       {
-        details
+        details: details.map(detail => {
+          if (detail.sku === sku) {
+            logger.info('Updating sku stock');
+            const newDetail = {
+              ...detail,
+              stock: parseInt(detail.stock, 10) - parseInt(quantity, 10)
+            };
+            logger.info('newDetail: ', newDetail);
+            return newDetail;
+          }
+          return detail;
+        })
       }
     );
     productInDBUpdated = await ProductRepository.findOne({
