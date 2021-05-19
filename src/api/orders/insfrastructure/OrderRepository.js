@@ -3,7 +3,7 @@ const Order = require('../../../db/models/order');
 const save = async orderData => {
   try {
     const order = new Order(orderData);
-    return await order.save().toJSON();
+    return await order.save();
   } catch (err) {
     throw new Error(`Can't save order in repository: ${err.message}`);
   }
