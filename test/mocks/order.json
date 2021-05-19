@@ -13,12 +13,10 @@
           "value": "texto 1"
         }
       ],
-      "prices": [
-        {
-          "BasePriceSales": 10990,
-          "BasePriceReference": 13990
-        }
-      ],
+      "price": {
+        "basePriceSales": 10990,
+        "basePriceReference": 13990
+      },
       "hasInventory": true,
       "quantity": 15
     }

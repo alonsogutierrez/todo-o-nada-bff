@@ -176,7 +176,7 @@ const updateStockProducts = async products => {
         }
       }
     });
-    logger.info('Product well updated');
+    logger.info('Product well updated: ', productInDB);
     return {
       ...productInDB,
       inventoryState: {

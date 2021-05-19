@@ -41,11 +41,11 @@ const productSchema = new mongoose.Schema(
       type: 'String'
     },
     price: {
-      BasePriceReference: {
+      basePriceReference: {
         required: true,
         type: 'Number'
       },
-      BasePriceSales: {
+      basePriceSales: {
         required: true,
         type: 'Number'
       },

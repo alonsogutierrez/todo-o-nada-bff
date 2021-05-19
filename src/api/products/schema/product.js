@@ -49,8 +49,8 @@ const productSchema = {
     price: {
       type: 'object',
       properties: {
-        BasePriceSales: { type: 'number' },
-        BasePriceReference: { type: 'number' },
+        basePriceSales: { type: 'number' },
+        basePriceReference: { type: 'number' },
         discount: { type: 'number' }
       }
     },

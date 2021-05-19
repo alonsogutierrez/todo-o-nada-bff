@@ -29,13 +29,11 @@
       "value": "13cm"
     }
   ],
-  "price": [
-    {
-      "BasePriceSales": 19990,
-      "BasePriceReference": 25990,
-      "discount": 0
-    }
-  ],
+  "price": {
+    "basePriceSales": 19990,
+    "basePriceReference": 25990,
+    "discount": 0
+  },
   "quantity": 50,
   "published": true,
   "hasSizes": true,

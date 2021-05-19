@@ -32,6 +32,7 @@ const isClientRunning = async () => {
             logger.error('ElasticSearch cluster is down');
             reject(false);
           } else {
+            logger.info('ElasticSearch is running well');
             resolve(true);
           }
         }
@@ -74,7 +75,7 @@ const SearchRequest = async (index, query, from = 0, size = 10) => {
   }
 };
 
-const UpdateRequest = async (index, type, id, body) => {
+const UpdateRequest = async (index, id, body) => {
   try {
     logger.log('Begin update request for id: ', id);
     const isElasticSearchClientRunning = await isClientRunning();
@@ -82,7 +83,6 @@ const UpdateRequest = async (index, type, id, body) => {
     if (isElasticSearchClientRunning) {
       const response = await elasticSearchClient.update({
         index,
-        type,
         id,
         body: {
           doc: body
@@ -96,7 +96,7 @@ const UpdateRequest = async (index, type, id, body) => {
   }
 };
 
-const CreateRequest = async (index, type, body) => {
+const CreateRequest = async (index, body) => {
   try {
     logger.log('Begin create request for body: ', body);
     const isElasticSearchClientRunning = await isClientRunning();
@@ -116,9 +116,9 @@ const CreateRequest = async (index, type, body) => {
     if (isElasticSearchClientRunning) {
       const response = await elasticSearchClient.index({
         index,
-        type,
         body
       });
+      logger.log('Product well indexed: ', response);
       return response;
     }
     throw new Error('ElasticSearch cluster is down');

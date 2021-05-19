@@ -26,7 +26,7 @@ const uploadAndProcessLotsProducts = async (req, res) => {
           size,
           color,
           basePriceSales,
-          BasePriceReference,
+          basePriceReference,
           discount,
           stock
         ] = row;
@@ -39,8 +39,8 @@ const uploadAndProcessLotsProducts = async (req, res) => {
           sku,
           itemNumber,
           price: {
-            BasePriceSales: parseInt(basePriceSales),
-            BasePriceReference: parseInt(BasePriceReference),
+            basePriceSales: parseInt(basePriceSales),
+            basePriceReference: parseInt(basePriceReference),
             discount: parseInt(discount)
           },
           stock
@@ -68,14 +68,13 @@ const uploadAndProcessLotsProducts = async (req, res) => {
       };
       const productFoundElasticRepository = await ElasticSearchRestData.SearchRequest(
         'products',
-        'product',
         { query }
       );
       const { hits } = productFoundElasticRepository;
-      if (hits) {
+      if (hits && Object.keys(hits).length > 0) {
         const { total } = hits;
         const { value } = total;
-        if (value > 0) {
+        if (total && value && value > 0) {
           const finalHits = hits.hits;
           const actualProduct = finalHits[0]._source;
           const newProductData = {
@@ -91,7 +90,6 @@ const uploadAndProcessLotsProducts = async (req, res) => {
 
           await ElasticSearchRestData.UpdateRequest(
             'products',
-            'product',
             finalHits[0]._id,
             newProductData
           );
@@ -107,11 +105,7 @@ const uploadAndProcessLotsProducts = async (req, res) => {
             price: product.price,
             quantity: product.stock
           };
-          await ElasticSearchRestData.CreateRequest(
-            'products',
-            'product',
-            newProduct
-          );
+          await ElasticSearchRestData.CreateRequest('products', newProduct);
         }
       } else {
         throw new Error(
@@ -143,7 +137,7 @@ const uploadAndProcessLotsProducts = async (req, res) => {
             price: product.price
           };
 
-          const doc = await Products.updateOne(
+          await Products.updateOne(
             { itemNumber: product.itemNumber },
             newProductData
           );
@@ -161,7 +155,7 @@ const uploadAndProcessLotsProducts = async (req, res) => {
             price: product.price,
             details: productFound.details.concat(newProductDetails)
           };
-          const doc = await Products.updateOne(
+          await Products.updateOne(
             { itemNumber: product.itemNumber },
             newProductData
           );
