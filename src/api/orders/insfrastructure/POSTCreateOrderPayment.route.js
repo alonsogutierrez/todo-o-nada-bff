@@ -14,7 +14,7 @@ const action = async (req, res) => {
       });
       return;
     }
-    logger.log('Begining to create order payment');
+    logger.log('Begining to create order payment: ', body);
     const createOrderPaymentResponse = await CreateOrderPaymentUseCases.createOrderPayment(
       body
     );
