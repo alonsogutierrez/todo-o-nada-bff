@@ -100,10 +100,10 @@ const confirmOrderPayment = async token => {
       const orderPaidUpdated = await updateOrderStatus(
         commerceOrder,
         products,
+        orderPaid.paymentData,
         'paid'
       );
-      logger.info('Order well updated');
-      console.log('orderPaid: ', orderPaidUpdated);
+      logger.info('Order well updated: ', orderPaidUpdated);
       //TODO: Create logic when an order is paid (validate and confirm inventory, change order state to paid)
       return {
         orderPaidUpdated,
@@ -177,13 +177,19 @@ const updateStockProducts = async products => {
   return productsUpdated;
 };
 
-const updateOrderStatus = async (orderNumber, products, status) => {
+const updateOrderStatus = async (
+  orderNumber,
+  products,
+  paymentData,
+  status
+) => {
+  paymentData.state = status;
   return await OrderRepository.updateOne(
     {
       orderNumber
     },
     {
-      status,
+      paymentData,
       products
     }
   );
@@ -240,7 +246,7 @@ const generatePaymentData = order => {
     payment_currency: 'CLP',
     subject: 'Creando pago para Todo o Nada Tatto Art',
     urlConfirmation: `${BASE_URL_BFF}/orders/payment_confirm`,
-    urlReturn: `${BASE_URL_FE}`
+    urlReturn: `${BASE_URL_FE}?orderNumber=${order.orderNumber}`
   };
 };
 

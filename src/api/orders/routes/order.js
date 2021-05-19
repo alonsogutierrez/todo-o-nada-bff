@@ -37,7 +37,14 @@ router.get('/orders', async (req, res) => {
         ' Orders found like orderNumber equal to ' +
         orderNumber
     );
-    res.status(200).send(orderDocs);
+    let order = orderDocs[0];
+    order = {
+      orderNumber: order.orderNumber,
+      paymentData: order.paymentData,
+      products: order.products,
+      createdAt: order.createdAt
+    };
+    res.status(200).send(order);
   } catch (e) {
     logger.error('Can`t found order: ', e.message);
     res.status(500).send(e.message);
