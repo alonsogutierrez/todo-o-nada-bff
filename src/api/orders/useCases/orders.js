@@ -152,7 +152,7 @@ const updateStockProducts = products => {
         if (pDetail.sku === sku) {
           return {
             ...pDetail,
-            stock: parseInt(pDetail.stock, 10) - quantity
+            stock: parseInt(pDetail.stock, 10) - parseInt(quantity, 10)
           }
         }
         return pDetail
@@ -180,7 +180,7 @@ const updateStockProducts = products => {
       });
       logger.info('Product well updated: ', productInDBUpdated);
       return {
-        ...productInDBUpdated,
+        ...product,
         inventoryState: {
           state: 'confirmed'
         }
