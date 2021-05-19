@@ -147,18 +147,16 @@ const updateStockProducts = products => {
       }
       let { details: productDetails } = productInDB;
       logger.info('Actual details: ', productDetails);
-      const newProductDetails = productDetails.map(pDetail => {
-        logger.info('pDetail: ', pDetail)
-        logger.info('pDetail.sku === sku): ', pDetail.sku === sku)
-        if (pDetail.sku === sku) {
-          const productUpdated = {
-            ...pDetail,
-            stock: parseInt(pDetail.stock, 10) - parseInt(quantity, 10)
-          }
-          logger.info('productUpdated: ', productUpdated)
-          return productUpdated
+      const newProductDetails = productDetails.map(productDetail => {
+        logger.info('productDetail: ', productDetail)
+        logger.info('productDetail.sku === sku): ', productDetail.sku === sku)
+        if (productDetail.sku === sku) {
+          let productDetailUpdated = productDetail
+          productDetailUpdated.stock = parseInt(productDetail.stock, 10) - parseInt(quantity, 10)
+          logger.info('productUpdated: ', productDetailUpdated)
+          return productDetailUpdated
         }
-        return pDetailåå
+        return productDetail
       })
       logger.info('newProductDetails: ', newProductDetails);
       await ProductRepository.updateOne(
