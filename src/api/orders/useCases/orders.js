@@ -83,7 +83,7 @@ const confirmOrderPayment = async token => {
   const { status, commerceOrder } = paymentStatusResponse;
   switch (status) {
     case STATUS_PAYMENT_RESPONSE['PAYED']:
-      console.log('commerceOrder: ', commerceOrder);
+      logger.info('commerceOrder: ', commerceOrder);
       let orderPaid = await OrderRepository.findOne({
         orderNumber: commerceOrder
       });
@@ -128,7 +128,7 @@ const confirmOrderPayment = async token => {
 
 const updateStockProducts = async products => {
   const productsUpdated = await products.map(async product => {
-    console.log('product: ', product);
+    logger.info('product: ', product);
     const { itemNumber, sku, quantity } = product;
     let productInDB = await ProductRepository.findOne({
       itemNumber,
@@ -138,7 +138,7 @@ const updateStockProducts = async products => {
         }
       }
     });
-    console.log('productInDB: ', productInDB);
+    logger.info('productInDB: ', productInDB);
     if (!productInDB) {
       return {
         code: 404,
@@ -233,7 +233,7 @@ const generateOrderData = async order => {
   };
   order.paymentData = paymentData;
   order.products = products.map(product => {
-    console.log('product from client: ', product);
+    logger.log('Product from client: ', product);
     return {
       ...product,
       inventoryState: {
