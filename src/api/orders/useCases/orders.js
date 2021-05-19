@@ -145,8 +145,8 @@ const updateStockProducts = async products => {
         message: 'Product not found in repository'
       };
     }
-    let { details } = productInDB;
-    logger.info('Actual details: ', details);
+    let { details: productDetails } = productInDB;
+    logger.info('Actual details: ', productDetails);
     await ProductRepository.updateOne(
       {
         itemNumber,
@@ -157,7 +157,7 @@ const updateStockProducts = async products => {
         }
       },
       {
-        details: details.map(detail => {
+        details: productDetails.map(detail => {
           if (detail.sku === sku) {
             logger.info('Updating sku stock');
             const newDetail = {
