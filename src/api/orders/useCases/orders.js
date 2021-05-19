@@ -126,8 +126,8 @@ const confirmOrderPayment = async token => {
   }
 };
 
-const updateStockProducts = products => {
-  return Promise.all(products.map(async product => {
+const updateStockProducts = async products => {
+  return await Promise.all(products.map(async product => {
       logger.info('product: ', product);
       const { itemNumber, sku, quantity } = product;
       let productInDB = await ProductRepository.findOne({
