@@ -127,7 +127,7 @@ const confirmOrderPayment = async token => {
 };
 
 const updateStockProducts = products => {
-  Promise.all(products.map(async product => {
+  return Promise.all(products.map(async product => {
       logger.info('product: ', product);
       const { itemNumber, sku, quantity } = product;
       let productInDB = await ProductRepository.findOne({
@@ -148,15 +148,19 @@ const updateStockProducts = products => {
       let { details: productDetails } = productInDB;
       logger.info('Actual details: ', productDetails);
       const newProductDetails = productDetails.map(pDetail => {
-        console.log('pDetail: ', pDetail)
+        logger.info('pDetail: ', pDetail)
+        logger.info('pDetail.sku === sku): ', pDetail.sku === sku)
         if (pDetail.sku === sku) {
-          return {
+          const productUpdated = {
             ...pDetail,
             stock: parseInt(pDetail.stock, 10) - parseInt(quantity, 10)
           }
+          logger.info('productUpdated: ', productUpdated)
+          return productUpdated
         }
-        return pDetail
+        return pDetailåå
       })
+      logger.info('newProductDetails: ', newProductDetails);
       await ProductRepository.updateOne(
         {
           itemNumber,
@@ -170,15 +174,6 @@ const updateStockProducts = products => {
           details: newProductDetails
         }
       );
-      productInDBUpdated = await ProductRepository.findOne({
-        itemNumber,
-        details: {
-          $elemMatch: {
-            sku
-          }
-        }
-      });
-      logger.info('Product well updated: ', productInDBUpdated);
       return {
         ...product,
         inventoryState: {
@@ -188,9 +183,6 @@ const updateStockProducts = products => {
     // TODO: Update elastic repository
     })
   )
-  logger.info('updateStockProducts: ', products)
-  
-  return products;
 };
 
 const updateOrderStatus = async (
