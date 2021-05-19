@@ -130,7 +130,7 @@ const updateStockProducts = async products => {
   const productsUpdated = await products.map(async product => {
     console.log('product: ', product);
     const { itemNumber, sku, quantity } = product;
-    const productInDB = await ProductRepository.findOne({
+    let productInDB = await ProductRepository.findOne({
       itemNumber,
       details: {
         $elemMatch: {
@@ -147,10 +147,13 @@ const updateStockProducts = async products => {
     }
     let { details } = productInDB;
     details = details.map(detail => {
-      return {
-        ...detail,
-        stock: detail.stock - quantity
-      };
+      if (detail.sku === sku) {
+        return {
+          ...detail,
+          stock: detail.stock - quantity
+        };
+      }
+      return detail;
     });
     await ProductRepository.updateOne(
       {
@@ -165,9 +168,17 @@ const updateStockProducts = async products => {
         details
       }
     );
+    productInDB = await ProductRepository.findOne({
+      itemNumber,
+      details: {
+        $elemMatch: {
+          sku
+        }
+      }
+    });
     logger.info('Product well updated');
     return {
-      ...product,
+      ...productInDB,
       inventoryState: {
         state: 'confirmed'
       }
@@ -218,7 +229,7 @@ const generateOrderData = async order => {
     shipping: getShippingAmount(city)
   };
   order.paymentData = paymentData;
-  products = products.map(product => {
+  order.products = products.map(product => {
     return {
       ...product,
       inventoryState: {
@@ -226,7 +237,6 @@ const generateOrderData = async order => {
       }
     };
   });
-  order.products = products;
   return order;
 };
 
