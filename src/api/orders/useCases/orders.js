@@ -171,12 +171,14 @@ const updateStockProducts = async products => {
           details: newProductDetails
         }
       );
-      return {
+      const productDetailsUpdated = {
         ...product,
         inventoryState: {
           state: 'confirmed'
         }
-      };
+      }
+      logger.info('productDetailsUpdated: ', productDetailsUpdated)
+      return productDetailsUpdated;
     // TODO: Update elastic repository
     })
   )

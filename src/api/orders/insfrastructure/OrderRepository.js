@@ -21,7 +21,7 @@ const findOne = async filters => {
 const updateOne = async (filters, newData) => {
   try {
     const order = await Order.updateOne(filters, newData);
-    return order.toJSON();
+    return order;
   } catch (err) {
     throw new Error(`Can't find order in repository: ${err.message}`);
   }

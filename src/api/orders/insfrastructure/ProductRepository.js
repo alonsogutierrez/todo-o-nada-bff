@@ -12,7 +12,7 @@ const findOne = async filters => {
 const updateOne = async (filters, newData) => {
   try {
     const productInDB = await Product.updateOne(filters, newData);
-    return productInDB.toJSON();
+    return productInDB;
   } catch (err) {
     throw new Error(`Product not found in db ${err.message}`);
   }
