@@ -152,8 +152,8 @@ const updateStockProducts = async products => {
         logger.info('productDetail.sku === sku): ', productDetail.sku === sku)
         if (productDetail.sku === sku) {
           productDetail.stock = parseInt(productDetail.stock, 10) - parseInt(quantity, 10)
-          logger.info('productUpdated: ', productDetailUpdated)
-          return productDetailUpdated
+          logger.info('productUpdated: ', productDetail)
+          return productDetail
         }
         return productDetail
       })
