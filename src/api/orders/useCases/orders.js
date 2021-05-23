@@ -130,6 +130,7 @@ const updateStockProducts = async products => {
   return await Promise.all(
     products.map(async product => {
       const { itemNumber, sku, quantity } = product;
+      logger.info('Trying to get product from product repository');
       let productInDB = await ProductRepository.findOne({
         itemNumber,
         details: {
@@ -139,11 +140,13 @@ const updateStockProducts = async products => {
         }
       });
       if (!productInDB) {
+        logger.info('Product is not found in product repository');
         return {
           code: 404,
           message: 'Product not found in repository'
         };
       }
+      logger.info('Product found in product repository');
       await updateProductRepository(productInDB, sku, quantity);
       await updateSearchProductRepository(itemNumber, sku, quantity);
       const productDetailsUpdated = {
@@ -160,6 +163,7 @@ const updateStockProducts = async products => {
 };
 
 const updateProductRepository = async (productInDB, sku, quantity) => {
+  logger.info('Trying to update product in product repository');
   const { details: productDetails, itemNumber } = productInDB;
   const newProductDetails = productDetails.map(productDetail => {
     if (productDetail.sku === sku) {
@@ -169,7 +173,7 @@ const updateProductRepository = async (productInDB, sku, quantity) => {
     }
     return productDetail;
   });
-  await ProductRepository.updateOne(
+  return await ProductRepository.updateOne(
     {
       itemNumber,
       details: {
@@ -185,6 +189,7 @@ const updateProductRepository = async (productInDB, sku, quantity) => {
 };
 
 const updateSearchProductRepository = async (itemNumber, sku, quantity) => {
+  logger.info('Trying to update product in search product repository');
   const query = {
     bool: {
       must: [
@@ -205,6 +210,10 @@ const updateSearchProductRepository = async (itemNumber, sku, quantity) => {
     query
   });
   const { hits } = productFound;
+  const productNotFoundResponse = {
+    code: 404,
+    message: 'Product not found in search repository'
+  };
   if (hits && Object.keys(hits).length > 0) {
     const { total } = hits;
     const { value } = total;
@@ -215,15 +224,15 @@ const updateSearchProductRepository = async (itemNumber, sku, quantity) => {
         ...actualProduct,
         quantity: parseInt(actualProduct.quantity, 10) - parseInt(quantity, 10)
       };
-      await ElasticSearchRestData.UpdateRequest(
+      return await ElasticSearchRestData.UpdateRequest(
         'products',
         finalHits[0]._id,
         newProductData
       );
     }
-  } else {
-    throw new Error('Product not found in search repository');
+    return productNotFoundResponse;
   }
+  return productNotFoundResponse;
 };
 
 const updateOrderStatus = async (
