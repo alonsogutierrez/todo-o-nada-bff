@@ -92,7 +92,8 @@ const uploadAndProcessLotsProducts = async (req, res) => {
             colors: product.color,
             sizeDetail: product.size,
             price: product.price,
-            quantity: Number(actualProduct.quantity) + Number(product.stock)
+            quantity:
+              parseInt(actualProduct.quantity, 10) + parseInt(product.stock, 10)
           };
 
           await ElasticSearchRestData.UpdateRequest(
