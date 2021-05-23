@@ -1,6 +1,7 @@
 const CryptoJS = require('crypto-js');
 const FormData = require('form-data');
 
+const ElasticSearchRestData = require('../../shared/infrastructure/ElasticSearchRESTData');
 const PaymentAPI = require('../insfrastructure/PaymentAPI');
 const OrderRepository = require('../insfrastructure/OrderRepository');
 const ProductRepository = require('../insfrastructure/ProductRepository');
@@ -130,7 +131,9 @@ const updateStockProducts = async products => {
   return await Promise.all(
     products.map(async product => {
       const { itemNumber, sku, quantity } = product;
-      logger.info('Trying to get product from product repository');
+      logger.info(
+        `Trying to get product from product repository: itemNumber ${itemNumber} & SKU ${sku}`
+      );
       let productInDB = await ProductRepository.findOne({
         itemNumber,
         details: {
@@ -140,13 +143,14 @@ const updateStockProducts = async products => {
         }
       });
       if (!productInDB) {
-        logger.info('Product is not found in product repository');
+        logger.info(
+          `Product is not found in product repository: itemNumber ${itemNumber} & SKU ${sku}`
+        );
         return {
           code: 404,
           message: 'Product not found in repository'
         };
       }
-      logger.info('Product found in product repository');
       await updateProductRepository(productInDB, sku, quantity);
       await updateSearchProductRepository(itemNumber, sku, quantity);
       const productDetailsUpdated = {
@@ -155,7 +159,7 @@ const updateStockProducts = async products => {
           state: 'confirmed'
         }
       };
-      logger.info('productDetailsUpdated: ', productDetailsUpdated);
+      logger.info('Product details updated: ', productDetailsUpdated);
       return productDetailsUpdated;
       // TODO: Update elastic repository
     })
@@ -163,9 +167,11 @@ const updateStockProducts = async products => {
 };
 
 const updateProductRepository = async (productInDB, sku, quantity) => {
-  logger.info('Trying to update product in product repository');
   const { details: productDetails, itemNumber } = productInDB;
   const newProductDetails = productDetails.map(productDetail => {
+    logger.info(
+      `Trying to update product in product repository: itemNumber ${itemNumber} & SKU ${productDetail.sku}`
+    );
     if (productDetail.sku === sku) {
       productDetail.stock =
         parseInt(productDetail.stock, 10) - parseInt(quantity, 10);
@@ -189,7 +195,9 @@ const updateProductRepository = async (productInDB, sku, quantity) => {
 };
 
 const updateSearchProductRepository = async (itemNumber, sku, quantity) => {
-  logger.info('Trying to update product in search product repository');
+  logger.info(
+    `Trying to update product in search product repository: itemNumber ${itemNumber} & SKU ${sku}`
+  );
   const query = {
     bool: {
       must: [
