@@ -223,26 +223,35 @@ const updateSearchProductRepository = async (itemNumber, sku, quantity) => {
     message: 'Product not found in search repository'
   };
   if (hits && Object.keys(hits).length > 0) {
-    logger.info('Product found in search repository', itemNumber, sku);
-    const { total } = hits;
-    const { value } = total;
-    logger.info('Total hits: ', value);
-    if (total && value && value > 0) {
-      const finalHits = hits.hits;
-      const actualProduct = finalHits[0]._source;
-      logger.info('Actual product data: ', actualProduct);
-      const newProductData = {
-        ...actualProduct,
-        quantity: parseInt(actualProduct.quantity, 10) - parseInt(quantity, 10)
-      };
-      logger.info('New product data: ', newProductData);
-      return await ElasticSearchRestData.UpdateRequest(
-        'products',
-        finalHits[0]._id,
-        newProductData
+    try {
+      logger.info(
+        'Product found in search repository',
+        itemNumber,
+        sku,
+        productFound
       );
+      const { total } = hits;
+      const { value } = total;
+      logger.info('Total hits: ', value);
+      if (total && value && value > 0) {
+        const finalHits = hits.hits;
+        const actualProduct = finalHits[0]._source;
+        logger.info('Actual product data: ', actualProduct);
+        const newProductData = {
+          ...actualProduct,
+          quantity:
+            parseInt(actualProduct.quantity, 10) - parseInt(quantity, 10)
+        };
+        logger.info('New product data: ', newProductData);
+        return await ElasticSearchRestData.UpdateRequest(
+          'products',
+          finalHits[0]._id,
+          newProductData
+        );
+      }
+    } catch (err) {
+      throw new Error(`Product not found in search repository: ${err.message}`);
     }
-    return productNotFoundResponse;
   }
   return productNotFoundResponse;
 };
