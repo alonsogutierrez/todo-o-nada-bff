@@ -231,9 +231,8 @@ const updateSearchProductRepository = async (itemNumber, sku, quantity) => {
         productFound
       );
       const { total } = hits;
-      const { value } = total;
-      logger.info('Total hits: ', value);
-      if (total && value && value > 0) {
+      logger.info('Total hits: ', total);
+      if (total > 0) {
         const finalHits = hits.hits;
         const actualProduct = finalHits[0]._source;
         logger.info('Actual product data: ', actualProduct);
