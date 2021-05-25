@@ -242,11 +242,13 @@ const updateSearchProductRepository = async (itemNumber, sku, quantity) => {
             parseInt(actualProduct.quantity, 10) - parseInt(quantity, 10)
         };
         logger.info('New product data: ', newProductData);
-        return await ElasticSearchRestData.UpdateRequest(
+        const updateRequestData = await ElasticSearchRestData.UpdateRequest(
           'products',
           finalHits[0]._id,
           newProductData
         );
+        logger.info('updateRequestData: ', newProductData);
+        return updateRequestData;
       }
     } catch (err) {
       throw new Error(`Product not found in search repository: ${err.message}`);

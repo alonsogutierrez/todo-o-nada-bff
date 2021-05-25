@@ -18,7 +18,7 @@
     "cors": "^2.8.5",
     "crypto-js": "^4.0.0",
     "date-fns": "^2.16.1",
-    "elasticsearch": "^16.7.2",
+    "elasticsearch": "16.7.2",
     "env-cmd": "^10.1.0",
     "exceljs": "^4.2.1",
     "express": "^4.17.1",
