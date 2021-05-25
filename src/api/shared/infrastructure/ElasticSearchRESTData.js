@@ -86,8 +86,10 @@ const UpdateRequest = async (index, id, body) => {
         id,
         body: {
           doc: body
-        }
+        },
+        refresh: true
       });
+      logger.info('response update request: ', response);
       return response;
     }
     throw new Error('ElasticSearch cluster is down');
