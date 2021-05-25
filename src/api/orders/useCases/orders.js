@@ -241,7 +241,6 @@ const updateSearchProductRepository = async (itemNumber, sku, quantity) => {
           quantity:
             parseInt(actualProduct.quantity, 10) - parseInt(quantity, 10)
         };
-        logger.info('New product data: ', newProductData);
         const updateRequestData = await ElasticSearchRestData.UpdateRequest(
           'products',
           finalHits[0]._id,

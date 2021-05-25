@@ -122,10 +122,7 @@ const uploadAndProcessLotsProducts = async (req, res) => {
             quantity: product.stock
           };
           await ElasticSearchRestData.CreateRequest('products', newProduct);
-          logger.info(
-            'Product well created in search repository',
-            newProductData
-          );
+          logger.info('Product well created in search repository', newProduct);
         }
       } else {
         throw new Error(

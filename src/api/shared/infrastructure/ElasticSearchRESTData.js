@@ -71,10 +71,7 @@ const UpdateRequest = async (index, id, body) => {
       const response = await elasticSearchClient.index({
         id,
         index,
-        body: {
-          doc: body
-        },
-        refresh: true
+        body
       });
       logger.info('Response update request: ', response);
       return response;

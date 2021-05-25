@@ -1,5 +1,8 @@
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
+
+const logger = console;
 
 __dirname = path.resolve();
 const excelFilter = (req, file, cb) => {
@@ -15,11 +18,14 @@ const excelFilter = (req, file, cb) => {
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, __dirname + '/src/uploads/');
+    logger.info('dirname: ', __dirname);
+    const path = `/src/uploads/`;
+    fs.mkdirSync(__dirname + path, { recursive: true });
+    return cb(null, __dirname + path);
   },
   filename: (req, file, cb) => {
-    console.log('file upload, filename -> ', file.originalname);
-    cb(null, `${Date.now()}-${file.originalname}`);
+    logger.info('file upload, filename -> ', file.originalname);
+    return cb(null, `${Date.now()}-${file.originalname}`);
   }
 });
 
