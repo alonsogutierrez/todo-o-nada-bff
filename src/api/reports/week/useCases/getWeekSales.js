@@ -14,7 +14,7 @@ const getWeekSales = async () => {
   }
   const orders = await Order.find(
     {
-      'paymentData.state': 'created',
+      'paymentData.state': 'paid',
       createdAt: {
         $gte: new Date(from7DaysBefore),
         $lte: new Date(todayDay)

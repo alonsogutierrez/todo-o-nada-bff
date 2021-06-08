@@ -1,5 +1,6 @@
 const CryptoJS = require('crypto-js');
 const FormData = require('form-data');
+const { nanoid } = require('nanoid');
 
 const ElasticSearchRestData = require('../../shared/infrastructure/ElasticSearchRESTData');
 const PaymentAPI = require('../insfrastructure/PaymentAPI');
@@ -70,7 +71,7 @@ const createOrderPayment = async order => {
 };
 
 const confirmOrderPayment = async token => {
-  logger.info('Begin to confirm order payment');
+  logger.info(`Begin to confirm order payment with token: ${token}`);
   const objectToSign = {
     apiKey: FLOW_API_KEY,
     token
@@ -296,6 +297,7 @@ const generateOrderData = async order => {
     subTotal: subTotal,
     shipping: getShippingAmount(city)
   };
+  order.token = nanoid();
   order.paymentData = paymentData;
   order.products = products.map(product => {
     logger.log('Product from client: ', product);
@@ -310,7 +312,7 @@ const generateOrderData = async order => {
 };
 
 const generatePaymentData = order => {
-  const { paymentData } = order;
+  const { paymentData, token } = order;
   const {
     transaction: { subTotal, shipping },
     user: { email }
@@ -325,7 +327,7 @@ const generatePaymentData = order => {
     payment_currency: 'CLP',
     subject: 'Creando pago para Todo o Nada Tatto Art',
     urlConfirmation: `${BASE_URL_BFF}/orders/payment_confirm`,
-    urlReturn: `${BASE_URL_FE}?orderNumber=${order.orderNumber}`
+    urlReturn: `${BASE_URL_FE}?orderNumber=${order.orderNumber}&token=${token}`
   };
 };
 

@@ -119,11 +119,11 @@ const getSKU = product => {
 };
 
 const getItemPrice = product => {
-  const { prices } = product;
-  if (prices === undefined) {
-    throw new Error(`invalid prices: ${data.orderNumber}`);
+  const { price } = product;
+  if (price === undefined) {
+    throw new Error(`Invalid price: ${data.orderNumber}`);
   }
-  return prices[0].basePriceSales;
+  return price.basePriceSales;
 };
 
 const getQuantity = product => {

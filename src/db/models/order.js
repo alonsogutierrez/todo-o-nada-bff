@@ -110,6 +110,10 @@ const orderSchema = new mongoose.Schema(
       apiResponse: {
         type: Object
       }
+    },
+    token: {
+      type: String,
+      required: true
     }
   },
   {

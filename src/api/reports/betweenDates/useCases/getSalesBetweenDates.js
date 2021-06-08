@@ -10,7 +10,7 @@ const getSalesBetweenDates = async (startDate, endDate) => {
   const end = format(parseISO(endDate), dateDBFormat);
   const orders = await Order.find(
     {
-      'paymentData.state': 'created', //TODO: Change by 'paid'
+      'paymentData.state': 'paid',
       createdAt: {
         $gte: new Date(start),
         $lte: new Date(end)
