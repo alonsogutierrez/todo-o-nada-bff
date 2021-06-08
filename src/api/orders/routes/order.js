@@ -22,14 +22,23 @@ router.get('/orders', async (req, res) => {
     if (!query) {
       throw new Error('Invalid request');
     }
-    const { orderNumber } = query;
+    const { orderNumber, id } = query;
     if (!orderNumber) {
       throw new Error('Invalid orderNumber');
     }
-    const orderDocs = await Order.find({
-      orderNumber: Number(orderNumber)
-    });
-    if (!orderDocs) {
+    let orderDocs = [];
+    if (!id) {
+      orderDocs = await Order.find({
+        orderNumber: Number(orderNumber)
+      });
+    } else {
+      orderDocs = await Order.find({
+        orderNumber: Number(orderNumber),
+        uuid: id
+      });
+    }
+
+    if (!orderDocs || orderDocs.length < 1) {
       res.status(404).send('Order not found');
     }
     logger.log(

@@ -297,7 +297,7 @@ const generateOrderData = async order => {
     subTotal: subTotal,
     shipping: getShippingAmount(city)
   };
-  order.token = nanoid();
+  order.uuid = nanoid();
   order.paymentData = paymentData;
   order.products = products.map(product => {
     logger.log('Product from client: ', product);
@@ -312,7 +312,7 @@ const generateOrderData = async order => {
 };
 
 const generatePaymentData = order => {
-  const { paymentData, token } = order;
+  const { paymentData, uuid } = order;
   const {
     transaction: { subTotal, shipping },
     user: { email }
@@ -327,7 +327,7 @@ const generatePaymentData = order => {
     payment_currency: 'CLP',
     subject: 'Creando pago para Todo o Nada Tatto Art',
     urlConfirmation: `${BASE_URL_BFF}/orders/payment_confirm`,
-    urlReturn: `${BASE_URL_FE}?orderNumber=${order.orderNumber}&token=${token}`
+    urlReturn: `${BASE_URL_FE}?orderNumber=${order.orderNumber}&id=${uuid}`
   };
 };
 

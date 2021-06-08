@@ -111,7 +111,7 @@ const orderSchema = new mongoose.Schema(
         type: Object
       }
     },
-    token: {
+    uuid: {
       type: String,
       required: true
     }
