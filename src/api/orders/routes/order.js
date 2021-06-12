@@ -39,7 +39,9 @@ router.get('/orders', async (req, res) => {
     }
 
     if (!orderDocs || orderDocs.length < 1) {
-      res.status(404).send('Order not found');
+      res.status(404).send({
+        message: 'Order not found'
+      });
     }
     logger.log(
       orderDocs.length +
