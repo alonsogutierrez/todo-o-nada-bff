@@ -1,7 +1,6 @@
 const readXlsxFile = require('read-excel-file/node');
 const path = require('path');
 const Products = require('../../db/models/product');
-
 const ElasticSearchRestData = require('../shared/infrastructure/ElasticSearchRESTData');
 
 __dirname = path.resolve();
@@ -275,5 +274,5 @@ module.exports = {
   findProductByItemNumber,
   findAllProducts,
   findProductsByParentCategory,
-  findProductsByParentChildCategory
+  findProductsByParentChildCategory,
 };
