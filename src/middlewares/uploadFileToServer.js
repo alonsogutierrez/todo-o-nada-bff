@@ -5,7 +5,9 @@ __dirname = path.resolve();
 const excelFilter = (req, file, cb) => {
     if (
         file.mimetype.includes("excel") ||
-        file.mimetype.includes("spreadsheetml")
+        file.mimetype.includes("spreadsheetml") ||
+        file.mimetype.includes("png") ||
+        file.mimetype.includes("jpg")
     ) {
         cb(null, true);
     } else {
