@@ -1,14 +1,15 @@
 const express = require('express');
 const saveProduct = require('./useCases/saveProduct');
 const router = new express.Router();
-const upload = require('../../middlewares/upload');
+const uploadFileToServer = require('../../middlewares/uploadFileToServer');
+const uploadS3 = require('../../middlewares/uploadS3');
 const controller = require('./controller');
 
 const logger = console;
 
 router.post(
   '/product/upload',
-  upload.single('file'),
+    uploadFileToServer.single('file'),
   controller.uploadAndProcessLotsProducts
 );
 
@@ -22,6 +23,7 @@ router.post('/product', async (req, res) => {
   }
 });
 
+router.post('/product/uploadImage', uploadS3.uploadImagesS3)
 router.get('/product', controller.findAllProducts);
 router.get('/product/itemNumber/:itemNumber', controller.findProductByItemNumber)
 router.get('/product/category/:category', controller.findProductsByParentCategory)
