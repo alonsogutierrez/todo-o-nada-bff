@@ -22,11 +22,11 @@ const productSchema = {
       type: 'string',
       description: 'product description'
     },
+    color: { type: 'string' },
     details: {
       type: 'array',
       items: {
         sku: { type: 'number' },
-        color: { type: 'string' },
         size: { type: 'string' },
         stock: { type: 'number' },
         pictures: {
