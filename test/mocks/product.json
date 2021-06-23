@@ -1,13 +1,36 @@
 {
-  "name": "test01",
-  "category": [{ "name": "cat01", "code": "111" }],
-  "sku": 1111,
-  "description": "test description",
-  "sizes": [{ "name": "testSize01" }],
+  "name": "coleccion dragon",
+  "category": ["hombre", "coleccion", "verano"],
+  "itemNumber": 1,
+  "description": "polera basica cuello V hombre",
   "specifications": [{ "name": "color", "order": 1, "value": "red" }],
-  "price": { "basePriceSales": 1000, "basePriceReference": 10001 },
   "hasInventory": true,
   "hasSizes": true,
-  "quantity": 10,
-  "pictures": [{ "image": "image01.png", "priority": 1 }]
+  "published": true,
+  "price": {
+    "basePriceSales": 20000,
+    "basePriceReference": 15000,
+    "discount": 0
+  },
+  "quantity": 1,
+  "details": [
+    {
+      "sku": 1001,
+      "size": "s",
+      "stock": 5,
+      "pictures": [{ "image": "image01.png", "order": 1 }]
+    },
+    {
+      "sku": 1002,
+      "size": "m",
+      "stock": 10,
+      "pictures": [{ "image": "image01.png", "order": 1 }]
+    },
+    {
+      "sku": 1003,
+      "size": "l",
+      "stock": 20,
+      "pictures": [{ "image": "image01.png", "order": 1 }]
+    }
+  ]
 }
