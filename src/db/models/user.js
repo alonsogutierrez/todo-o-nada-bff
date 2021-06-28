@@ -1,13 +1,16 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
     },
     password: {
       type: String,
@@ -18,7 +21,7 @@ const userSchema = new mongoose.Schema(
         if (password.toLowerCase().includes('password')) {
           throw new Error(`Password can't be 'password'`);
         }
-      }
+      },
     },
     email: {
       type: String,
@@ -30,7 +33,7 @@ const userSchema = new mongoose.Schema(
         if (!validator.isEmail(email)) {
           throw new Error('Email is invalid');
         }
-      }
+      },
     },
     age: {
       type: Number,
@@ -39,26 +42,44 @@ const userSchema = new mongoose.Schema(
         if (age < 0) {
           throw new Error('Age cant be minor to zero');
         }
-      }
+      },
     },
     tokens: [
       {
         token: {
           type: String,
-          required: true
-        }
-      }
+          required: true,
+        },
+      },
     ],
     avatar: {
-      type: Buffer
-    }
+      type: Buffer,
+    },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 
-userSchema.methods.toJSON = function() {
+userSchema.methods.generateAuthToken = async function () {
+  const user = this;
+  const token = jwt.sign(
+    {
+      _id: user._id.toString(),
+    },
+    JWT_SECRET,
+    {
+      expiresIn: '7 days',
+    }
+  );
+
+  user.tokens = user.tokens.concat({ token });
+  await user.save();
+
+  return token;
+};
+
+userSchema.methods.toJSON = function () {
   const user = this;
   const userObject = user.toObject();
 
@@ -85,7 +106,7 @@ userSchema.statics.findByCredentials = async (email, password) => {
   return user;
 };
 
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
   const user = this;
 
   if (user.isModified('password')) {

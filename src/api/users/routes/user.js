@@ -23,8 +23,9 @@ router.post('/users/login', async (req, res) => {
       req.body.email,
       req.body.password
     );
+    const token = await user.generateAuthToken();
     logger.log('User succesfully login');
-    res.send({ user });
+    res.send({ user, token });
   } catch (e) {
     logger.error('Cant login user');
     res.status(401).send(e.message);
@@ -35,7 +36,7 @@ router.get('/users/profile', async (req, res) => {
   try {
     const email = req.query.userId;
     const user = await User.find({
-      email
+      email,
     });
     logger.log('User profile OK');
     res.status(200).send({ user });
