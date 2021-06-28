@@ -1,21 +1,16 @@
 const express = require('express');
+
+const POSTCreateUserRoute = require('./../infrastructure/POSTCreateUser.route');
 const User = require('../../../db/models/user');
+
 const router = new express.Router();
 
 const logger = console;
 
-router.post('/users', async (req, res) => {
-  const user = new User(req.body);
-  try {
-    await user.save();
-    logger.log('User saved succesfully');
-    const token = await user.generateAuthToken();
-    res.status(201).send({ user, token });
-  } catch (e) {
-    logger.error('Can`t save user: ', e.message);
-    res.status(500).send(e.message);
-  }
-});
+router[POSTCreateUserRoute.method.toLocaleLowerCase()](
+  POSTCreateUserRoute.route,
+  POSTCreateUserRoute.action
+);
 
 router.post('/users/login', async (req, res) => {
   try {
