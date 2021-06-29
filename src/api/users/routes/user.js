@@ -2,9 +2,9 @@ const express = require('express');
 
 const POSTCreateUserRoute = require('./../infrastructure/POSTCreateUser.route');
 const User = require('../../../db/models/user');
+const auth = require('./../../../middlewares/auth');
 
 const router = new express.Router();
-
 const logger = console;
 
 router[POSTCreateUserRoute.method.toLocaleLowerCase()](
@@ -27,7 +27,7 @@ router.post('/users/login', async (req, res) => {
   }
 });
 
-router.get('/users/profile', async (req, res) => {
+router.get('/users/profile', auth, async (req, res) => {
   try {
     const email = req.query.userId;
     const user = await User.find({

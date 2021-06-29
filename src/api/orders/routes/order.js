@@ -23,24 +23,18 @@ router.get('/orders', async (req, res) => {
       throw new Error('Invalid request');
     }
     const { orderNumber, id } = query;
-    if (!orderNumber) {
-      throw new Error('Invalid orderNumber');
+    if (!orderNumber || !id) {
+      throw new Error('Invalid params');
     }
     let orderDocs = [];
-    if (!id) {
-      orderDocs = await Order.find({
-        orderNumber: Number(orderNumber)
-      });
-    } else {
-      orderDocs = await Order.find({
-        orderNumber: Number(orderNumber),
-        uuid: id
-      });
-    }
+    orderDocs = await Order.find({
+      orderNumber: Number(orderNumber),
+      uuid: id,
+    });
 
     if (!orderDocs || orderDocs.length < 1) {
       res.status(404).send({
-        message: 'Order not found'
+        message: 'Order not found',
       });
     }
     logger.log(
@@ -53,7 +47,7 @@ router.get('/orders', async (req, res) => {
       orderNumber: order.orderNumber,
       paymentData: order.paymentData,
       products: order.products,
-      createdAt: order.createdAt
+      createdAt: order.createdAt,
     };
     res.status(200).send(order);
   } catch (e) {

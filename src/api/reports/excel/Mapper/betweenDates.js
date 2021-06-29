@@ -1,6 +1,6 @@
 const dateFns = require('date-fns');
 
-const getOrderNumber = data => {
+const getOrderNumber = (data) => {
   const { orderNumber } = data;
   if (Number.isInteger(orderNumber)) {
     return orderNumber;
@@ -8,7 +8,7 @@ const getOrderNumber = data => {
   throw new Error(`Cant get order number: ${data.orderNumber}`);
 };
 
-const getTransactionDate = data => {
+const getTransactionDate = (data) => {
   const { createdAt } = data;
   if (createdAt === undefined) {
     throw new Error(`invalid date ${data.orderNumber}`);
@@ -20,7 +20,7 @@ const getTransactionDate = data => {
   throw new Error(`Cant get transaction date ${data.orderNumber}`);
 };
 
-const getClientNames = data => {
+const getClientNames = (data) => {
   const { paymentData } = data;
   if (paymentData === undefined) {
     throw new Error(`invalid paymentData ${data.orderNumber}`);
@@ -36,7 +36,7 @@ const getClientNames = data => {
   return firstName + ' ' + lastName;
 };
 
-const getClientEmail = data => {
+const getClientEmail = (data) => {
   const { paymentData } = data;
   if (paymentData === undefined) {
     throw new Error(`invalid paymentData ${data.orderNumber}`);
@@ -52,7 +52,7 @@ const getClientEmail = data => {
   return email;
 };
 
-const getSubTotal = data => {
+const getSubTotal = (data) => {
   const { paymentData } = data;
   if (paymentData === undefined) {
     throw new Error(`invalid paymentData ${data.orderNumber}`);
@@ -68,7 +68,7 @@ const getSubTotal = data => {
   return subTotal;
 };
 
-const getShippingTotal = data => {
+const getShippingTotal = (data) => {
   const { paymentData } = data;
   if (paymentData === undefined) {
     throw new Error(`invalid paymentData ${data.orderNumber}`);
@@ -84,7 +84,7 @@ const getShippingTotal = data => {
   return shipping;
 };
 
-const getTotal = data => {
+const getTotal = (data) => {
   const { paymentData } = data;
   if (paymentData === undefined) {
     throw new Error(`invalid paymentData: ${data.orderNumber}`);
@@ -100,7 +100,7 @@ const getTotal = data => {
   return shipping + subTotal;
 };
 
-const getItemNumber = product => {
+const getItemNumber = (product) => {
   const { itemNumber } = product;
   if (itemNumber === undefined) {
     console.error('itemNumber undefined');
@@ -109,7 +109,7 @@ const getItemNumber = product => {
   return itemNumber;
 };
 
-const getSKU = product => {
+const getSKU = (product) => {
   const { sku } = product;
   if (sku === undefined) {
     console.error('sku undefined');
@@ -118,18 +118,18 @@ const getSKU = product => {
   return sku;
 };
 
-const getItemPrice = product => {
+const getItemPrice = (product) => {
   const { price } = product;
   if (price === undefined) {
-    throw new Error(`Invalid price: ${data.orderNumber}`);
+    throw new Error(`Invalid price`);
   }
   return price.basePriceSales;
 };
 
-const getQuantity = product => {
+const getQuantity = (product) => {
   const { quantity } = product;
   if (quantity === undefined) {
-    throw new Error(`invalid quantity: ${data.orderNumber}`);
+    throw new Error(`invalid quantity`);
   }
   return quantity;
 };
@@ -145,5 +145,5 @@ module.exports = {
   getItemNumber,
   getSKU,
   getItemPrice,
-  getQuantity
+  getQuantity,
 };
