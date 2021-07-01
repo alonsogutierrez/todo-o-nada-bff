@@ -18,12 +18,12 @@ const STATUS_PAYMENT_RESPONSE = {
   PAYMENT_PENDING: 1,
   PAYED: 2,
   REJECTED: 3,
-  CANCELED: 4
+  CANCELED: 4,
 };
 
 const logger = console;
 
-const createOrderPayment = async order => {
+const createOrderPayment = async (order) => {
   try {
     logger.info('Creating order payment', order);
     order = await generateOrderData(order);
@@ -51,7 +51,7 @@ const createOrderPayment = async order => {
       const createOrderPaymentResponse = {
         redirect_to: `${url}?token=${token}`,
         flowOrder,
-        orderData
+        orderData,
       };
       return createOrderPaymentResponse;
     }
@@ -70,11 +70,11 @@ const createOrderPayment = async order => {
   }
 };
 
-const confirmOrderPayment = async token => {
+const confirmOrderPayment = async (token) => {
   logger.info(`Begin to confirm order payment with token: ${token}`);
   const objectToSign = {
     apiKey: FLOW_API_KEY,
-    token
+    token,
   };
   const signedMessage = signMessage(objectToSign);
   const paymentStatusResponse = await PaymentAPI.getPaymentStatus(
@@ -87,13 +87,13 @@ const confirmOrderPayment = async token => {
     case STATUS_PAYMENT_RESPONSE['PAYED']:
       logger.info('commerceOrder: ', commerceOrder);
       let orderPaid = await OrderRepository.findOne({
-        orderNumber: commerceOrder
+        orderNumber: commerceOrder,
       });
       logger.info('Trying to update order: ', commerceOrder);
       if (!orderPaid) {
         return {
           code: 404,
-          message: 'Order not found in repository'
+          message: 'Order not found in repository',
         };
       }
       let { products } = orderPaid;
@@ -109,7 +109,7 @@ const confirmOrderPayment = async token => {
       //TODO: Create logic when an order is paid (validate and confirm inventory, change order state to paid)
       return {
         orderPaidUpdated,
-        message: 'Order well updated'
+        message: 'Order well updated',
       };
 
     case STATUS_PAYMENT_RESPONSE['PAYMENT_PENDING']:
@@ -128,9 +128,9 @@ const confirmOrderPayment = async token => {
   }
 };
 
-const updateStockProducts = async products => {
-  return await Promise.all(
-    products.map(async product => {
+const updateStockProducts = async (products) => {
+  const productsUpdated = await Promise.all(
+    products.map(async (product) => {
       const { itemNumber, sku, quantity } = product;
       logger.info(
         `Trying to get product from product repository: itemNumber ${itemNumber} & SKU ${sku}`
@@ -139,9 +139,9 @@ const updateStockProducts = async products => {
         itemNumber,
         details: {
           $elemMatch: {
-            sku
-          }
-        }
+            sku,
+          },
+        },
       });
       if (!productInDB) {
         logger.info(
@@ -149,7 +149,7 @@ const updateStockProducts = async products => {
         );
         return {
           code: 404,
-          message: 'Product not found in repository'
+          message: 'Product not found in repository',
         };
       }
       await updateProductRepository(productInDB, sku, quantity);
@@ -157,19 +157,20 @@ const updateStockProducts = async products => {
       const productDetailsUpdated = {
         ...product,
         inventoryState: {
-          state: 'confirmed'
-        }
+          state: 'confirmed',
+        },
       };
       logger.info('Product details updated: ', productDetailsUpdated);
       return productDetailsUpdated;
-      // TODO: Update elastic repository
     })
   );
+  logger.log('updateStockProducts => productsUpdated: ', productsUpdated);
+  return productsUpdated;
 };
 
 const updateProductRepository = async (productInDB, sku, quantity) => {
   const { details: productDetails, itemNumber } = productInDB;
-  const newProductDetails = productDetails.map(productDetail => {
+  const newProductDetails = productDetails.map((productDetail) => {
     logger.info(
       `Trying to update product in product repository: itemNumber ${itemNumber} & SKU ${productDetail.sku}`
     );
@@ -185,12 +186,12 @@ const updateProductRepository = async (productInDB, sku, quantity) => {
       itemNumber,
       details: {
         $elemMatch: {
-          sku
-        }
-      }
+          sku,
+        },
+      },
     },
     {
-      details: newProductDetails
+      details: newProductDetails,
     }
   );
 };
@@ -204,24 +205,24 @@ const updateSearchProductRepository = async (itemNumber, sku, quantity) => {
       must: [
         {
           match: {
-            itemNumber: itemNumber
-          }
+            itemNumber: itemNumber,
+          },
         },
         {
           match: {
-            sku: sku
-          }
-        }
-      ]
-    }
+            sku: sku,
+          },
+        },
+      ],
+    },
   };
   const productFound = await ElasticSearchRestData.SearchRequest('products', {
-    query
+    query,
   });
   const { hits } = productFound;
   const productNotFoundResponse = {
     code: 404,
-    message: 'Product not found in search repository'
+    message: 'Product not found in search repository',
   };
   if (hits && Object.keys(hits).length > 0) {
     try {
@@ -240,7 +241,7 @@ const updateSearchProductRepository = async (itemNumber, sku, quantity) => {
         const newProductData = {
           ...actualProduct,
           quantity:
-            parseInt(actualProduct.quantity, 10) - parseInt(quantity, 10)
+            parseInt(actualProduct.quantity, 10) - parseInt(quantity, 10),
         };
         const updateRequestData = await ElasticSearchRestData.UpdateRequest(
           'products',
@@ -266,26 +267,21 @@ const updateOrderStatus = async (
   paymentData.state = status;
   return await OrderRepository.updateOne(
     {
-      orderNumber
+      orderNumber,
     },
     {
       paymentData,
-      products
+      products,
     }
   );
 };
 
-const generateOrderData = async order => {
+const generateOrderData = async (order) => {
   const orderNumber = await idBuilder.generateOrderId();
   order.orderNumber = orderNumber;
   let { paymentData, products } = order;
-  const {
-    user: {
-      address: { city }
-    }
-  } = paymentData;
   let subTotal = 0;
-  products.forEach(product => {
+  products.forEach((product) => {
     subTotal +=
       parseInt(product.price.basePriceSales, 10) *
       parseInt(product.quantity, 10);
@@ -295,27 +291,29 @@ const generateOrderData = async order => {
     date: new Date(),
     discount: 0,
     subTotal: subTotal,
-    shipping: getShippingAmount(city)
+    shipping: 0,
   };
   order.uuid = nanoid();
   order.paymentData = paymentData;
-  order.products = products.map(product => {
+  order.products = products.map((product) => {
     logger.log('Product from client: ', product);
-    return {
+    const reservedProduct = {
       ...product,
       inventoryState: {
-        state: 'Reserved'
-      }
+        state: 'Reserved',
+      },
     };
+    logger.log('reservedProduct: ', reservedProduct);
+    return reservedProduct;
   });
   return order;
 };
 
-const generatePaymentData = order => {
+const generatePaymentData = (order) => {
   const { paymentData, uuid } = order;
   const {
     transaction: { subTotal, shipping },
-    user: { email }
+    user: { email },
   } = paymentData;
   // NOTE: All fields must be order alphabetically in asc way
   return {
@@ -327,11 +325,11 @@ const generatePaymentData = order => {
     payment_currency: 'CLP',
     subject: 'Creando pago para Todo o Nada Tatto Art',
     urlConfirmation: `${BASE_URL_BFF}/orders/payment_confirm`,
-    urlReturn: `${BASE_URL_FE}?orderNumber=${order.orderNumber}&id=${uuid}`
+    urlReturn: `${BASE_URL_FE}?orderNumber=${order.orderNumber}&id=${uuid}`,
   };
 };
 
-const signMessage = objectToSign => {
+const signMessage = (objectToSign) => {
   let messageToSign = '';
   for (const key in objectToSign) {
     messageToSign += key + objectToSign[key];
@@ -354,7 +352,7 @@ const generatePaymentFormData = (paymentData, signPaymentMessage) => {
     payment_currency,
     subject,
     urlConfirmation,
-    urlReturn
+    urlReturn,
   } = paymentData;
   const paymentFormData = new FormData();
 
@@ -372,40 +370,10 @@ const generatePaymentFormData = (paymentData, signPaymentMessage) => {
   return paymentFormData;
 };
 
-const isValidPaymentResponse = paymentResponse => {
+const isValidPaymentResponse = (paymentResponse) => {
   const { token, url, flowOrder } = paymentResponse;
   const isValid = token && url && flowOrder ? true : false;
   return isValid;
-};
-
-// TODO: Mofify all regions ID
-const getShippingAmount = region => {
-  switch (region) {
-    case 'I':
-      return 12000;
-    case 'II':
-      return 11000;
-    case 'III':
-      return 10000;
-    case 'IV':
-      return 9000;
-    case 'Región Metropolitana de Santiago':
-      return -1000;
-    case 'VI':
-      return 5000;
-    case 'VII':
-      return 7000;
-    case 'VII':
-      return 8000;
-    case 'VII':
-      return 10000;
-    case 'VII':
-      return 12000;
-    case 'VII':
-      return 15000;
-    default:
-      throw new Error('Region unrecognized');
-  }
 };
 
 module.exports = { createOrderPayment, confirmOrderPayment };
