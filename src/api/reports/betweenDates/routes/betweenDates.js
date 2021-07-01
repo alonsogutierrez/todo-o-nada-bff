@@ -1,17 +1,17 @@
+const express = require('express');
+
+const auth = require('./../../../../middlewares/auth');
 const getSalesBetweenDates = require('../useCases/getSalesBetweenDates');
 
-const express = require('express');
 const router = new express.Router();
-
 const logger = console;
 
-router.get('/reports/betweenDates', async (req, res) => {
+router.get('/reports/betweenDates', auth, async (req, res) => {
   try {
-    if (!req.query.startDate || !req.query.endDate) {
+    const { startDate, endDate } = req.query;
+    if (!startDate || !endDate) {
       throw new Error('Invalid dates');
     }
-    const startDate = req.query.startDate;
-    const endDate = req.query.endDate;
     logger.log(`Going to get sales between ${startDate} and ${endDate}`);
     const ordersBuffer = await getSalesBetweenDates(startDate, endDate);
     const fileName = `TodoONada_Report_${startDate}_${endDate}.xlsx`;

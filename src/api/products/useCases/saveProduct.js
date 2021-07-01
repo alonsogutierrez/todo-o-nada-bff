@@ -1,4 +1,3 @@
-const elasticSearch = require('elasticsearch');
 const { validate } = require('json-schema');
 
 const productSchema = require('../schema/product');
@@ -7,7 +6,7 @@ const ElasticSearchRestData = require('../../shared/infrastructure/ElasticSearch
 
 const logger = console;
 
-const saveProduct = async productInput => {
+const saveProduct = async (productInput) => {
   if (validate(productInput, productSchema)) {
     const product = new Product(productInput);
     logger.log('Trying to save product in MongoDB');
@@ -21,17 +20,13 @@ const saveProduct = async productInput => {
       name: product.name,
       categories: product.category,
       description: product.description,
-      colors: product.details.map(detail => detail.color),
-      sizeDetail: product.details.map(detail => detail.size),
+      colors: product.details.map((detail) => detail.color),
+      sizeDetail: product.details.map((detail) => detail.size),
       price: product.price,
-      quantity: product.quantity
+      quantity: product.quantity,
     };
     logger.log('Trying to save product document in elasticSearch');
-    await ElasticSearchRestData.CreateRequest(
-      'products',
-      'product',
-      productToIndex
-    );
+    await ElasticSearchRestData.CreateRequest('products', productToIndex);
     logger.log('Product well indexed in elasticSearch');
     return productToIndex;
   } else {

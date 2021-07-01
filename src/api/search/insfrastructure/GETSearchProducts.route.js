@@ -10,7 +10,7 @@ const action = async (req, res) => {
     logger.log('Validating query');
     if (!isValidQuery({ query })) {
       res.status(HTTPCodes.BAD_REQUEST).send({
-        error: 'Invalid params'
+        error: 'Invalid params',
       });
       return;
     }
@@ -23,7 +23,7 @@ const action = async (req, res) => {
     res.status(HTTPCodes.OK).send(searchProductsResponse);
   } catch (err) {
     res.status(HTTPCodes.INTERNAL_SERVER_ERROR).send({
-      error: `Can't search products: ${err.message}`
+      error: `Can't search products: ${err.message}`,
     });
   }
 };
@@ -31,5 +31,5 @@ const action = async (req, res) => {
 module.exports = {
   method: 'GET',
   route: '/search',
-  action
+  action,
 };

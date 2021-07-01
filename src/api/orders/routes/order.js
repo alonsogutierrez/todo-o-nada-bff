@@ -1,5 +1,6 @@
 const express = require('express');
 
+const auth = require('./../../../middlewares/auth');
 const POSTCreateOrderPayment = require('../insfrastructure/POSTCreateOrderPayment.route');
 const POSTPaymentConfirm = require('../insfrastructure/POSTPaymentConfirm.route');
 const Order = require('../../../db/models/order');
@@ -23,24 +24,18 @@ router.get('/orders', async (req, res) => {
       throw new Error('Invalid request');
     }
     const { orderNumber, id } = query;
-    if (!orderNumber) {
-      throw new Error('Invalid orderNumber');
+    if (!orderNumber || !id) {
+      throw new Error('Invalid params');
     }
     let orderDocs = [];
-    if (!id) {
-      orderDocs = await Order.find({
-        orderNumber: Number(orderNumber)
-      });
-    } else {
-      orderDocs = await Order.find({
-        orderNumber: Number(orderNumber),
-        uuid: id
-      });
-    }
+    orderDocs = await Order.find({
+      orderNumber: Number(orderNumber),
+      uuid: id,
+    });
 
     if (!orderDocs || orderDocs.length < 1) {
       res.status(404).send({
-        message: 'Order not found'
+        message: 'Order not found',
       });
     }
     logger.log(
@@ -53,7 +48,46 @@ router.get('/orders', async (req, res) => {
       orderNumber: order.orderNumber,
       paymentData: order.paymentData,
       products: order.products,
-      createdAt: order.createdAt
+      createdAt: order.createdAt,
+    };
+    res.status(200).send(order);
+  } catch (e) {
+    logger.error('Can`t found order: ', e.message);
+    res.status(500).send(e.message);
+  }
+});
+
+router.get('/orders/admin', auth, async (req, res) => {
+  try {
+    const query = req.query;
+    if (!query) {
+      throw new Error('Invalid request');
+    }
+    const { orderNumber } = query;
+    if (!orderNumber) {
+      throw new Error('Invalid params');
+    }
+    let orderDocs = [];
+    orderDocs = await Order.find({
+      orderNumber: Number(orderNumber),
+    });
+
+    if (!orderDocs || orderDocs.length < 1) {
+      res.status(404).send({
+        message: 'Order not found',
+      });
+    }
+    logger.log(
+      orderDocs.length +
+        ' Orders found like orderNumber equal to ' +
+        orderNumber
+    );
+    let order = orderDocs[0];
+    order = {
+      orderNumber: order.orderNumber,
+      paymentData: order.paymentData,
+      products: order.products,
+      createdAt: order.createdAt,
     };
     res.status(200).send(order);
   } catch (e) {
