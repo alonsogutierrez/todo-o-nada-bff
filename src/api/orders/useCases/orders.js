@@ -128,44 +128,60 @@ const confirmOrderPayment = async (token) => {
   }
 };
 
-const updateStockProducts = async (products) => {
-  const productsUpdated = await Promise.all(
-    products.map(async (product) => {
-      const { itemNumber, sku, quantity } = product;
-      logger.info(
-        `Trying to get product from product repository: itemNumber ${itemNumber} & SKU ${sku}`
-      );
-      let productInDB = await ProductRepository.findOne({
-        itemNumber,
-        details: {
-          $elemMatch: {
-            sku,
-          },
-        },
-      });
-      if (!productInDB) {
-        logger.info(
-          `Product is not found in product repository: itemNumber ${itemNumber} & SKU ${sku}`
-        );
-        return {
-          code: 404,
-          message: 'Product not found in repository',
-        };
-      }
-      await updateProductRepository(productInDB, sku, quantity);
-      await updateSearchProductRepository(itemNumber, sku, quantity);
-      const productDetailsUpdated = {
-        ...product,
-        inventoryState: {
-          state: 'confirmed',
-        },
-      };
-      logger.info('Product details updated: ', productDetailsUpdated);
-      return productDetailsUpdated;
-    })
+const updateProduct = async (itemNumber, sku, quantity) => {
+  logger.info(
+    `Trying to get product from product repository: itemNumber ${itemNumber} & SKU ${sku}`
   );
-  logger.log('updateStockProducts => productsUpdated: ', productsUpdated);
-  return productsUpdated;
+  let productInDB = await ProductRepository.findOne({
+    itemNumber,
+    details: {
+      $elemMatch: {
+        sku,
+      },
+    },
+  });
+  if (!productInDB) {
+    logger.info(
+      `Product is not found in product repository: itemNumber ${itemNumber} & SKU ${sku}`
+    );
+    return {
+      code: 404,
+      message: 'Product not found in repository',
+    };
+  }
+  await updateProductRepository(productInDB, sku, quantity);
+  await updateSearchProductRepository(itemNumber, sku, quantity);
+  const productDetailsUpdated = {
+    ...product,
+    inventoryState: {
+      state: 'confirmed',
+    },
+  };
+  logger.info('Product details updated: ', productDetailsUpdated);
+  return productDetailsUpdated;
+};
+
+const updateStockProducts = async (products) => {
+  const productsUpdatesPromises = products.map((product) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { itemNumber, sku, quantity } = product;
+        const productUpdated = await updateProduct(itemNumber, sku, quantity);
+        logger.log('productUpdated: ', productUpdated);
+        resolve(productUpdated);
+      } catch (err) {
+        reject(`Can't update product: ${err.message}`);
+      }
+    });
+  });
+  logger.info('productsUpdatesPromises: ', productsUpdatesPromises);
+  try {
+    const productsUpdated = await Promise.all(productsUpdatesPromises);
+    logger.log('updateStockProducts => productsUpdated: ', productsUpdated);
+    return productsUpdated;
+  } catch (err) {
+    throw new Error(`Fail in updateStockProducts: ${err.message}`);
+  }
 };
 
 const updateProductRepository = async (productInDB, sku, quantity) => {
