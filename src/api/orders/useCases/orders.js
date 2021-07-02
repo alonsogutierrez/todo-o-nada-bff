@@ -149,8 +149,12 @@ const updateProduct = async (itemNumber, sku, quantity) => {
       message: 'Product not found in repository',
     };
   }
-  await updateProductRepository(productInDB, sku, quantity);
-  await updateSearchProductRepository(itemNumber, sku, quantity);
+  logger.info(`Begin Promise All to update products for sku ${sku}`);
+  await Promise.all([
+    updateProductRepository(productInDB, sku, quantity),
+    updateSearchProductRepository(itemNumber, sku, quantity),
+  ]);
+  logger.info(`End Promise All to update products for sku ${sku}`);
   const productDetailsUpdated = {
     ...product,
     inventoryState: {
@@ -185,93 +189,112 @@ const updateStockProducts = async (products) => {
 };
 
 const updateProductRepository = async (productInDB, sku, quantity) => {
-  const { details: productDetails, itemNumber } = productInDB;
-  const newProductDetails = productDetails.map((productDetail) => {
-    logger.info(
-      `Trying to update product in product repository: itemNumber ${itemNumber} & SKU ${productDetail.sku}`
-    );
-    if (productDetail.sku === sku) {
-      productDetail.stock =
-        parseInt(productDetail.stock, 10) - parseInt(quantity, 10);
-      return productDetail;
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { details: productDetails, itemNumber } = productInDB;
+      const newProductDetails = productDetails.map((productDetail) => {
+        logger.info(
+          `Trying to update product in product repository: itemNumber ${itemNumber} & SKU ${productDetail.sku}`
+        );
+        if (productDetail.sku === sku) {
+          productDetail.stock =
+            parseInt(productDetail.stock, 10) - parseInt(quantity, 10);
+          return productDetail;
+        }
+        return productDetail;
+      });
+      resolve(
+        await ProductRepository.updateOne(
+          {
+            itemNumber,
+            details: {
+              $elemMatch: {
+                sku,
+              },
+            },
+          },
+          {
+            details: newProductDetails,
+          }
+        )
+      );
+    } catch (err) {
+      reject(`Error in update product repository: ${err.message}`);
     }
-    return productDetail;
   });
-  return await ProductRepository.updateOne(
-    {
-      itemNumber,
-      details: {
-        $elemMatch: {
-          sku,
-        },
-      },
-    },
-    {
-      details: newProductDetails,
-    }
-  );
 };
 
 const updateSearchProductRepository = async (itemNumber, sku, quantity) => {
-  logger.info(
-    `Trying to update product in search product repository: itemNumber ${itemNumber} & SKU ${sku}`
-  );
-  const query = {
-    bool: {
-      must: [
-        {
-          match: {
-            itemNumber: itemNumber,
-          },
-        },
-        {
-          match: {
-            sku: sku,
-          },
-        },
-      ],
-    },
-  };
-  const productFound = await ElasticSearchRestData.SearchRequest('products', {
-    query,
-  });
-  const { hits } = productFound;
-  const productNotFoundResponse = {
-    code: 404,
-    message: 'Product not found in search repository',
-  };
-  if (hits && Object.keys(hits).length > 0) {
+  return new Promise(async (resolve, reject) => {
     try {
       logger.info(
-        'Product found in search repository',
-        itemNumber,
-        sku,
-        productFound
+        `Trying to update product in search product repository: itemNumber ${itemNumber} & SKU ${sku}`
       );
-      const { total } = hits;
-      logger.info('Total hits: ', total);
-      if (total > 0) {
-        const finalHits = hits.hits;
-        const actualProduct = finalHits[0]._source;
-        logger.info('Actual product data: ', actualProduct);
-        const newProductData = {
-          ...actualProduct,
-          quantity:
-            parseInt(actualProduct.quantity, 10) - parseInt(quantity, 10),
-        };
-        const updateRequestData = await ElasticSearchRestData.UpdateRequest(
-          'products',
-          finalHits[0]._id,
-          newProductData
-        );
-        logger.info('updateRequestData: ', newProductData);
-        return updateRequestData;
+      const query = {
+        bool: {
+          must: [
+            {
+              match: {
+                itemNumber: itemNumber,
+              },
+            },
+            {
+              match: {
+                sku: sku,
+              },
+            },
+          ],
+        },
+      };
+      const productFound = await ElasticSearchRestData.SearchRequest(
+        'products',
+        {
+          query,
+        }
+      );
+      const { hits } = productFound;
+      const productNotFoundResponse = {
+        code: 404,
+        message: 'Product not found in search repository',
+      };
+      if (hits && Object.keys(hits).length > 0) {
+        try {
+          logger.info(
+            'Product found in search repository',
+            itemNumber,
+            sku,
+            productFound
+          );
+          const { total } = hits;
+          logger.info('Total hits: ', total);
+          if (total > 0) {
+            const finalHits = hits.hits;
+            const actualProduct = finalHits[0]._source;
+            logger.info('Actual product data: ', actualProduct);
+            const newProductData = {
+              ...actualProduct,
+              quantity:
+                parseInt(actualProduct.quantity, 10) - parseInt(quantity, 10),
+            };
+            const updateRequestData = await ElasticSearchRestData.UpdateRequest(
+              'products',
+              finalHits[0]._id,
+              newProductData
+            );
+            logger.info('updateRequestData: ', newProductData);
+            resolve(updateRequestData);
+          }
+        } catch (err) {
+          reject(
+            `Error trying in updateSearchProductRepository: ${err.message}`
+          );
+        }
       }
+      return productNotFoundResponse;
     } catch (err) {
-      throw new Error(`Product not found in search repository: ${err.message}`);
+      reject(`Error trying in updateSearchProductRepository: ${err.message}`);
     }
-  }
-  return productNotFoundResponse;
+  });
 };
 
 const updateOrderStatus = async (
