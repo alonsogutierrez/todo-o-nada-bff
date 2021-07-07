@@ -27,8 +27,8 @@ module.exports = class Report {
         height: 20000,
         firstSheet: 0,
         activeTab: 1,
-        visibility: 'visible'
-      }
+        visibility: 'visible',
+      },
     ];
   }
 
@@ -36,21 +36,23 @@ module.exports = class Report {
     this.sheet.columns = [
       { header: 'Nº orden', key: 'numOrder', width: 20 },
       { header: 'Fecha venta', key: 'creationDate', width: 15 },
-      { header: 'Client', key: 'clientNames', width: 20 },
-      { header: 'Email', key: 'clientEmail', width: 20 },
-      { header: 'Sub total', key: 'subTotal', width: 10 },
-      { header: 'Envío', key: 'shippingTotal', width: 40 },
-      { header: 'Total', key: 'total', width: 10 },
-      { header: 'Item Number', key: 'itemNumber', width: 10 },
+      { header: 'Cliente', key: 'clientNames', width: 20 },
+      { header: 'Email', key: 'clientEmail', width: 30 },
+      { header: 'Sub total order', key: 'subTotal', width: 15 },
+      { header: 'Envío', key: 'shippingTotal', width: 5 },
+      { header: 'Total order', key: 'total', width: 15 },
+      { header: 'Item number', key: 'itemNumber', width: 10 },
       { header: 'SKU', key: 'sku', width: 10 },
-      { header: 'Item Price', key: 'itemPrice', width: 15 },
-      { header: 'Quantity', key: 'quantity', width: 10 }
+      { header: 'Talla', key: 'size', width: 5 },
+      { header: 'Precio unitario', key: 'itemPrice', width: 15 },
+      { header: 'Cantidad', key: 'quantity', width: 10 },
+      { header: 'Precio total', key: 'totalPrice', width: 10 },
     ];
   }
 
   setRows() {
     try {
-      this.rows.forEach(order => {
+      this.rows.forEach((order) => {
         const numOrder = this.mapper.getOrderNumber(order);
         const creationDate = this.mapper.getTransactionDate(order);
         const clientNames = this.mapper.getClientNames(order);
@@ -58,11 +60,13 @@ module.exports = class Report {
         const subTotal = this.mapper.getSubTotal(order);
         const shippingTotal = this.mapper.getShippingTotal(order);
         const total = this.mapper.getTotal(order);
-        order.products.forEach(product => {
+        order.products.forEach((product) => {
           const itemNumber = this.mapper.getItemNumber(product);
           const sku = this.mapper.getSKU(product);
+          const size = this.mapper.getSize(product);
           const itemPrice = this.mapper.getItemPrice(product);
           const quantity = this.mapper.getQuantity(product);
+          const totalPrice = parseInt(itemPrice * quantity, 10);
           this.sheet.addRow({
             numOrder,
             creationDate,
@@ -73,8 +77,10 @@ module.exports = class Report {
             total,
             itemNumber,
             sku,
+            size,
             itemPrice,
-            quantity
+            quantity,
+            totalPrice,
           });
         });
       });
