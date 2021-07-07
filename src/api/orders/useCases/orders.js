@@ -98,7 +98,9 @@ const confirmOrderPayment = async (token) => {
         };
       }
       const { products } = orderPaid;
+      logger.info('Trying to update products stock');
       await updateStockProducts(products);
+      logger.info('Update stock products in both repositories');
       const productsConfirmed = products.map((product) => {
         return {
           ...product,
@@ -114,7 +116,6 @@ const confirmOrderPayment = async (token) => {
         'paid'
       );
       logger.info('Order well updated: ', orderPaidUpdated);
-      //TODO: Create logic when an order is paid (validate and confirm inventory, change order state to paid)
       return {
         orderPaidUpdated,
         message: 'Order well updated',
@@ -139,15 +140,11 @@ const confirmOrderPayment = async (token) => {
 const updateProductInRepositories = async (itemNumber, sku, quantity) => {
   try {
     logger.info(`Begin Promise All to update products for sku ${sku}`);
-    const promisesReponses = await Promise.all([
+    await Promise.all([
       updateProductRepository(itemNumber, sku, quantity),
       updateSearchProductRepository(itemNumber, sku, quantity),
     ]);
-    logger.info(
-      `End Promise All to update products for sku ${sku}: ${JSON.stringify(
-        promisesReponses
-      )}`
-    );
+    logger.info(`End Promise All to update products for sku ${sku}`);
     return;
   } catch (err) {
     throw new Error(`Error update product: ${err.message}`);
@@ -156,7 +153,7 @@ const updateProductInRepositories = async (itemNumber, sku, quantity) => {
 
 const updateStockProducts = async (products) => {
   try {
-    const productsUpdated = await Promise.all(
+    await Promise.all(
       products.map(async (product) => {
         try {
           const { itemNumber, sku, quantity } = product;
@@ -169,8 +166,7 @@ const updateStockProducts = async (products) => {
         }
       })
     );
-    logger.log('updateStockProducts => productsUpdated: ', productsUpdated);
-    return productsUpdated;
+    return;
   } catch (err) {
     throw new Error(`Fail in updateStockProducts: ${err.message}`);
   }
@@ -288,15 +284,14 @@ const updateSearchProductRepository = async (itemNumber, sku, quantity) => {
           quantity:
             parseInt(actualProduct.quantity, 10) - parseInt(quantity, 10),
         };
-        const updateRequestData = await ElasticSearchRestData.UpdateRequest(
+        await ElasticSearchRestData.UpdateRequest(
           'products',
           finalHits[0]._id,
           newProductData
         );
         logger.info(
           'Product well updated in elastic repository: ',
-          newProductData,
-          updateRequestData
+          newProductData
         );
         return;
       }
