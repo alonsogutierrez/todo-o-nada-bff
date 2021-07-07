@@ -138,30 +138,9 @@ const confirmOrderPayment = async (token) => {
 
 const updateProductInRepositories = async (itemNumber, sku, quantity) => {
   try {
-    logger.info(
-      `Trying to get product from mongo db product repository: itemNumber ${itemNumber} & SKU ${sku}`
-    );
-    let productInDB = await ProductRepository.findOne({
-      itemNumber,
-      details: {
-        $elemMatch: {
-          sku,
-        },
-      },
-    });
-    logger.info(`Product found in DB => ${itemNumber} & SKU ${sku}`);
-    if (!productInDB) {
-      logger.info(
-        `Product is not found in product repository: itemNumber ${itemNumber} & SKU ${sku}`
-      );
-      return {
-        code: 404,
-        message: 'Product not found in repository',
-      };
-    }
     logger.info(`Begin Promise All to update products for sku ${sku}`);
     const promisesReponses = await Promise.all([
-      updateProductRepository(productInDB, sku, quantity),
+      updateProductRepository(itemNumber, sku, quantity),
       updateSearchProductRepository(itemNumber, sku, quantity),
     ]);
     logger.info(
@@ -169,14 +148,7 @@ const updateProductInRepositories = async (itemNumber, sku, quantity) => {
         promisesReponses
       )}`
     );
-    const productDetailsUpdated = {
-      ...product,
-      inventoryState: {
-        state: 'confirmed',
-      },
-    };
-    logger.info('Product details updated: ', productDetailsUpdated);
-    return productDetailsUpdated;
+    return;
   } catch (err) {
     throw new Error(`Error update product: ${err.message}`);
   }
@@ -209,8 +181,31 @@ const updateStockProducts = async (products) => {
   }
 };
 
-const updateProductRepository = async (productInDB, sku, quantity) => {
+const updateProductRepository = async (itemNumber, sku, quantity) => {
   try {
+    logger.info(
+      `Trying to get product from mongo db product repository: itemNumber ${itemNumber} & SKU ${sku}`
+    );
+    let productInDB = await ProductRepository.findOne({
+      itemNumber,
+      details: {
+        $elemMatch: {
+          sku,
+        },
+      },
+    });
+
+    logger.info(`Product found in DB => ${itemNumber} & SKU ${sku}`);
+    logger.info(`Product in DB Response:  ${productInDB}`);
+    if (!productInDB) {
+      logger.info(
+        `Product is not found in product repository: itemNumber ${itemNumber} & SKU ${sku}`
+      );
+      return {
+        code: 404,
+        message: 'Product not found in repository',
+      };
+    }
     const { details: productDetails, itemNumber } = productInDB;
     const newProductDetails = productDetails.map((productDetail) => {
       logger.info(
@@ -223,7 +218,10 @@ const updateProductRepository = async (productInDB, sku, quantity) => {
       }
       return productDetail;
     });
-    return await ProductRepository.updateOne(
+    logger.info(
+      `newProductDetails in updateProductRepository method: ${newProductDetails}`
+    );
+    const productUpdatedResponse = await ProductRepository.updateOne(
       {
         itemNumber,
         details: {
@@ -236,6 +234,10 @@ const updateProductRepository = async (productInDB, sku, quantity) => {
         details: newProductDetails,
       }
     );
+    logger.info(
+      `Product well updated in db repository: itemNumber ${itemNumber} & SKU ${productDetail.sku} & productUpdatedResponse ${productUpdatedResponse}`
+    );
+    return;
   } catch (err) {
     throw new Error(`Error in update product repository: ${err.message}`);
   }
@@ -296,8 +298,12 @@ const updateSearchProductRepository = async (itemNumber, sku, quantity) => {
           finalHits[0]._id,
           newProductData
         );
-        logger.info('Product updated in elastic repository: ', newProductData);
-        return updateRequestData;
+        logger.info(
+          'Product well updated in elastic repository: ',
+          newProductData,
+          updateRequestData
+        );
+        return;
       }
     }
     return productNotFoundResponse;
