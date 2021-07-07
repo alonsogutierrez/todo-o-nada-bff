@@ -152,7 +152,7 @@ const updateProduct = async (itemNumber, sku, quantity) => {
       };
     }
     logger.info(`Begin Promise All to update products for sku ${sku}`);
-    const promisesReponses = Promise.all([
+    const promisesReponses = await Promise.all([
       updateProductRepository(productInDB, sku, quantity),
       updateSearchProductRepository(itemNumber, sku, quantity),
     ]);
@@ -174,27 +174,22 @@ const updateProduct = async (itemNumber, sku, quantity) => {
   }
 };
 
-const getUpdateProductsPromises = (products) => {
-  return products.map(async (product) => {
-    try {
-      const { itemNumber, sku, quantity } = product;
-      const productUpdated = await updateProduct(itemNumber, sku, quantity);
-      logger.log('productUpdated: ', productUpdated);
-      return productUpdated;
-    } catch (err) {
-      throw new Error(
-        `Error updating product in getUpdateProductsPromises: ${err.message}`
-      );
-    }
-  });
-};
-
 const updateStockProducts = async (products) => {
   try {
-    const productsUpdatesPromises = getUpdateProductsPromises(products);
-    logger.info('productsUpdatesPromises: ', productsUpdatesPromises);
-
-    const productsUpdated = Promise.all(productsUpdatesPromises);
+    const productsUpdated = await Promise.all(
+      products.map(async (product) => {
+        try {
+          const { itemNumber, sku, quantity } = product;
+          const productUpdated = await updateProduct(itemNumber, sku, quantity);
+          logger.log('productUpdated: ', productUpdated);
+          return productUpdated;
+        } catch (err) {
+          throw new Error(
+            `Error updating product in getUpdateProductsPromises: ${err.message}`
+          );
+        }
+      })
+    );
     logger.log('updateStockProducts => productsUpdated: ', productsUpdated);
     return productsUpdated;
   } catch (err) {
@@ -205,17 +200,19 @@ const updateStockProducts = async (products) => {
 const updateProductRepository = async (productInDB, sku, quantity) => {
   try {
     const { details: productDetails, itemNumber } = productInDB;
-    const newProductDetails = productDetails.map((productDetail) => {
-      logger.info(
-        `Trying to update product in product repository: itemNumber ${itemNumber} & SKU ${productDetail.sku}`
-      );
-      if (productDetail.sku === sku) {
-        productDetail.stock =
-          parseInt(productDetail.stock, 10) - parseInt(quantity, 10);
+    const newProductDetails = await Promise.all(
+      productDetails.map(async (productDetail) => {
+        logger.info(
+          `Trying to update product in product repository: itemNumber ${itemNumber} & SKU ${productDetail.sku}`
+        );
+        if (productDetail.sku === sku) {
+          productDetail.stock =
+            parseInt(productDetail.stock, 10) - parseInt(quantity, 10);
+          return productDetail;
+        }
         return productDetail;
-      }
-      return productDetail;
-    });
+      })
+    );
     return await ProductRepository.updateOne(
       {
         itemNumber,
