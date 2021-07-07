@@ -85,20 +85,20 @@ const confirmOrderPayment = async (token) => {
   const { status, commerceOrder } = paymentStatusResponse;
   switch (status) {
     case STATUS_PAYMENT_RESPONSE['PAYED']:
-      logger.info('commerceOrder: ', commerceOrder);
+      logger.info('Trying to update order: ', commerceOrder);
       let orderPaid = await OrderRepository.findOne({
         orderNumber: commerceOrder,
       });
-      logger.info('Trying to update order: ', commerceOrder);
+
+      logger.info('Order to update: ', orderPaid);
       if (!orderPaid) {
         return {
           code: 404,
           message: 'Order not found in repository',
         };
       }
-      let { products } = orderPaid;
-      products = await updateStockProducts(products);
-      logger.info('Products well updated: ', products);
+      const { products } = orderPaid;
+      await updateStockProducts(products);
       const productsConfirmed = products.map((product) => {
         return {
           ...product,
@@ -160,13 +160,8 @@ const updateStockProducts = async (products) => {
       products.map(async (product) => {
         try {
           const { itemNumber, sku, quantity } = product;
-          const productUpdated = await updateProductInRepositories(
-            itemNumber,
-            sku,
-            quantity
-          );
-          logger.log('productUpdated: ', productUpdated);
-          return productUpdated;
+          await updateProductInRepositories(itemNumber, sku, quantity);
+          return;
         } catch (err) {
           throw new Error(
             `Error updating product in getUpdateProductsPromises: ${err.message}`
@@ -316,18 +311,20 @@ const updateSearchProductRepository = async (itemNumber, sku, quantity) => {
 
 const updateOrderStatus = async (
   orderNumber,
-  products,
+  productsUpdated,
   paymentData,
   status
 ) => {
+  let paymentDataUpdated = paymentData;
+  paymentDataUpdated.state = status;
   paymentData.state = status;
   return await OrderRepository.updateOne(
     {
       orderNumber,
     },
     {
-      paymentData,
-      products,
+      paymentData: paymentDataUpdated,
+      products: productsUpdated,
     }
   );
 };
