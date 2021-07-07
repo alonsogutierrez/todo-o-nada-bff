@@ -118,6 +118,14 @@ const getSKU = (product) => {
   return sku;
 };
 
+const getSize = (product) => {
+  const { size } = product;
+  if (size === undefined) {
+    throw new Error(`Invalid size`);
+  }
+  return size;
+};
+
 const getItemPrice = (product) => {
   const { price } = product;
   if (price === undefined) {
@@ -144,6 +152,7 @@ module.exports = {
   getTotal,
   getItemNumber,
   getSKU,
+  getSize,
   getItemPrice,
   getQuantity,
 };

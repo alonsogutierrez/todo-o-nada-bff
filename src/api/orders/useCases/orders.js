@@ -338,17 +338,43 @@ const generateOrderData = async (order) => {
   };
   order.uuid = nanoid();
   order.paymentData = paymentData;
-  order.products = products.map((product) => {
-    logger.log('Product from client: ', product);
-    const reservedProduct = {
-      ...product,
-      inventoryState: {
-        state: 'Reserved',
-      },
-    };
-    logger.log('reservedProduct: ', reservedProduct);
-    return reservedProduct;
-  });
+  const productsUpdated = await Promise.all(
+    products.map(async (product) => {
+      logger.log('Product from client: ', product);
+      const productFilter = {
+        itemNumber: product.itemNumber,
+      };
+      try {
+        const dbProduct = await ProductRepository.findOne(productFilter);
+        if (Object.keys(dbProduct).length === 0) {
+          throw new Error('Invalid product');
+        }
+        const detailProduct = dbProduct.details.find(
+          (detail) => detail.sku === product.sku
+        );
+        if (!detailProduct) {
+          throw new Error('Invalid product details');
+        }
+        logger.log('detailProduct: ', detailProduct);
+        const reservedProduct = {
+          ...product,
+          size: detailProduct.size,
+          inventoryState: {
+            state: 'Reserved',
+          },
+        };
+        logger.log('reservedProduct: ', reservedProduct);
+        return reservedProduct;
+      } catch (err) {
+        logger.error(`Product not exist in repository ${err.message}`);
+        throw new Error(`Product doesn't exist in repository ${err.message}`);
+      }
+    })
+  );
+
+  logger.log('productsUpdated: ', productsUpdated);
+
+  order.products = productsUpdated;
   return order;
 };
 

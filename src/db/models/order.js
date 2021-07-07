@@ -4,120 +4,124 @@ const orderSchema = new mongoose.Schema(
   {
     orderNumber: {
       type: Number,
-      required: true
+      required: true,
     },
     products: [
       {
         name: {
           type: String,
-          required: true
+          required: true,
         },
         itemNumber: {
           type: Number,
-          required: true
+          required: true,
         },
         sku: {
           type: Number,
-          required: true
+          required: true,
         },
         price: {
           basePriceSales: {
             type: Number,
-            required: true
+            required: true,
           },
           basePriceReference: {
             type: Number,
-            required: true
+            required: true,
           },
           discount: {
-            type: Number
-          }
+            type: Number,
+          },
         },
         quantity: {
           type: Number,
-          required: true
+          required: true,
+        },
+        size: {
+          type: String,
+          required: true,
         },
         inventoryState: {
           status: {
             type: String,
-            required: false
-          }
-        }
-      }
+            required: false,
+          },
+        },
+      },
     ],
     paymentData: {
       user: {
         firstName: {
           type: String,
-          required: true
+          required: true,
         },
         lastName: {
           type: String,
-          required: true
+          required: true,
         },
         email: {
           type: String,
-          required: true
+          required: true,
         },
         phone: {
           type: String,
-          required: true
+          required: true,
         },
         address: {
           country: {
             type: String,
-            required: true
+            required: true,
           },
           city: {
             type: String,
-            required: true
+            required: true,
           },
           commune: {
             type: String,
-            required: true
+            required: true,
           },
           zip_code: {
-            type: String
+            type: String,
           },
           address: {
             type: String,
-            required: true
+            required: true,
           },
           num_address: {
             type: String,
-            required: true
-          }
-        }
+            required: true,
+          },
+        },
       },
       state: {
         type: String, // created, paid, cancel
-        required: true
+        required: true,
       },
       transaction: {
         date: {
           type: Date,
-          required: true
+          required: true,
         },
         subTotal: {
           type: Number,
-          required: true
+          required: true,
         },
         shipping: {
           type: Number,
-          required: true
-        }
+          required: true,
+        },
       },
       apiResponse: {
-        type: Object
-      }
+        type: Object,
+      },
     },
     uuid: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 
