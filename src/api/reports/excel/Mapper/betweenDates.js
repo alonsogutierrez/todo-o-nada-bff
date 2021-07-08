@@ -120,8 +120,8 @@ const getSKU = (product) => {
 
 const getSize = (product) => {
   const { size } = product;
-  if (size === undefined) {
-    throw new Error(`Invalid size`);
+  if (!size) {
+    return '';
   }
   return size;
 };
