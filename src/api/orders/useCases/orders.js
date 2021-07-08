@@ -212,7 +212,7 @@ const updateProductRepository = async (itemNumber, sku, quantity) => {
         },
       },
     });
-    logger.info(`Product in DB Response:  ${productInDB}`);
+    logger.info(`Product in DB Response:  ${json.stringify(productInDB)}`);
     if (!productInDB) {
       logger.info(
         `Product is not found in product repository: itemNumber ${itemNumber} & SKU ${sku}`
@@ -222,20 +222,24 @@ const updateProductRepository = async (itemNumber, sku, quantity) => {
         message: 'Product not found in repository',
       };
     }
-    const { details: productDetails } = productInDB;
-    const newProductDetails = productDetails.map((productDetail) => {
+    const { details } = productInDB;
+    const newProductDetails = details.map((detail) => {
       logger.info(
-        `Trying to update product in product repository: itemNumber ${itemNumber} & SKU ${productDetail.sku}`
+        `Trying to update product in product repository: itemNumber ${itemNumber} & SKU ${detail.sku}`
       );
-      if (productDetail.sku === sku) {
-        productDetail.stock =
-          parseInt(productDetail.stock, 10) - parseInt(quantity, 10);
-        return productDetail;
+      if (detail.sku === sku) {
+        logger.info(`Stock actual quantity ${detail.stock}`);
+        detail.stock = parseInt(detail.stock, 10) - parseInt(quantity, 10);
+        logger.info(`Stock updated quantity ${detail.stock}`);
+        return detail;
       }
-      return productDetail;
+      logger.info(`Stock not updated sku ${sku}`);
+      return detail;
     });
     logger.info(
-      `newProductDetails in updateProductRepository method: ${newProductDetails}`
+      `newProductDetails in updateProductRepository method: ${json.stringify(
+        newProductDetails
+      )}`
     );
     const productUpdatedResponse = await ProductRepository.updateOne(
       {
@@ -247,7 +251,7 @@ const updateProductRepository = async (itemNumber, sku, quantity) => {
         },
       },
       {
-        details: newProductDetails,
+        details: newProductDetails.toJSON(),
       }
     );
     logger.info(
