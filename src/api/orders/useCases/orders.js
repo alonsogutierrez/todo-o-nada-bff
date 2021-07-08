@@ -255,7 +255,7 @@ const updateProductRepository = async (itemNumber, sku, quantity) => {
       }
     );
     logger.info(
-      `Product well updated in db repository: itemNumber ${itemNumber} & SKU ${productDetail.sku} & productUpdatedResponse ${productUpdatedResponse}`
+      `Product well updated in db repository: itemNumber ${itemNumber} & SKU ${sku} & productUpdatedResponse ${productUpdatedResponse}`
     );
     return productUpdatedResponse;
   } catch (err) {
