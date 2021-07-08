@@ -212,7 +212,7 @@ const updateProductRepository = async (itemNumber, sku, quantity) => {
         },
       },
     });
-    logger.info(`Product in DB Response:  ${json.stringify(productInDB)}`);
+    logger.info(`Product in DB Response:  ${JSON.stringify(productInDB)}`);
     if (!productInDB) {
       logger.info(
         `Product is not found in product repository: itemNumber ${itemNumber} & SKU ${sku}`
@@ -237,7 +237,7 @@ const updateProductRepository = async (itemNumber, sku, quantity) => {
       return detail;
     });
     logger.info(
-      `newProductDetails in updateProductRepository method: ${json.stringify(
+      `newProductDetails in updateProductRepository method: ${JSON.stringify(
         newProductDetails
       )}`
     );
