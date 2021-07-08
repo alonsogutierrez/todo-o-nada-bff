@@ -204,19 +204,14 @@ const updateStockProducts = async (products) => {
 
 const updateProductRepository = async (itemNumber, sku, quantity) => {
   try {
-    logger.info(
-      `Trying to get product from mongo db product repository: itemNumber ${itemNumber} & SKU ${sku}`
-    );
     let productInDB = await ProductRepository.findOne({
-      itemNumber,
+      itemNumber: itemNumber,
       details: {
         $elemMatch: {
           sku,
         },
       },
     });
-
-    logger.info(`Product found in DB => ${itemNumber} & SKU ${sku}`);
     logger.info(`Product in DB Response:  ${productInDB}`);
     if (!productInDB) {
       logger.info(
@@ -227,7 +222,7 @@ const updateProductRepository = async (itemNumber, sku, quantity) => {
         message: 'Product not found in repository',
       };
     }
-    const { details: productDetails, itemNumber } = productInDB;
+    const { details: productDetails } = productInDB;
     const newProductDetails = productDetails.map((productDetail) => {
       logger.info(
         `Trying to update product in product repository: itemNumber ${itemNumber} & SKU ${productDetail.sku}`
