@@ -251,7 +251,7 @@ const updateProductRepository = async (itemNumber, sku, quantity) => {
         },
       },
       {
-        details: newProductDetails.toJSON(),
+        details: newProductDetails,
       }
     );
     logger.info(
