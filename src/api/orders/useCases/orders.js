@@ -71,72 +71,77 @@ const createOrderPayment = async (order) => {
 };
 
 const confirmOrderPayment = async (token) => {
-  logger.info(`Begin to confirm order payment with token: ${token}`);
-  const objectToSign = {
-    apiKey: FLOW_API_KEY,
-    token,
-  };
-  const signedMessage = signMessage(objectToSign);
-  const paymentStatusResponse = await PaymentAPI.getPaymentStatus(
-    FLOW_API_KEY,
-    token,
-    signedMessage
-  );
-  const { status, commerceOrder } = paymentStatusResponse;
-  switch (status) {
-    case STATUS_PAYMENT_RESPONSE['PAYED']:
-      logger.info('Trying to update order: ', commerceOrder);
-      let orderPaid = await OrderRepository.findOne({
-        orderNumber: commerceOrder,
-      });
+  try {
+    logger.info(`Begin to confirm order payment with token: ${token}`);
+    const objectToSign = {
+      apiKey: FLOW_API_KEY,
+      token,
+    };
+    const signedMessage = signMessage(objectToSign);
+    const paymentStatusResponse = await PaymentAPI.getPaymentStatus(
+      FLOW_API_KEY,
+      token,
+      signedMessage
+    );
+    const { status, commerceOrder } = paymentStatusResponse;
+    logger.info('Payment status response: ', status);
+    switch (status) {
+      case STATUS_PAYMENT_RESPONSE['PAYED']:
+        logger.info('Trying to update order: ', commerceOrder);
+        let orderPaid = await OrderRepository.findOne({
+          orderNumber: commerceOrder,
+        });
 
-      logger.info('Order to update: ', orderPaid);
-      if (!orderPaid) {
+        logger.info('Order to update: ', orderPaid);
+        if (!orderPaid) {
+          return {
+            code: 404,
+            message: 'Order not found in repository',
+          };
+        }
+        const { products } = orderPaid;
+        logger.info('Trying to update products stock');
+        const updateProductStockResults = await updateStockProducts(products);
+        logger.info(
+          'Update stock products process well done: ',
+          updateProductStockResults
+        );
+        const productsConfirmed = products.map((product) => {
+          return {
+            ...product,
+            inventoryState: {
+              status: 'Confirmed',
+            },
+          };
+        });
+        const orderPaidUpdated = await updateOrderStatus(
+          commerceOrder,
+          productsConfirmed,
+          orderPaid.paymentData,
+          'paid'
+        );
+        logger.info('Order well updated: ', orderPaidUpdated);
         return {
-          code: 404,
-          message: 'Order not found in repository',
+          orderPaidUpdated,
+          message: 'Order well updated',
         };
-      }
-      const { products } = orderPaid;
-      logger.info('Trying to update products stock');
-      const updateProductStockResults = await updateStockProducts(products);
-      logger.info(
-        'Update stock products process well done: ',
-        updateProductStockResults
-      );
-      const productsConfirmed = products.map((product) => {
-        return {
-          ...product,
-          inventoryState: {
-            status: 'Confirmed',
-          },
-        };
-      });
-      const orderPaidUpdated = await updateOrderStatus(
-        commerceOrder,
-        productsConfirmed,
-        orderPaid.paymentData,
-        'paid'
-      );
-      logger.info('Order well updated: ', orderPaidUpdated);
-      return {
-        orderPaidUpdated,
-        message: 'Order well updated',
-      };
 
-    case STATUS_PAYMENT_RESPONSE['PAYMENT_PENDING']:
-      //TODO: Create logic when an order is payment pending (maintain same order)
-      return 0;
+      case STATUS_PAYMENT_RESPONSE['PAYMENT_PENDING']:
+        //TODO: Create logic when an order is payment pending (maintain same order)
+        return 0;
 
-    case STATUS_PAYMENT_RESPONSE['REJECTED']:
-      //TODO: Create logic when an order is payment rejected (unreserve inventory, throw 500 status response)
-      return 0;
+      case STATUS_PAYMENT_RESPONSE['REJECTED']:
+        //TODO: Create logic when an order is payment rejected (unreserve inventory, throw 500 status response)
+        return 0;
 
-    case STATUS_PAYMENT_RESPONSE['CANCELED']:
-      //TODO: Create logic when an order is payment rejected (unreserve inventory, throw 500 status response)
-      return 0;
-    default:
-      throw new Error('Unrecognized payment status');
+      case STATUS_PAYMENT_RESPONSE['CANCELED']:
+        //TODO: Create logic when an order is payment rejected (unreserve inventory, throw 500 status response)
+        return 0;
+      default:
+        throw new Error('Unrecognized payment status');
+    }
+  } catch (err) {
+    throw new Error(`Error trying to confirm order: ${err.message}`);
   }
 };
 
@@ -168,11 +173,14 @@ const updateProductInRepositories = async (itemNumber, sku, quantity) => {
 
 const updateStockProducts = async (products) => {
   try {
+    logger.info('Updating products stock in both repositories, promise all');
     const updateStockProductsResult = await Promise.all(
       products.map(async (product) => {
         try {
           const { itemNumber, sku, quantity } = product;
+          logger.info('Updating product: ', product);
           await updateProductInRepositories(itemNumber, sku, quantity);
+          logger.info('Product updated: ', product);
           return;
         } catch (err) {
           throw new Error(
@@ -181,6 +189,7 @@ const updateStockProducts = async (products) => {
         }
       })
     );
+    logger.info('End update products stock in both repositories, promise all');
     return updateStockProductsResult;
   } catch (err) {
     throw new Error(`Fail in updateStockProducts: ${err.message}`);
