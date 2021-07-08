@@ -99,8 +99,11 @@ const confirmOrderPayment = async (token) => {
       }
       const { products } = orderPaid;
       logger.info('Trying to update products stock');
-      await updateStockProducts(products);
-      logger.info('Update stock products in both repositories');
+      const updateProductStockResults = await updateStockProducts(products);
+      logger.info(
+        'Update stock products process well done: ',
+        updateProductStockResults
+      );
       const productsConfirmed = products.map((product) => {
         return {
           ...product,
@@ -141,11 +144,23 @@ const updateProductInRepositories = async (itemNumber, sku, quantity) => {
   try {
     logger.info(`Begin updateProductInRepositories for sku ${sku}`);
 
-    await updateProductRepository(itemNumber, sku, quantity);
-    await updateSearchProductRepository(itemNumber, sku, quantity);
+    const updateProductRepositoryResponse = await updateProductRepository(
+      itemNumber,
+      sku,
+      quantity
+    );
+    const updateSearchRepositoryResponse = await updateSearchProductRepository(
+      itemNumber,
+      sku,
+      quantity
+    );
 
     logger.info(`End updateProductInRepositories for sku ${sku}`);
-    return;
+    const productUpdateResume = {
+      updateProductRepositoryResponse,
+      updateSearchRepositoryResponse,
+    };
+    return productUpdateResume;
   } catch (err) {
     throw new Error(`Error update product: ${err.message}`);
   }
@@ -153,7 +168,7 @@ const updateProductInRepositories = async (itemNumber, sku, quantity) => {
 
 const updateStockProducts = async (products) => {
   try {
-    await Promise.all(
+    const updateStockProductsResult = await Promise.all(
       products.map(async (product) => {
         try {
           const { itemNumber, sku, quantity } = product;
@@ -166,7 +181,7 @@ const updateStockProducts = async (products) => {
         }
       })
     );
-    return;
+    return updateStockProductsResult;
   } catch (err) {
     throw new Error(`Fail in updateStockProducts: ${err.message}`);
   }
@@ -228,7 +243,7 @@ const updateProductRepository = async (itemNumber, sku, quantity) => {
     logger.info(
       `Product well updated in db repository: itemNumber ${itemNumber} & SKU ${productDetail.sku} & productUpdatedResponse ${productUpdatedResponse}`
     );
-    return;
+    return productUpdatedResponse;
   } catch (err) {
     throw new Error(`Error in update product repository: ${err.message}`);
   }
@@ -262,41 +277,38 @@ const updateSearchProductRepository = async (itemNumber, sku, quantity) => {
       `Product found in elastic repository: itemNumber ${itemNumber} & SKU ${sku}`
     );
     const { hits } = productFound;
-    const productNotFoundResponse = {
-      code: 404,
-      message: 'Product not found in search repository',
-    };
-    if (hits && Object.keys(hits).length > 0) {
-      logger.info(
-        'Product found in search repository',
-        itemNumber,
-        sku,
-        productFound
-      );
-      const { total } = hits;
-      logger.info('Total hits: ', total);
-      if (total > 0) {
-        const finalHits = hits.hits;
-        const actualProduct = finalHits[0]._source;
-        logger.info('Actual product data: ', actualProduct);
-        const newProductData = {
-          ...actualProduct,
-          quantity:
-            parseInt(actualProduct.quantity, 10) - parseInt(quantity, 10),
-        };
-        await ElasticSearchRestData.UpdateRequest(
-          'products',
-          finalHits[0]._id,
-          newProductData
-        );
-        logger.info(
-          'Product well updated in elastic repository: ',
-          newProductData
-        );
-        return;
-      }
+    if (!hits && !Object.keys(hits).length > 0) {
+      throw new Error(`Invalid hits`);
     }
-    return productNotFoundResponse;
+    logger.info(
+      'Product found in search repository',
+      itemNumber,
+      sku,
+      productFound
+    );
+    const { total } = hits;
+    logger.info('Total hits: ', total);
+    if (!(total > 0)) {
+      throw new Error(`Total is negative`);
+    }
+    const finalHits = hits.hits;
+    const actualProduct = finalHits[0]._source;
+    logger.info('Actual product data: ', actualProduct);
+    const newProductData = {
+      ...actualProduct,
+      quantity: parseInt(actualProduct.quantity, 10) - parseInt(quantity, 10),
+    };
+    const updateResponse = await ElasticSearchRestData.UpdateRequest(
+      'products',
+      finalHits[0]._id,
+      newProductData
+    );
+    logger.info(
+      'Product well updated in elastic repository: ',
+      newProductData,
+      updateResponse
+    );
+    return updateResponse;
   } catch (err) {
     throw new Error(
       `Error trying in updateSearchProductRepository: ${err.message}`
