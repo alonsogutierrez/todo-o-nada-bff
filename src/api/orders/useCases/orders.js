@@ -167,6 +167,7 @@ const updateProductInRepositories = async (itemNumber, sku, quantity) => {
     };
     return productUpdateResume;
   } catch (err) {
+    logger.error(`Error update product: ${err.message}`);
     throw new Error(`Error update product: ${err.message}`);
   }
 };
@@ -179,10 +180,14 @@ const updateStockProducts = async (products) => {
         try {
           const { itemNumber, sku, quantity } = product;
           logger.info('Updating product: ', product);
-          await updateProductInRepositories(itemNumber, sku, quantity);
-          logger.info('Product updated: ', product);
-          return;
+          const updateProductInRepositoriesResult =
+            await updateProductInRepositories(itemNumber, sku, quantity);
+          logger.info('Product updated: ', updateProductInRepositoriesResult);
+          return updateProductInRepositoriesResult;
         } catch (err) {
+          logger.error(
+            `Error updating product in getUpdateProductsPromises: ${err.message}`
+          );
           throw new Error(
             `Error updating product in getUpdateProductsPromises: ${err.message}`
           );
@@ -192,6 +197,7 @@ const updateStockProducts = async (products) => {
     logger.info('End update products stock in both repositories, promise all');
     return updateStockProductsResult;
   } catch (err) {
+    logger.error(`Fail in updateStockProducts: ${err.message}`);
     throw new Error(`Fail in updateStockProducts: ${err.message}`);
   }
 };
@@ -254,6 +260,7 @@ const updateProductRepository = async (itemNumber, sku, quantity) => {
     );
     return productUpdatedResponse;
   } catch (err) {
+    logger.error(`Error in update product repository: ${err.message}`);
     throw new Error(`Error in update product repository: ${err.message}`);
   }
 };
