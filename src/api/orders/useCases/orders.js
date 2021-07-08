@@ -139,12 +139,12 @@ const confirmOrderPayment = async (token) => {
 
 const updateProductInRepositories = async (itemNumber, sku, quantity) => {
   try {
-    logger.info(`Begin Promise All to update products for sku ${sku}`);
-    await Promise.all([
-      updateProductRepository(itemNumber, sku, quantity),
-      updateSearchProductRepository(itemNumber, sku, quantity),
-    ]);
-    logger.info(`End Promise All to update products for sku ${sku}`);
+    logger.info(`Begin updateProductInRepositories for sku ${sku}`);
+
+    await updateProductRepository(itemNumber, sku, quantity);
+    await updateSearchProductRepository(itemNumber, sku, quantity);
+
+    logger.info(`End updateProductInRepositories for sku ${sku}`);
     return;
   } catch (err) {
     throw new Error(`Error update product: ${err.message}`);
