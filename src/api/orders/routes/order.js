@@ -47,6 +47,7 @@ router.get('/orders', async (req, res) => {
     order = {
       orderNumber: order.orderNumber,
       paymentData: order.paymentData,
+      dispatchData: order.dispatchData,
       products: order.products,
       createdAt: order.createdAt,
     };
