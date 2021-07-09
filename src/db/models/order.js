@@ -70,26 +70,26 @@ const orderSchema = new mongoose.Schema(
         address: {
           country: {
             type: String,
-            required: true,
+            required: false,
           },
           city: {
             type: String,
-            required: true,
+            required: false,
           },
           commune: {
             type: String,
-            required: true,
+            required: false,
           },
           zip_code: {
             type: String,
           },
           address: {
             type: String,
-            required: true,
+            required: false,
           },
           num_address: {
             type: String,
-            required: true,
+            required: false,
           },
         },
       },
@@ -114,6 +114,10 @@ const orderSchema = new mongoose.Schema(
       apiResponse: {
         type: Object,
       },
+    },
+    dispatchData: {
+      type: String,
+      required: true,
     },
     uuid: {
       type: String,

@@ -5,13 +5,17 @@ const orderPaymentSchema = {
   properties: {
     paymentData: {
       type: 'object',
-      description: 'payment data info'
+      description: 'payment data info',
     },
     products: {
       type: 'array',
-      description: 'array with all products to pay'
-    }
-  }
+      description: 'array with all products to pay',
+    },
+    dispatchData: {
+      type: 'string',
+      description: 'dispatch data description',
+    },
+  },
 };
 
 module.exports = orderPaymentSchema;
