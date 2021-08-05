@@ -38,7 +38,27 @@ const getProductsByCategory = async (categoryName, page, size = 20) => {
   return elasticSearchResponse.hits;
 };
 
+const getMoreInterestingProducts = async (page = 0, size = 5) => {
+  const query = {
+    bool: {
+      filter: {
+        terms: {
+          sku: [1001, 1002, 1003, 1004, 1005]
+        }
+      }
+    }
+  };
+  const elasticSearchResponse = await ElasticSearchRestData.SearchRequest(
+    'products',
+    { query },
+    page,
+    size
+  );
+  return elasticSearchResponse.hits;
+};
+
 module.exports = {
   getProducts,
-  getProductsByCategory
+  getProductsByCategory,
+  getMoreInterestingProducts
 };

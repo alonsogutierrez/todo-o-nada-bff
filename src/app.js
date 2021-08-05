@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const cron = require('node-cron');
 const { connectWithMongodDB } = require('./db/mongoose');
 const orderRouter = require('./api/orders/routes/order');
 const productRouter = require('./api/products/routes');
@@ -10,6 +11,10 @@ const downloadReportRouter = require('./api/reports/betweenDates/routes/betweenD
 const orderReportRouter = require('./api/reports/orders/routes/orders');
 const healthRouter = require('./api/health/routes/health');
 const searchRouter = require('./api/search/routes/search');
+
+const healthCheckCron = require('./cron/healthCheck');
+
+const logger = console;
 
 try {
   connectWithMongodDB();
@@ -30,5 +35,9 @@ app.use(reportRouter);
 app.use(downloadReportRouter);
 app.use(orderReportRouter);
 app.use(searchRouter);
+
+cron.schedule('*/10 * * * *', async function () {
+  await healthCheckCron();
+});
 
 module.exports = app;

@@ -56,6 +56,7 @@ const uploadAndProcessLotsProducts = async (req, res) => {
     });
     logger.log('Procesaremos ', productsFromExcel.length, ' productos');
     for (const product of productsFromExcel) {
+      logger.info('Procesing product ', product);
       const query = {
         bool: {
           must: [
@@ -78,11 +79,17 @@ const uploadAndProcessLotsProducts = async (req, res) => {
       );
       const { hits } = productFoundElasticRepository;
       if (hits && Object.keys(hits).length > 0) {
+        logger.info(
+          'Product found in search repository',
+          product.itemNumber,
+          product.sku,
+          hits
+        );
         const { total } = hits;
-        const { value } = total;
-        if (total && value && value > 0) {
+        if (total > 0) {
           const finalHits = hits.hits;
           const actualProduct = finalHits[0]._source;
+          logger.info('Actual product data: ', actualProduct);
           const newProductData = {
             ...actualProduct,
             name: product.name,
@@ -94,12 +101,13 @@ const uploadAndProcessLotsProducts = async (req, res) => {
             quantity:
               parseInt(actualProduct.quantity, 10) + parseInt(product.stock, 10)
           };
-
-          await ElasticSearchRestData.UpdateRequest(
+          logger.info('New product data: ', newProductData);
+          const updateRequestData = await ElasticSearchRestData.UpdateRequest(
             'products',
             finalHits[0]._id,
             newProductData
           );
+          logger.info('updateRequestData: ', updateRequestData);
         } else {
           const newProduct = {
             itemNumber: product.itemNumber,
@@ -113,6 +121,7 @@ const uploadAndProcessLotsProducts = async (req, res) => {
             quantity: product.stock
           };
           await ElasticSearchRestData.CreateRequest('products', newProduct);
+          logger.info('Product well created in search repository', newProduct);
         }
       } else {
         throw new Error(

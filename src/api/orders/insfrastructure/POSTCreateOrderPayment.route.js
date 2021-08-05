@@ -9,20 +9,19 @@ const action = async (req, res) => {
     const { body } = req;
     logger.log('Validating query');
     if (!isValidQuery({ body })) {
-      res.status(HTTPCodes.BAD_REQUEST).send({
-        error: 'Invalid params'
+      res.status(HTTPCodes.StatusCodes.BAD_REQUEST).send({
+        error: 'Invalid params',
       });
       return;
     }
     logger.log('Begining to create order payment: ', body);
-    const createOrderPaymentResponse = await CreateOrderPaymentUseCases.createOrderPayment(
-      body
-    );
+    const createOrderPaymentResponse =
+      await CreateOrderPaymentUseCases.createOrderPayment(body);
     logger.log('Request finished: ', createOrderPaymentResponse);
-    res.status(HTTPCodes.OK).send(createOrderPaymentResponse);
+    res.status(HTTPCodes.StatusCodes.OK).send(createOrderPaymentResponse);
   } catch (err) {
-    res.status(HTTPCodes.INTERNAL_SERVER_ERROR).send({
-      error: `Can't create order payment: ${err.message}`
+    res.status(HTTPCodes.StatusCodes.INTERNAL_SERVER_ERROR).send({
+      error: `Can't create order payment: ${err.message}`,
     });
   }
 };
@@ -30,5 +29,5 @@ const action = async (req, res) => {
 module.exports = {
   method: 'POST',
   route: '/orders',
-  action
+  action,
 };

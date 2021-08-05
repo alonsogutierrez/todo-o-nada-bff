@@ -21,26 +21,12 @@ const elasticSearchClient = new ElasticSearch.Client({
 });
 
 const isClientRunning = async () => {
-  return new Promise((resolve, reject) => {
-    try {
-      elasticSearchClient.ping(
-        {
-          requestTimeout: 10 * 1000
-        },
-        err => {
-          if (err) {
-            logger.error('ElasticSearch cluster is down');
-            reject(false);
-          } else {
-            logger.info('ElasticSearch is running well');
-            resolve(true);
-          }
-        }
-      );
-    } catch (err) {
-      reject(err.message);
-    }
-  });
+  try {
+    const pingResponse = await elasticSearchClient.ping();
+    return pingResponse;
+  } catch (err) {
+    throw new Error(`ElasticSearch cluster is down: ${err.message}`);
+  }
 };
 
 const SearchRequest = async (index, query, from = 0, size = 10) => {
@@ -77,17 +63,17 @@ const SearchRequest = async (index, query, from = 0, size = 10) => {
 
 const UpdateRequest = async (index, id, body) => {
   try {
-    logger.log('Begin update request for id: ', id);
+    logger.log('Begin update request for id: ', id, body);
     const isElasticSearchClientRunning = await isClientRunning();
 
     if (isElasticSearchClientRunning) {
-      const response = await elasticSearchClient.update({
-        index,
+      logger.info('Trying to update document ', index, id, body);
+      const response = await elasticSearchClient.index({
         id,
-        body: {
-          doc: body
-        }
+        index,
+        body
       });
+      logger.info('Response update request: ', response);
       return response;
     }
     throw new Error('ElasticSearch cluster is down');

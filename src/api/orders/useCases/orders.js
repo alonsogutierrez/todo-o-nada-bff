@@ -1,5 +1,6 @@
 const CryptoJS = require('crypto-js');
 const FormData = require('form-data');
+const { nanoid } = require('nanoid');
 
 const ElasticSearchRestData = require('../../shared/infrastructure/ElasticSearchRESTData');
 const PaymentAPI = require('../insfrastructure/PaymentAPI');
@@ -17,12 +18,12 @@ const STATUS_PAYMENT_RESPONSE = {
   PAYMENT_PENDING: 1,
   PAYED: 2,
   REJECTED: 3,
-  CANCELED: 4
+  CANCELED: 4,
 };
 
 const logger = console;
 
-const createOrderPayment = async order => {
+const createOrderPayment = async (order) => {
   try {
     logger.info('Creating order payment', order);
     order = await generateOrderData(order);
@@ -50,7 +51,7 @@ const createOrderPayment = async order => {
       const createOrderPaymentResponse = {
         redirect_to: `${url}?token=${token}`,
         flowOrder,
-        orderData
+        orderData,
       };
       return createOrderPaymentResponse;
     }
@@ -69,209 +70,293 @@ const createOrderPayment = async order => {
   }
 };
 
-const confirmOrderPayment = async token => {
-  logger.info('Begin to confirm order payment');
-  const objectToSign = {
-    apiKey: FLOW_API_KEY,
-    token
-  };
-  const signedMessage = signMessage(objectToSign);
-  const paymentStatusResponse = await PaymentAPI.getPaymentStatus(
-    FLOW_API_KEY,
-    token,
-    signedMessage
-  );
-  const { status, commerceOrder } = paymentStatusResponse;
-  switch (status) {
-    case STATUS_PAYMENT_RESPONSE['PAYED']:
-      logger.info('commerceOrder: ', commerceOrder);
-      let orderPaid = await OrderRepository.findOne({
-        orderNumber: commerceOrder
-      });
-      logger.info('Trying to update order: ', commerceOrder);
-      if (!orderPaid) {
+const confirmOrderPayment = async (token) => {
+  try {
+    logger.info(`Begin to confirm order payment with token: ${token}`);
+    const objectToSign = {
+      apiKey: FLOW_API_KEY,
+      token,
+    };
+    const signedMessage = signMessage(objectToSign);
+    const paymentStatusResponse = await PaymentAPI.getPaymentStatus(
+      FLOW_API_KEY,
+      token,
+      signedMessage
+    );
+    const { status, commerceOrder } = paymentStatusResponse;
+    logger.info('Payment status response: ', status);
+    switch (status) {
+      case STATUS_PAYMENT_RESPONSE['PAYED']:
+        logger.info('Trying to update order: ', commerceOrder);
+        let orderPaid = await OrderRepository.findOne({
+          orderNumber: commerceOrder,
+        });
+
+        logger.info('Order to update: ', orderPaid);
+        if (!orderPaid) {
+          return {
+            code: 404,
+            message: 'Order not found in repository',
+          };
+        }
+        const { products } = orderPaid;
+        logger.info('Trying to update products stock');
+        const updateProductStockResults = await updateStockProducts(products);
+        logger.info(
+          'Update stock products process well done: ',
+          updateProductStockResults
+        );
+        const productsConfirmed = products.map((product) => {
+          return {
+            ...product,
+            inventoryState: {
+              status: 'Confirmed',
+            },
+          };
+        });
+        const orderPaidUpdated = await updateOrderStatus(
+          commerceOrder,
+          productsConfirmed,
+          orderPaid.paymentData,
+          'paid'
+        );
+        logger.info('Order well updated: ', orderPaidUpdated);
         return {
-          code: 404,
-          message: 'Order not found in repository'
+          orderPaidUpdated,
+          message: 'Order well updated',
         };
-      }
-      let { products } = orderPaid;
-      products = await updateStockProducts(products);
-      logger.info('Products well updated: ', products);
-      const orderPaidUpdated = await updateOrderStatus(
-        commerceOrder,
-        products,
-        orderPaid.paymentData,
-        'paid'
-      );
-      logger.info('Order well updated: ', orderPaidUpdated);
-      //TODO: Create logic when an order is paid (validate and confirm inventory, change order state to paid)
-      return {
-        orderPaidUpdated,
-        message: 'Order well updated'
-      };
 
-    case STATUS_PAYMENT_RESPONSE['PAYMENT_PENDING']:
-      //TODO: Create logic when an order is payment pending (maintain same order)
-      return 0;
+      case STATUS_PAYMENT_RESPONSE['PAYMENT_PENDING']:
+        //TODO: Create logic when an order is payment pending (maintain same order)
+        return 0;
 
-    case STATUS_PAYMENT_RESPONSE['REJECTED']:
-      //TODO: Create logic when an order is payment rejected (unreserve inventory, throw 500 status response)
-      return 0;
+      case STATUS_PAYMENT_RESPONSE['REJECTED']:
+        //TODO: Create logic when an order is payment rejected (unreserve inventory, throw 500 status response)
+        return 0;
 
-    case STATUS_PAYMENT_RESPONSE['CANCELED']:
-      //TODO: Create logic when an order is payment rejected (unreserve inventory, throw 500 status response)
-      return 0;
-    default:
-      throw new Error('Unrecognized payment status');
+      case STATUS_PAYMENT_RESPONSE['CANCELED']:
+        //TODO: Create logic when an order is payment rejected (unreserve inventory, throw 500 status response)
+        return 0;
+      default:
+        throw new Error('Unrecognized payment status');
+    }
+  } catch (err) {
+    throw new Error(`Error trying to confirm order: ${err.message}`);
   }
 };
 
-const updateStockProducts = async products => {
-  return await Promise.all(
-    products.map(async product => {
-      const { itemNumber, sku, quantity } = product;
+const updateProductInRepositories = async (itemNumber, sku, quantity) => {
+  try {
+    logger.info(`Begin updateProductInRepositories for sku ${sku}`);
+
+    const updateProductRepositoryResponse = await updateProductRepository(
+      itemNumber,
+      sku,
+      quantity
+    );
+    const updateSearchRepositoryResponse = await updateSearchProductRepository(
+      itemNumber,
+      sku,
+      quantity
+    );
+
+    logger.info(`End updateProductInRepositories for sku ${sku}`);
+    const productUpdateResume = {
+      updateProductRepositoryResponse,
+      updateSearchRepositoryResponse,
+    };
+    return productUpdateResume;
+  } catch (err) {
+    logger.error(`Error update product: ${err.message}`);
+    throw new Error(`Error update product: ${err.message}`);
+  }
+};
+
+const updateStockProducts = async (products) => {
+  try {
+    logger.info('Updating products stock in both repositories, promise all');
+    const updateStockProductsResult = await Promise.all(
+      products.map(async (product) => {
+        try {
+          const { itemNumber, sku, quantity } = product;
+          logger.info('Updating product: ', product);
+          const updateProductInRepositoriesResult =
+            await updateProductInRepositories(itemNumber, sku, quantity);
+          logger.info('Product updated: ', updateProductInRepositoriesResult);
+          return updateProductInRepositoriesResult;
+        } catch (err) {
+          logger.error(
+            `Error updating product in getUpdateProductsPromises: ${err.message}`
+          );
+          throw new Error(
+            `Error updating product in getUpdateProductsPromises: ${err.message}`
+          );
+        }
+      })
+    );
+    logger.info('End update products stock in both repositories, promise all');
+    return updateStockProductsResult;
+  } catch (err) {
+    logger.error(`Fail in updateStockProducts: ${err.message}`);
+    throw new Error(`Fail in updateStockProducts: ${err.message}`);
+  }
+};
+
+const updateProductRepository = async (itemNumber, sku, quantity) => {
+  try {
+    let productInDB = await ProductRepository.findOne({
+      itemNumber: itemNumber,
+      details: {
+        $elemMatch: {
+          sku,
+        },
+      },
+    });
+    logger.info(`Product in DB Response:  ${JSON.stringify(productInDB)}`);
+    if (!productInDB) {
       logger.info(
-        `Trying to get product from product repository: itemNumber ${itemNumber} & SKU ${sku}`
+        `Product is not found in product repository: itemNumber ${itemNumber} & SKU ${sku}`
       );
-      let productInDB = await ProductRepository.findOne({
+      return {
+        code: 404,
+        message: 'Product not found in repository',
+      };
+    }
+    const { details } = productInDB;
+    const newProductDetails = details.map((detail) => {
+      logger.info(
+        `Trying to update product in product repository: itemNumber ${itemNumber} & SKU ${detail.sku}`
+      );
+      if (detail.sku === sku) {
+        logger.info(`Stock actual quantity ${detail.stock}`);
+        detail.stock = parseInt(detail.stock, 10) - parseInt(quantity, 10);
+        logger.info(`Stock updated quantity ${detail.stock}`);
+        return detail;
+      }
+      logger.info(`Stock not updated sku ${sku}`);
+      return detail;
+    });
+    logger.info(
+      `newProductDetails in updateProductRepository method: ${JSON.stringify(
+        newProductDetails
+      )}`
+    );
+    const productUpdatedResponse = await ProductRepository.updateOne(
+      {
         itemNumber,
         details: {
           $elemMatch: {
-            sku
-          }
-        }
-      });
-      if (!productInDB) {
-        logger.info(
-          `Product is not found in product repository: itemNumber ${itemNumber} & SKU ${sku}`
-        );
-        return {
-          code: 404,
-          message: 'Product not found in repository'
-        };
+            sku,
+          },
+        },
+      },
+      {
+        details: newProductDetails,
       }
-      await updateProductRepository(productInDB, sku, quantity);
-      await updateSearchProductRepository(itemNumber, sku, quantity);
-      const productDetailsUpdated = {
-        ...product,
-        inventoryState: {
-          state: 'confirmed'
-        }
-      };
-      logger.info('Product details updated: ', productDetailsUpdated);
-      return productDetailsUpdated;
-      // TODO: Update elastic repository
-    })
-  );
-};
-
-const updateProductRepository = async (productInDB, sku, quantity) => {
-  const { details: productDetails, itemNumber } = productInDB;
-  const newProductDetails = productDetails.map(productDetail => {
-    logger.info(
-      `Trying to update product in product repository: itemNumber ${itemNumber} & SKU ${productDetail.sku}`
     );
-    if (productDetail.sku === sku) {
-      productDetail.stock =
-        parseInt(productDetail.stock, 10) - parseInt(quantity, 10);
-      return productDetail;
-    }
-    return productDetail;
-  });
-  return await ProductRepository.updateOne(
-    {
-      itemNumber,
-      details: {
-        $elemMatch: {
-          sku
-        }
-      }
-    },
-    {
-      details: newProductDetails
-    }
-  );
+    logger.info(
+      `Product well updated in db repository: itemNumber ${itemNumber} & SKU ${sku} & productUpdatedResponse ${productUpdatedResponse}`
+    );
+    return productUpdatedResponse;
+  } catch (err) {
+    logger.error(`Error in update product repository: ${err.message}`);
+    throw new Error(`Error in update product repository: ${err.message}`);
+  }
 };
 
 const updateSearchProductRepository = async (itemNumber, sku, quantity) => {
-  logger.info(
-    `Trying to update product in search product repository: itemNumber ${itemNumber} & SKU ${sku}`
-  );
-  const query = {
-    bool: {
-      must: [
-        {
-          match: {
-            itemNumber: itemNumber
-          }
-        },
-        {
-          match: {
-            sku: sku
-          }
-        }
-      ]
+  try {
+    logger.info(
+      `Trying to update product in search product repository: itemNumber ${itemNumber} & SKU ${sku}`
+    );
+    const query = {
+      bool: {
+        must: [
+          {
+            match: {
+              itemNumber: itemNumber,
+            },
+          },
+          {
+            match: {
+              sku: sku,
+            },
+          },
+        ],
+      },
+    };
+    const productFound = await ElasticSearchRestData.SearchRequest('products', {
+      query,
+    });
+    logger.info(
+      `Product found in elastic repository: itemNumber ${itemNumber} & SKU ${sku}`
+    );
+    const { hits } = productFound;
+    if (!hits && !Object.keys(hits).length > 0) {
+      throw new Error(`Invalid hits`);
     }
-  };
-  const productFound = await ElasticSearchRestData.SearchRequest('products', {
-    query
-  });
-  const { hits } = productFound;
-  const productNotFoundResponse = {
-    code: 404,
-    message: 'Product not found in search repository'
-  };
-  if (hits && Object.keys(hits).length > 0) {
+    logger.info(
+      'Product found in search repository',
+      itemNumber,
+      sku,
+      productFound
+    );
     const { total } = hits;
-    const { value } = total;
-    if (total && value && value > 0) {
-      const finalHits = hits.hits;
-      const actualProduct = finalHits[0]._source;
-      const newProductData = {
-        ...actualProduct,
-        quantity: parseInt(actualProduct.quantity, 10) - parseInt(quantity, 10)
-      };
-      return await ElasticSearchRestData.UpdateRequest(
-        'products',
-        finalHits[0]._id,
-        newProductData
-      );
+    logger.info('Total hits: ', total);
+    if (!(total > 0)) {
+      throw new Error(`Total is negative`);
     }
-    return productNotFoundResponse;
+    const finalHits = hits.hits;
+    const actualProduct = finalHits[0]._source;
+    logger.info('Actual product data: ', actualProduct);
+    const newProductData = {
+      ...actualProduct,
+      quantity: parseInt(actualProduct.quantity, 10) - parseInt(quantity, 10),
+    };
+    const updateResponse = await ElasticSearchRestData.UpdateRequest(
+      'products',
+      finalHits[0]._id,
+      newProductData
+    );
+    logger.info(
+      'Product well updated in elastic repository: ',
+      newProductData,
+      updateResponse
+    );
+    return updateResponse;
+  } catch (err) {
+    throw new Error(
+      `Error trying in updateSearchProductRepository: ${err.message}`
+    );
   }
-  return productNotFoundResponse;
 };
 
 const updateOrderStatus = async (
   orderNumber,
-  products,
+  productsUpdated,
   paymentData,
   status
 ) => {
+  let paymentDataUpdated = paymentData;
+  paymentDataUpdated.state = status;
   paymentData.state = status;
   return await OrderRepository.updateOne(
     {
-      orderNumber
+      orderNumber,
     },
     {
-      paymentData,
-      products
+      paymentData: paymentDataUpdated,
+      products: productsUpdated,
     }
   );
 };
 
-const generateOrderData = async order => {
+const generateOrderData = async (order) => {
   const orderNumber = await idBuilder.generateOrderId();
   order.orderNumber = orderNumber;
   let { paymentData, products } = order;
-  const {
-    user: {
-      address: { city }
-    }
-  } = paymentData;
   let subTotal = 0;
-  products.forEach(product => {
+  products.forEach((product) => {
     subTotal +=
       parseInt(product.price.basePriceSales, 10) *
       parseInt(product.quantity, 10);
@@ -281,26 +366,55 @@ const generateOrderData = async order => {
     date: new Date(),
     discount: 0,
     subTotal: subTotal,
-    shipping: getShippingAmount(city)
+    shipping: 0,
   };
+  order.uuid = nanoid();
   order.paymentData = paymentData;
-  order.products = products.map(product => {
-    logger.log('Product from client: ', product);
-    return {
-      ...product,
-      inventoryState: {
-        state: 'Reserved'
+  const productsUpdated = await Promise.all(
+    products.map(async (product) => {
+      logger.log('Product from client: ', product);
+      const productFilter = {
+        itemNumber: product.itemNumber,
+      };
+      try {
+        const dbProduct = await ProductRepository.findOne(productFilter);
+        if (Object.keys(dbProduct).length === 0) {
+          throw new Error('Invalid product');
+        }
+        const detailProduct = dbProduct.details.find(
+          (detail) => detail.sku === product.sku
+        );
+        if (!detailProduct) {
+          throw new Error('Invalid product details');
+        }
+        logger.log('detailProduct: ', detailProduct);
+        const reservedProduct = {
+          ...product,
+          size: detailProduct.size,
+          inventoryState: {
+            state: 'Reserved',
+          },
+        };
+        logger.log('reservedProduct: ', reservedProduct);
+        return reservedProduct;
+      } catch (err) {
+        logger.error(`Product not exist in repository ${err.message}`);
+        throw new Error(`Product doesn't exist in repository ${err.message}`);
       }
-    };
-  });
+    })
+  );
+
+  logger.log('productsUpdated: ', productsUpdated);
+
+  order.products = productsUpdated;
   return order;
 };
 
-const generatePaymentData = order => {
-  const { paymentData } = order;
+const generatePaymentData = (order) => {
+  const { paymentData, uuid } = order;
   const {
     transaction: { subTotal, shipping },
-    user: { email }
+    user: { email },
   } = paymentData;
   // NOTE: All fields must be order alphabetically in asc way
   return {
@@ -312,11 +426,11 @@ const generatePaymentData = order => {
     payment_currency: 'CLP',
     subject: 'Creando pago para Todo o Nada Tatto Art',
     urlConfirmation: `${BASE_URL_BFF}/orders/payment_confirm`,
-    urlReturn: `${BASE_URL_FE}?orderNumber=${order.orderNumber}`
+    urlReturn: `${BASE_URL_FE}?orderNumber=${order.orderNumber}&id=${uuid}`,
   };
 };
 
-const signMessage = objectToSign => {
+const signMessage = (objectToSign) => {
   let messageToSign = '';
   for (const key in objectToSign) {
     messageToSign += key + objectToSign[key];
@@ -339,7 +453,7 @@ const generatePaymentFormData = (paymentData, signPaymentMessage) => {
     payment_currency,
     subject,
     urlConfirmation,
-    urlReturn
+    urlReturn,
   } = paymentData;
   const paymentFormData = new FormData();
 
@@ -357,40 +471,10 @@ const generatePaymentFormData = (paymentData, signPaymentMessage) => {
   return paymentFormData;
 };
 
-const isValidPaymentResponse = paymentResponse => {
+const isValidPaymentResponse = (paymentResponse) => {
   const { token, url, flowOrder } = paymentResponse;
   const isValid = token && url && flowOrder ? true : false;
   return isValid;
-};
-
-// TODO: Mofify all regions ID
-const getShippingAmount = region => {
-  switch (region) {
-    case 'I':
-      return 12000;
-    case 'II':
-      return 11000;
-    case 'III':
-      return 10000;
-    case 'IV':
-      return 9000;
-    case 'Región Metropolitana de Santiago':
-      return -1000;
-    case 'VI':
-      return 5000;
-    case 'VII':
-      return 7000;
-    case 'VII':
-      return 8000;
-    case 'VII':
-      return 10000;
-    case 'VII':
-      return 12000;
-    case 'VII':
-      return 15000;
-    default:
-      throw new Error('Region unrecognized');
-  }
 };
 
 module.exports = { createOrderPayment, confirmOrderPayment };

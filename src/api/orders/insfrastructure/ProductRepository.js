@@ -1,6 +1,6 @@
 const Product = require('../../../db/models/product');
 
-const findOne = async filters => {
+const findOne = async (filters) => {
   try {
     const productInDB = await Product.findOne(filters);
     return productInDB.toJSON();
@@ -20,5 +20,5 @@ const updateOne = async (filters, newData) => {
 
 module.exports = {
   findOne,
-  updateOne
+  updateOne,
 };

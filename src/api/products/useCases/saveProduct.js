@@ -1,3 +1,4 @@
+const elasticSearch = require('elasticsearch');
 const { validate } = require('json-schema');
 
 const productSchema = require('../schema/product');
@@ -16,19 +17,17 @@ const saveProduct = async productInput => {
     const productToIndex = {
       id: product._id,
       itemNumber: product.itemNumber,
+      sku: product.sku,
       name: product.name,
       categories: product.category,
       description: product.description,
-      color: product.color,
       sizeDetail: product.details.map(detail => detail.size),
+      color: product.color,
       price: product.price,
-      quantity: product.details.reduce((quantity, currentQuantity) => quantity + currentQuantity.stock, 0)
+      quantity: product.quantity,
     };
     logger.log('Trying to save product document in elasticSearch');
-    await ElasticSearchRestData.CreateRequest(
-      'products',
-      productToIndex
-    );
+    await ElasticSearchRestData.CreateRequest('products', productToIndex);
     logger.log('Product well indexed in elasticSearch');
     return productToIndex;
   } else {

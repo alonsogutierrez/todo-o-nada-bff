@@ -1,19 +1,20 @@
 const express = require('express');
 const saveProduct = require('./useCases/saveProduct');
-const router = new express.Router();
+const auth = require('./../../middlewares/auth');
 const uploadFileToServer = require('../../middlewares/uploadFileToServer');
 const uploadS3 = require('../../middlewares/uploadS3');
 const controller = require('./controller');
 
+const router = new express.Router();
 const logger = console;
 
 router.post(
   '/product/upload',
-    uploadFileToServer.single('file'),
+  [auth, uploadFileToServer.single('file')],
   controller.uploadAndProcessLotsProducts
 );
 
-router.post('/product', uploadS3.uploadImagesS3, async (req, res) => {
+router.post('/product', [auth, uploadS3.uploadImagesS3], async (req, res) => {
   try {
     const { locationArray } = req.imagesS3Service;
     const newProduct = {...req.body, pictures: locationArray,
@@ -30,9 +31,17 @@ router.post('/product', uploadS3.uploadImagesS3, async (req, res) => {
 });
 
 router.get('/product', controller.findAllProducts);
-router.get('/product/itemNumber/:itemNumber', controller.findProductByItemNumber)
-router.get('/product/category/:category', controller.findProductsByParentCategory)
-router.get('/product/category/:category/:childCategory', controller.findProductsByParentChildCategory)
-
+router.get(
+  '/product/itemNumber/:itemNumber',
+  controller.findProductByItemNumber
+);
+router.get(
+  '/product/category/:category',
+  controller.findProductsByParentCategory
+);
+router.get(
+  '/product/category/:category/:childCategory',
+  controller.findProductsByParentChildCategory
+);
 
 module.exports = router;

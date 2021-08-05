@@ -1,10 +1,9 @@
 const Order = require('../../../../db/models/order');
 
 const getOrders = async orderPaymentType => {
-  const paymentState = orderPaymentType === 'paid' ? 'paid' : 'created'; //TODO: Change by paid orders
   const orders = await Order.find(
     {
-      'paymentData.state': paymentState
+      'paymentData.state': orderPaymentType
     },
     [],
     {

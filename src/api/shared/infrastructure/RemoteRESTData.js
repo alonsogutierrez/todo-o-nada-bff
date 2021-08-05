@@ -3,7 +3,7 @@ const HttpStatus = require('http-status-codes');
 
 const logger = console;
 
-async function GETRequest(baseURL, url, query, body, headers) {
+async function GETRequest(baseURL, url, query = {}, body = {}, headers = {}) {
   try {
     const response = await axios({
       baseURL,
@@ -11,7 +11,7 @@ async function GETRequest(baseURL, url, query, body, headers) {
       method: 'GET',
       url,
       params: query,
-      data: body
+      data: body,
     });
     return response.data;
   } catch (e) {
@@ -20,7 +20,7 @@ async function GETRequest(baseURL, url, query, body, headers) {
       baseURL,
       url,
       query,
-      errorDescription: e.message
+      errorDescription: e.message,
     });
     throw e;
   }
@@ -34,7 +34,7 @@ async function POSTRequest(baseURL, url, query, body) {
       method: 'POST',
       url,
       params: query,
-      data: body
+      data: body,
     });
     return response.data;
   } catch (e) {
@@ -43,7 +43,7 @@ async function POSTRequest(baseURL, url, query, body) {
       baseURL,
       url,
       query,
-      errorDescription: e.message
+      errorDescription: e.message,
     });
     throw e;
   }
@@ -51,5 +51,5 @@ async function POSTRequest(baseURL, url, query, body) {
 
 module.exports = {
   GETRequest,
-  POSTRequest
+  POSTRequest,
 };
