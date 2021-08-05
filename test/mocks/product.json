@@ -7,6 +7,8 @@
   "hasInventory": true,
   "hasSizes": true,
   "published": true,
+  "color": "negro",
+  "pictures": [{ "image": "image01.png", "order": 1 }],
   "price": {
     "basePriceSales": 20000,
     "basePriceReference": 15000,
@@ -17,20 +19,17 @@
     {
       "sku": 1001,
       "size": "s",
-      "stock": 5,
-      "pictures": [{ "image": "image01.png", "order": 1 }]
+      "stock": 5
     },
     {
       "sku": 1002,
       "size": "m",
-      "stock": 10,
-      "pictures": [{ "image": "image01.png", "order": 1 }]
+      "stock": 10
     },
     {
       "sku": 1003,
       "size": "l",
-      "stock": 20,
-      "pictures": [{ "image": "image01.png", "order": 1 }]
+      "stock": 20
     }
   ]
 }
