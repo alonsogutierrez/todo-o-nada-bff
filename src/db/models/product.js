@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
+const AutoIncrement = require('mongoose-sequence')(mongoose);
+
 
 const productSchema = new mongoose.Schema(
   {
@@ -15,24 +17,18 @@ const productSchema = new mongoose.Schema(
     },
     details: [
       {
-        color: {
-          required: false,
-          type: 'String'
-        },
-        pictures: [
-          {
-            image: 'String',
-            order: 'Number'
-          }
-        ],
         size: 'String',
         sku: {
-          required: false,
-          type: 'Number'
+          type: 'Number',
         },
         stock: 'Number'
       }
     ],
+    pictures: [String],
+    color: {
+        required: true,
+        type: 'String'
+    },
     hasInventory: 'Boolean',
     hasSizes: 'Boolean',
     itemNumber: 'Number',
@@ -50,8 +46,8 @@ const productSchema = new mongoose.Schema(
         type: 'Number'
       },
       discount: {
-        required: false,
-        type: 'Number'
+        type: 'Number',
+        default: 0
       }
     },
     published: {
@@ -79,5 +75,6 @@ const productSchema = new mongoose.Schema(
 );
 
 productSchema.plugin(mongoosePaginate);
+productSchema.plugin(AutoIncrement, {inc_field: 'itemNumber'  });
 
 module.exports = mongoose.model('Product', productSchema);
