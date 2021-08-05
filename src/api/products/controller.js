@@ -23,7 +23,7 @@ const uploadAndProcessLotsProducts = async (req, res) => {
     }
     logger.info('File well readed');
     rows.shift();
-    rows.forEach(row => {
+    rows.forEach((row) => {
       const [
         itemNumber,
         sku,
@@ -35,7 +35,7 @@ const uploadAndProcessLotsProducts = async (req, res) => {
         basePriceSales,
         basePriceReference,
         discount,
-        stock
+        stock,
       ] = row;
       const product = {
         name,
@@ -48,9 +48,9 @@ const uploadAndProcessLotsProducts = async (req, res) => {
         price: {
           basePriceSales: parseInt(basePriceSales),
           basePriceReference: parseInt(basePriceReference),
-          discount: parseInt(discount)
+          discount: parseInt(discount),
         },
-        stock
+        stock,
       };
       productsFromExcel.push(product);
     });
@@ -62,21 +62,19 @@ const uploadAndProcessLotsProducts = async (req, res) => {
           must: [
             {
               match: {
-                itemNumber: product.itemNumber
-              }
+                itemNumber: product.itemNumber,
+              },
             },
             {
               match: {
-                sku: product.sku
-              }
-            }
-          ]
-        }
+                sku: product.sku,
+              },
+            },
+          ],
+        },
       };
-      const productFoundElasticRepository = await ElasticSearchRestData.SearchRequest(
-        'products',
-        { query }
-      );
+      const productFoundElasticRepository =
+        await ElasticSearchRestData.SearchRequest('products', { query });
       const { hits } = productFoundElasticRepository;
       if (hits && Object.keys(hits).length > 0) {
         logger.info(
@@ -95,11 +93,12 @@ const uploadAndProcessLotsProducts = async (req, res) => {
             name: product.name,
             categories: product.category,
             description: product.description,
-            colors: product.color,
+            color: product.color,
             sizeDetail: product.size,
             price: product.price,
             quantity:
-              parseInt(actualProduct.quantity, 10) + parseInt(product.stock, 10)
+              parseInt(actualProduct.quantity, 10) +
+              parseInt(product.stock, 10),
           };
           logger.info('New product data: ', newProductData);
           const updateRequestData = await ElasticSearchRestData.UpdateRequest(
@@ -115,10 +114,11 @@ const uploadAndProcessLotsProducts = async (req, res) => {
             name: product.name,
             categories: product.category,
             description: product.description,
-            colors: product.color,
+            color: product.color,
             sizeDetail: product.size,
             price: product.price,
-            quantity: product.stock
+            quantity: product.stock,
+            picture: `${process.env.S3_BASE_URL}/images/products/${product.itemNumber}.jpg`,
           };
           await ElasticSearchRestData.CreateRequest('products', newProduct);
           logger.info('Product well created in search repository', newProduct);
@@ -130,16 +130,15 @@ const uploadAndProcessLotsProducts = async (req, res) => {
       }
 
       const productFound = await Products.findOne({
-        itemNumber: product.itemNumber
+        itemNumber: product.itemNumber,
       });
       if (productFound) {
         const skuFound = productFound.details.find(
-          subProduct => subProduct.sku === product.sku
+          (subProduct) => subProduct.sku === product.sku
         );
         if (skuFound) {
-          const newProductDetails = productFound.details.map(subProduct => {
+          const newProductDetails = productFound.details.map((subProduct) => {
             if (subProduct.sku === product.sku) {
-              subProduct.color = product.color;
               subProduct.size = product.size;
               subProduct.stock += Number(product.stock);
             }
@@ -150,7 +149,8 @@ const uploadAndProcessLotsProducts = async (req, res) => {
             name: product.name,
             description: product.description,
             category: product.category,
-            price: product.price
+            price: product.price,
+            color: product.color,
           };
 
           await Products.updateOne(
@@ -160,16 +160,16 @@ const uploadAndProcessLotsProducts = async (req, res) => {
         } else {
           const newProductDetails = {
             sku: product.sku,
-            color: product.color,
             size: product.size,
-            stock: product.stock
+            stock: product.stock,
           };
           const newProductData = {
             name: product.name,
             description: product.description,
             category: product.category,
+            color: product.color,
             price: product.price,
-            details: productFound.details.concat(newProductDetails)
+            details: productFound.details.concat(newProductDetails),
           };
           await Products.updateOne(
             { itemNumber: product.itemNumber },
@@ -183,24 +183,28 @@ const uploadAndProcessLotsProducts = async (req, res) => {
           name: product.name,
           description: product.description,
           price: product.price,
+          color: product.color,
+          pictures: [
+            `${process.env.S3_BASE_URL}/images/products/${product.itemNumber}.jpg`,
+          ],
           details: [
             {
               sku: product.sku,
-              color: product.color,
               size: product.size,
-              stock: product.stock
-            }
-          ]
+              stock: product.stock,
+            },
+          ],
         };
         const p = new Products(newProduct);
         await p.save();
       }
     }
+    logger.info('All products well created in both repositories');
     return res.sendStatus(201);
   } catch (error) {
     logger.log(error);
     res.status(500).send({
-      message: 'Could not upload the file: ' + req.file.originalname
+      message: 'Could not upload the file: ' + req.file.originalname,
     });
   }
 };
@@ -208,11 +212,49 @@ const uploadAndProcessLotsProducts = async (req, res) => {
 const findProductByItemNumber = async (req, res) => {
   try {
     const { itemNumber } = req.params;
-    const product = await Products.findOne({
-      itemNumber: parseInt(itemNumber)
+    let product = await Products.findOne({
+      itemNumber: parseInt(itemNumber),
     });
+    const newProductDetails = {};
+    product.details.forEach((p) => {
+      newProductDetails[`${p.sku}`] = {
+        size: p.size,
+        stock: p.stock,
+        _id: p._id,
+      };
+    });
+    let productUpdated = {
+      price: {},
+      category: [],
+      published: false,
+      _id: '',
+      itemNumber: 0,
+      name: '',
+      description: '',
+      details: {},
+      color: '',
+      pictures: [],
+      specifications: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      __v: 0,
+    };
+    productUpdated.price = product.price;
+    productUpdated.category = product.category;
+    productUpdated.published = product.published;
+    productUpdated._id = product._id;
+    productUpdated.itemNumber = product.itemNumber;
+    productUpdated.name = product.name;
+    productUpdated.description = product.description;
+    productUpdated.details = newProductDetails;
+    productUpdated.color = product.color;
+    productUpdated.pictures = product.pictures;
+    productUpdated.specifications = product.specifications;
+    productUpdated.createdAt = product.createdAt;
+    productUpdated.updatedAt = product.updatedAt;
+    productUpdated.__v = product.__v;
     logger.log(`Product with itemNumber :${itemNumber} find successfully`);
-    res.status(200).send(product);
+    res.status(200).send(productUpdated);
   } catch (e) {
     logger.error('Can`t find product: ', e.message);
     res.status(404).send();
@@ -225,7 +267,7 @@ const findAllProducts = async (req, res) => {
     const options = {
       limit: 1,
       pagination: true,
-      page: page === isNaN(page) || page === undefined ? 1 : parseInt(page)
+      page: page === isNaN(page) || page === undefined ? 1 : parseInt(page),
     };
     const products = await Products.paginate({}, options);
     logger.log('Products get successfully');
@@ -243,7 +285,7 @@ const findProductsByParentCategory = async (req, res) => {
     const options = {
       limit: 1,
       pagination: true,
-      page: page === isNaN(page) || page === undefined ? 1 : parseInt(page)
+      page: page === isNaN(page) || page === undefined ? 1 : parseInt(page),
     };
     const products = await Products.paginate(
       { 'category.0': category },
@@ -264,7 +306,7 @@ const findProductsByParentChildCategory = async (req, res) => {
     const options = {
       limit: 1,
       pagination: true,
-      page: page === isNaN(page) || page === undefined ? 1 : parseInt(page)
+      page: page === isNaN(page) || page === undefined ? 1 : parseInt(page),
     };
     const products = await Products.paginate(
       { 'category.1': childCategory, 'category.0': category },
