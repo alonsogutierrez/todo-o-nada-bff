@@ -22,6 +22,12 @@ const productSchema = {
       type: 'string',
       description: 'product description'
     },
+    pictures: {
+      type: 'array',
+      item: {
+        image: { type: 'string' },
+      }
+    },
     color: { type: 'string' },
     details: {
       type: 'array',
@@ -29,13 +35,6 @@ const productSchema = {
         sku: { type: 'number' },
         size: { type: 'string' },
         stock: { type: 'number' },
-        pictures: {
-          type: 'array',
-          item: {
-            image: { type: 'string' },
-            order: { type: 'number' }
-          }
-        }
       }
     },
     specifications: {
@@ -75,5 +74,7 @@ const productSchema = {
     'hasInventory'
   ]
 };
+
+
 
 module.exports = productSchema;
