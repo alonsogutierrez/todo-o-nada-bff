@@ -3,8 +3,8 @@ const multerS3 = require("multer-s3");
 const multer = require('multer')
 
 const s3 = new AWS.S3({
-    accessKeyId: process.env.accessKeyId,
-    secretAccessKey: process.env.secretAccessKey
+    accessKeyId: process.env.SECRET_KEY_AWS_ID,
+    secretAccessKey: process.env.SECRET_KEY_AWS_ACCESS
 });
 
 const uploadS3 = multer({
@@ -17,15 +17,15 @@ const uploadS3 = multer({
             callBack(null, { fieldName: file.fieldname })
         },
         key: (req, file, callBack) => {
-            const fullPath = 'images/' + file.originalname; //If you want to save into a folder concat de name of the folder to the path
+            const fullPath = 'images/products/' + file.originalname; //If you want to save into a folder concat de name of the folder to the path
             callBack(null, fullPath)
         }
     }),
     limits: { fileSize: 2000000 },
 }).array('pictures', 3);
 
-
-exports.uploadImagesS3 = async (req, res) => {
+// TODO: enviar peticion y pasar la info a travez de next al otro middleware que sigue para crear el producto.....
+exports.uploadImagesS3 = async (req, res, next) => {
 
 
     uploadS3(req, res, (error) => {
@@ -54,12 +54,23 @@ exports.uploadImagesS3 = async (req, res) => {
                     console.log('filenm', fileLocation);
                     images.push(fileLocation)
                 }
-                // Save the file name into database
-                return res.status(200).json({
+                console.log({
                     status: 'ok',
                     filesArray: fileArray,
                     locationArray: images
-                });
+                })
+                // Save the file name into database
+                /*return res.status(200).json({
+                    status: 'ok',
+                    filesArray: fileArray,
+                    locationArray: images
+                });*/
+                req.imagesS3Service = {
+                    status: 'ok',
+                    filesArray: fileArray,
+                    locationArray: images
+                }
+                next();
 
             }
         }
