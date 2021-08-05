@@ -5,11 +5,11 @@ const logger = console;
 const connectWithMongodDB = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URL, {
-      //user: process.env.MONGO_DB_USER,
-      //pass: process.env.MONGO_DB_PASSWORD,
+      user: process.env.MONGO_DB_USER,
+      pass: process.env.MONGO_DB_PASSWORD,
       useNewUrlParser: true,
       useCreateIndex: true,
-      useFindAndModify: false
+      useFindAndModify: false,
     });
     logger.info('Well connected with MongoDB');
     return true;
