@@ -13,9 +13,15 @@ router.post(
   controller.uploadAndProcessLotsProducts
 );
 
-router.post('/product', async (req, res) => {
+router.post('/product', uploadS3.uploadImagesS3, async (req, res) => {
   try {
-    const productIndexed = await saveProduct(req.body);
+    const { locationArray } = req.imagesS3Service;
+    const newProduct = {...req.body, pictures: locationArray,
+      details: JSON.parse(req.body.details),
+      price: JSON.parse(req.body.price),
+      category: JSON.parse(req.body.category)
+    }
+    const productIndexed = await saveProduct(newProduct);
     res.status(201).send({ status: 201, data: productIndexed });
   } catch (e) {
     logger.error('Can`t save product: ', e.message);
@@ -23,7 +29,6 @@ router.post('/product', async (req, res) => {
   }
 });
 
-router.post('/product/uploadImage', uploadS3.uploadImagesS3)
 router.get('/product', controller.findAllProducts);
 router.get('/product/itemNumber/:itemNumber', controller.findProductByItemNumber)
 router.get('/product/category/:category', controller.findProductsByParentCategory)
