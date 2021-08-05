@@ -24,7 +24,6 @@ const uploadS3 = multer({
     limits: { fileSize: 2000000 },
 }).array('pictures', 3);
 
-// TODO: enviar peticion y pasar la info a travez de next al otro middleware que sigue para crear el producto.....
 exports.uploadImagesS3 = async (req, res, next) => {
 
 
