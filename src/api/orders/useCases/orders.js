@@ -394,6 +394,7 @@ const generateOrderData = async (order) => {
           inventoryState: {
             state: 'Reserved',
           },
+          pictures: dbProduct.pictures[0],
         };
         logger.log('reservedProduct: ', reservedProduct);
         return reservedProduct;

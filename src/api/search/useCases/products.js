@@ -8,8 +8,8 @@ const getProducts = async (searchText, page, size = 20) => {
     multi_match: {
       query: searchText,
       fields: ['name', 'categories', 'description'],
-      type: 'phrase_prefix'
-    }
+      type: 'phrase_prefix',
+    },
   };
   const elasticSearchResponse = await ElasticSearchRestData.SearchRequest(
     'products',
@@ -26,8 +26,8 @@ const getProductsByCategory = async (categoryName, page, size = 20) => {
     multi_match: {
       query: categoryName,
       fields: ['categories'],
-      type: 'phrase_prefix'
-    }
+      type: 'phrase_prefix',
+    },
   };
   const elasticSearchResponse = await ElasticSearchRestData.SearchRequest(
     'products',
@@ -43,10 +43,10 @@ const getMoreInterestingProducts = async (page = 0, size = 5) => {
     bool: {
       filter: {
         terms: {
-          sku: [1001, 1002, 1003, 1004, 1005]
-        }
-      }
-    }
+          sku: [1001, 1010, 1020, 1025, 1029],
+        },
+      },
+    },
   };
   const elasticSearchResponse = await ElasticSearchRestData.SearchRequest(
     'products',
@@ -60,5 +60,5 @@ const getMoreInterestingProducts = async (page = 0, size = 5) => {
 module.exports = {
   getProducts,
   getProductsByCategory,
-  getMoreInterestingProducts
+  getMoreInterestingProducts,
 };

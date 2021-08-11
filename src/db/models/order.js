@@ -47,6 +47,10 @@ const orderSchema = new mongoose.Schema(
             required: false,
           },
         },
+        pictures: {
+          type: String,
+          required: true,
+        },
       },
     ],
     paymentData: {
