@@ -277,11 +277,6 @@ const updateSearchProductRepository = async (itemNumber, sku, quantity) => {
               itemNumber: itemNumber,
             },
           },
-          {
-            match: {
-              sku: sku,
-            },
-          },
         ],
       },
     };
@@ -309,9 +304,27 @@ const updateSearchProductRepository = async (itemNumber, sku, quantity) => {
     const finalHits = hits.hits;
     const actualProduct = finalHits[0]._source;
     logger.info('Actual product data: ', actualProduct);
+    let productDetailsUpdated = {};
+    if (actualProduct.details[sku]) {
+      const productDetailsToUpdate = actualProduct.details;
+      productDetailsToUpdate[sku] = {
+        quantity:
+          parseInt(productDetailsToUpdate[sku].quantity, 10) +
+          parseInt(quantity, 10),
+        size: productDetailsToUpdate[sku].size,
+      };
+      productDetailsUpdated = productDetailsToUpdate;
+    } else {
+      const productDetailsToUpdate = actualProduct.details;
+      productDetailsToUpdate[sku] = {
+        quantity: parseInt(quantity, 10),
+        size: productDetailsToUpdate[sku].size,
+      };
+      productDetailsUpdated = productDetailsToUpdate;
+    }
     const newProductData = {
       ...actualProduct,
-      quantity: parseInt(actualProduct.quantity, 10) - parseInt(quantity, 10),
+      details: productDetailsUpdated,
     };
     const updateResponse = await ElasticSearchRestData.UpdateRequest(
       'products',

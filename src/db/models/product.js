@@ -74,6 +74,6 @@ const productSchema = new mongoose.Schema(
 );
 
 productSchema.plugin(mongoosePaginate);
-productSchema.plugin(AutoIncrement, { inc_field: 'itemNumber' });
+//productSchema.plugin(AutoIncrement, { inc_field: 'itemNumber' });
 
 module.exports = mongoose.model('Product', productSchema);
