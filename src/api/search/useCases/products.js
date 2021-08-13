@@ -43,7 +43,7 @@ const getMoreInterestingProducts = async (page = 0, size = 5) => {
     bool: {
       filter: {
         terms: {
-          sku: [1001, 1010, 1020, 1025, 1029],
+          itemNumber: [1, 4, 6, 7, 8],
         },
       },
     },
