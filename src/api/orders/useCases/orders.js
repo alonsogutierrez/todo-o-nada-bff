@@ -309,7 +309,7 @@ const updateSearchProductRepository = async (itemNumber, sku, quantity) => {
       const productDetailsToUpdate = actualProduct.details;
       productDetailsToUpdate[sku] = {
         quantity:
-          parseInt(productDetailsToUpdate[sku].quantity, 10) +
+          parseInt(productDetailsToUpdate[sku].quantity, 10) -
           parseInt(quantity, 10),
         size: productDetailsToUpdate[sku].size,
       };
