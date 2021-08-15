@@ -24,6 +24,7 @@ router.get('/orders', async (req, res) => {
       throw new Error('Invalid request');
     }
     const { orderNumber, id } = query;
+    logger.info(`Validating info: orderNumber => ${orderNumber} & id => ${id}`);
     if (!orderNumber || !id) {
       throw new Error('Invalid params');
     }

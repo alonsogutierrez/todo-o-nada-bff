@@ -430,6 +430,8 @@ const generatePaymentData = (order) => {
     transaction: { subTotal, shipping },
     user: { email },
   } = paymentData;
+  const urlReturn = `${BASE_URL_FE}?orderNumber=${order.orderNumber}&id=${uuid}`;
+  logger.info('Url Return: ', urlReturn);
   // NOTE: All fields must be order alphabetically in asc way
   return {
     amount: subTotal + shipping,
@@ -440,7 +442,7 @@ const generatePaymentData = (order) => {
     payment_currency: 'CLP',
     subject: 'Creando pago para Todo o Nada Tatto Art',
     urlConfirmation: `${BASE_URL_BFF}/orders/payment_confirm`,
-    urlReturn: `${BASE_URL_FE}?orderNumber=${order.orderNumber}&id=${uuid}`,
+    urlReturn,
   };
 };
 
