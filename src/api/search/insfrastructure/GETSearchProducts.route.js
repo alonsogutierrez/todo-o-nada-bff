@@ -22,6 +22,7 @@ const action = async (req, res) => {
     logger.log('Request finished: ', searchProductsResponse);
     res.status(HTTPCodes.OK).send(searchProductsResponse);
   } catch (err) {
+    logger.error(`Can't search products: ${err.message}`);
     res.status(HTTPCodes.INTERNAL_SERVER_ERROR).send({
       error: `Can't search products: ${err.message}`,
     });

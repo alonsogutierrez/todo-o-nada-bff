@@ -27,7 +27,7 @@ const setProductsFromExcel = (excelProducts) => {
     const product = {
       name,
       description: description === null ? '' : description,
-      category: categories.split(','),
+      category: categories.split(',').map((cat) => cat.trim().toLowerCase()),
       size,
       color,
       sku,
