@@ -7,7 +7,7 @@ const logger = console;
 const action = async (req, res) => {
   try {
     const { categoryName } = req.params;
-    logger.log('Validating query');
+    logger.log('Validating query: ', categoryName);
     if (!isValidQuery({ categoryName })) {
       res.status(HTTPCodes.BAD_REQUEST).send({
         error: 'Invalid params',

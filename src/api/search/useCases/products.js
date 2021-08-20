@@ -57,8 +57,22 @@ const getMoreInterestingProducts = async (page = 0, size = 5) => {
   return elasticSearchResponse.hits;
 };
 
+const getAdminProducts = async (page = 0, size = 20) => {
+  const query = {
+    match_all: {},
+  };
+  const elasticSearchResponse = await ElasticSearchRestData.SearchRequest(
+    'products',
+    { query },
+    page,
+    size
+  );
+  return elasticSearchResponse.hits;
+};
+
 module.exports = {
   getProducts,
   getProductsByCategory,
   getMoreInterestingProducts,
+  getAdminProducts,
 };
