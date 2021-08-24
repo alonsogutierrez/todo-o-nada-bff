@@ -141,7 +141,6 @@ const processSearchRepository = async (product) => {
           newProduct.itemNumber
         );
       }
-      return;
     } else {
       throw new Error('Error in elastic search, there is no hits in response');
     }
@@ -241,7 +240,6 @@ const processProductRepository = async (product) => {
         product.itemNumber
       );
     }
-    return;
   } catch (err) {
     logger.error(`Error trying to process product repository: ${err.message}`);
     throw new Error(err.message);

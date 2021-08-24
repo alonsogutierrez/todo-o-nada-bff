@@ -3,7 +3,7 @@ const ElasticSearch = require('elasticsearch');
 const logger = console;
 
 const SERVICES = {
-  ELASTICSEARCH_API: process.env.ELASTIC_SEARCH_URL
+  ELASTICSEARCH_API: process.env.ELASTIC_SEARCH_URL,
 };
 
 const RESOURCES = {
@@ -13,11 +13,11 @@ const RESOURCES = {
 
   SEARCH_PRODUCTS_BY_CATEGORY(categoryName) {
     return `/search/${categoryName}`;
-  }
+  },
 };
 
 const elasticSearchClient = new ElasticSearch.Client({
-  host: SERVICES.ELASTICSEARCH_API
+  host: SERVICES.ELASTICSEARCH_API,
 });
 
 const isClientRunning = async () => {
@@ -35,13 +35,13 @@ const SearchRequest = async (index, query, from = 0, size = 10) => {
     const isElasticSearchClientRunning = await isClientRunning();
 
     const elasticProductIndex = await elasticSearchClient.indices.exists({
-      index: 'products'
+      index: 'products',
     });
     if (!elasticProductIndex) {
       logger.log('Trying to create elasticSearch index');
       await elasticSearchClient.indices.create({
         index: 'products',
-        includeTypeName: true
+        includeTypeName: true,
       });
       logger.log('Index created');
     }
@@ -51,7 +51,7 @@ const SearchRequest = async (index, query, from = 0, size = 10) => {
         index,
         body: query,
         from,
-        size
+        size,
       });
       return response;
     }
@@ -71,7 +71,7 @@ const UpdateRequest = async (index, id, body) => {
       const response = await elasticSearchClient.index({
         id,
         index,
-        body
+        body,
       });
       logger.info('Response update request: ', response);
       return response;
@@ -88,13 +88,13 @@ const CreateRequest = async (index, body) => {
     const isElasticSearchClientRunning = await isClientRunning();
 
     const elasticProductIndex = await elasticSearchClient.indices.exists({
-      index: 'products'
+      index: 'products',
     });
     if (!elasticProductIndex) {
       logger.log('Trying to create elasticSearch index');
       await elasticSearchClient.indices.create({
         index: 'products',
-        includeTypeName: true
+        includeTypeName: true,
       });
       logger.log('Index created');
     }
@@ -102,9 +102,8 @@ const CreateRequest = async (index, body) => {
     if (isElasticSearchClientRunning) {
       const response = await elasticSearchClient.index({
         index,
-        body
+        body,
       });
-      logger.log('Product well indexed: ', response);
       return response;
     }
     throw new Error('ElasticSearch cluster is down');
@@ -118,5 +117,5 @@ module.exports = {
   SearchRequest,
   UpdateRequest,
   SERVICES,
-  RESOURCES
+  RESOURCES,
 };
