@@ -79,155 +79,173 @@ const updateProductDetails = (actualProductDetails, product) => {
 };
 
 const processSearchRepository = async (product) => {
-  const query = {
-    bool: {
-      must: [
-        {
-          match: {
-            itemNumber: product.itemNumber,
+  try {
+    const query = {
+      bool: {
+        must: [
+          {
+            match: {
+              itemNumber: parseInt(product.itemNumber, 10),
+            },
           },
-        },
-      ],
-    },
-  };
-  const productFoundElasticRepository =
-    await ElasticSearchRestData.SearchRequest('products', { query });
-  const { hits } = productFoundElasticRepository;
-  if (hits && Object.keys(hits).length > 0) {
-    logger.info(
-      'Product found in search repository',
-      product.itemNumber,
-      product.sku,
-      hits
-    );
-    const { total } = hits;
-    if (total > 0) {
-      const finalHits = hits.hits;
-      const actualProduct = finalHits[0]._source;
-      logger.info('Actual product data: ', actualProduct);
-      const newProductData = {
-        ...actualProduct,
-        name: product.name,
-        categories: product.category,
-        description: product.description,
-        color: product.color,
-        price: product.price,
-        details: updateProductDetails(actualProduct.details, product),
-        sizes: updateProductSizes(actualProduct.sizes, product.size),
-      };
-      logger.info('New product data: ', newProductData);
-      const updateRequestData = await ElasticSearchRestData.UpdateRequest(
-        'products',
-        finalHits[0]._id,
-        newProductData
-      );
-      logger.info('updateRequestData: ', updateRequestData);
+        ],
+      },
+    };
+    const productFoundElasticRepository =
+      await ElasticSearchRestData.SearchRequest('products', { query });
+    const { hits } = productFoundElasticRepository;
+    if (hits && Object.keys(hits).length > 0) {
+      const { total } = hits;
+      if (total > 0) {
+        const finalHits = hits.hits;
+        const actualProduct = finalHits[0]._source;
+        const newProductData = {
+          ...actualProduct,
+          name: product.name,
+          categories: product.category,
+          description: product.description,
+          color: product.color,
+          price: product.price,
+          details: updateProductDetails(actualProduct.details, product),
+          sizes: updateProductSizes(actualProduct.sizes, product.size),
+        };
+        await ElasticSearchRestData.UpdateRequest(
+          'products',
+          finalHits[0]._id,
+          newProductData
+        );
+        logger.info(
+          'Product well updated in search repository',
+          newProductData.itemNumber
+        );
+      } else {
+        const newProductDetails = {};
+        newProductDetails[product.sku] = {
+          quantity: product.stock,
+          size: product.size,
+        };
+        const newProduct = {
+          itemNumber: parseInt(product.itemNumber, 10),
+          name: product.name,
+          categories: product.category,
+          description: product.description,
+          color: product.color,
+          price: product.price,
+          picture: `${process.env.S3_BASE_URL}/images/products/${product.itemNumber}.jpg`,
+          details: newProductDetails,
+          sizes: [product.size],
+        };
+        await ElasticSearchRestData.CreateRequest('products', newProduct);
+        logger.info(
+          'Product well created in search repository',
+          newProduct.itemNumber
+        );
+      }
+      return;
     } else {
-      const newProductDetails = {};
-      newProductDetails[product.sku] = {
-        quantity: product.stock,
-        size: product.size,
-      };
-      const newProduct = {
-        itemNumber: product.itemNumber,
-        name: product.name,
-        categories: product.category,
-        description: product.description,
-        color: product.color,
-        price: product.price,
-        picture: `${process.env.S3_BASE_URL}/images/products/${product.itemNumber}.jpg`,
-        details: newProductDetails,
-        sizes: [product.size],
-      };
-      await ElasticSearchRestData.CreateRequest('products', newProduct);
-      logger.info('Product well created in search repository', newProduct);
+      throw new Error('Error in elastic search, there is no hits in response');
     }
-    return;
-  } else {
-    throw new Error('Error in elastic search, there is no hits in response');
+  } catch (err) {
+    logger.error(`Error trying to process search repository: ${err.message}`);
+    throw new Error(err.message);
   }
 };
 
 const processProductRepository = async (product) => {
-  const productFound = await Products.findOne({
-    itemNumber: product.itemNumber,
-  });
-  logger.info('Product founded in product repository ', productFound);
-  if (productFound) {
-    const skuFound = productFound.details.some(
-      (subProduct) => subProduct.sku === parseInt(product.sku, 10)
-    );
-    logger.info('Sub product sku founded in product repository ', skuFound);
-    if (skuFound) {
-      logger.info('Begin to update sku product in product repository');
-      const newProductDetails = productFound.details.map((subProduct) => {
-        if (subProduct.sku === product.sku) {
-          subProduct.size = product.size;
-          subProduct.stock += parseInt(product.stock, 10);
-        }
-        return subProduct;
-      });
-      const newProductData = {
-        details: newProductDetails,
-        name: product.name,
-        description: product.description,
-        category: product.category,
-        price: {
-          basePriceSales: product.price.basePriceSales,
-          basePriceReference: product.price.basePriceSales,
-          discount: product.price.discount,
-        },
-        color: product.color,
-      };
+  try {
+    const productFound = await Products.findOne({
+      itemNumber: product.itemNumber,
+    });
+    if (productFound) {
+      const skuFound = productFound.details.some(
+        (subProduct) => subProduct.sku === parseInt(product.sku, 10)
+      );
+      logger.info('Sub product sku founded in product repository ', skuFound);
+      if (skuFound) {
+        const newProductDetails = productFound.details.map((subProduct) => {
+          if (subProduct.sku === product.sku) {
+            subProduct.size = product.size;
+            subProduct.stock += parseInt(product.stock, 10);
+          }
+          return subProduct;
+        });
+        const newProductData = {
+          details: newProductDetails,
+          name: product.name,
+          description: product.description,
+          category: product.category,
+          price: {
+            basePriceSales: product.price.basePriceSales,
+            basePriceReference: product.price.basePriceSales,
+            discount: product.price.discount,
+          },
+          color: product.color,
+        };
 
-      await Products.updateOne(
-        { itemNumber: product.itemNumber },
-        newProductData
-      );
-    } else {
-      logger.info('Begin to create sku product in product repository');
-      const newProductDetails = {
-        sku: parseInt(product.sku, 10),
-        size: product.size,
-        stock: parseInt(product.stock, 10),
-      };
-      const newProductData = {
-        name: product.name,
-        description: product.description,
-        category: product.category,
-        color: product.color,
-        price: product.price,
-        details: productFound.details.concat(newProductDetails),
-      };
-      await Products.updateOne(
-        { itemNumber: product.itemNumber },
-        newProductData
-      );
-    }
-  } else {
-    logger.info('Begin to create product in product repository');
-    const newProduct = {
-      itemNumber: parseInt(product.itemNumber, 10),
-      category: product.category,
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      color: product.color,
-      pictures: [
-        `${process.env.S3_BASE_URL}/images/products/${product.itemNumber}.jpg`,
-      ],
-      details: [
-        {
+        await Products.updateOne(
+          { itemNumber: product.itemNumber },
+          newProductData
+        );
+        logger.info(
+          'Sub product sku well updated in product repository ',
+          product.itemNumber,
+          product.sku
+        );
+      } else {
+        const newProductDetails = {
           sku: parseInt(product.sku, 10),
           size: product.size,
           stock: parseInt(product.stock, 10),
-        },
-      ],
-    };
-    const p = new Products(newProduct);
-    await p.save();
+        };
+        const newProductData = {
+          name: product.name,
+          description: product.description,
+          category: product.category,
+          color: product.color,
+          price: product.price,
+          details: productFound.details.concat(newProductDetails),
+        };
+        await Products.updateOne(
+          { itemNumber: product.itemNumber },
+          newProductData
+        );
+        logger.info(
+          'Sub product sku well created in product repository ',
+          product.itemNumber,
+          product.sku
+        );
+      }
+    } else {
+      const newProduct = {
+        itemNumber: parseInt(product.itemNumber, 10),
+        category: product.category,
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        color: product.color,
+        pictures: [
+          `${process.env.S3_BASE_URL}/images/products/${product.itemNumber}.jpg`,
+        ],
+        details: [
+          {
+            sku: parseInt(product.sku, 10),
+            size: product.size,
+            stock: parseInt(product.stock, 10),
+          },
+        ],
+      };
+      const p = new Products(newProduct);
+      await p.save();
+      logger.info(
+        'Product sku well created in product repository',
+        product.itemNumber
+      );
+    }
+    return;
+  } catch (err) {
+    logger.error(`Error trying to process product repository: ${err.message}`);
+    throw new Error(err.message);
   }
-  return;
 };
 
 const uploadAndProcessLotsProducts = async (req, res) => {
@@ -249,19 +267,27 @@ const uploadAndProcessLotsProducts = async (req, res) => {
 
     productsExcelMapped = setProductsFromExcel(rows);
 
-    logger.log('Procesaremos ', productsExcelMapped.length, ' productos');
-    for (const excelProduct of productsExcelMapped) {
-      logger.info('Processing actual product from excel: ', excelProduct);
-      await processSearchRepository(excelProduct);
-      await processProductRepository(excelProduct);
-    }
+    try {
+      logger.log('Procesaremos ', productsExcelMapped.length, ' productos');
 
-    logger.info('All products well created in both repositories');
-    return res.sendStatus(201);
+      for (const excelProduct of productsExcelMapped) {
+        logger.info('Processing actual product from excel: ', excelProduct);
+        await processSearchRepository(excelProduct);
+        await processProductRepository(excelProduct);
+      }
+      logger.info('All products well created in both repositories');
+      return res
+        .status(201)
+        .send({ message: 'All products well created in both repositories' });
+    } catch (err) {
+      throw new Error(
+        `Error processing itemNumber ${excelProduct.itemNumber} ${err.message}`
+      );
+    }
   } catch (error) {
     logger.log(error);
     res.status(500).send({
-      message: 'Could not upload the file: ' + req.file.originalname,
+      message: `Could not upload the file: ${req.file.originalname}: ${err.message}`,
     });
   }
 };
