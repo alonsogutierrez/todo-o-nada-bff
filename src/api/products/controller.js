@@ -82,17 +82,16 @@ const processSearchRepository = async (product) => {
   try {
     const query = {
       bool: {
-        must: [
-          {
-            match: {
-              itemNumber: parseInt(product.itemNumber, 10),
-            },
+        must: {
+          match: {
+            itemNumber: parseInt(product.itemNumber, 10),
           },
-        ],
+        },
       },
     };
     const productFoundElasticRepository =
       await ElasticSearchRestData.SearchRequest('products', { query });
+
     const { hits } = productFoundElasticRepository;
     if (hits && Object.keys(hits).length > 0) {
       const { total } = hits;
@@ -141,6 +140,7 @@ const processSearchRepository = async (product) => {
           newProduct.itemNumber
         );
       }
+      return;
     } else {
       throw new Error('Error in elastic search, there is no hits in response');
     }
@@ -236,10 +236,11 @@ const processProductRepository = async (product) => {
       const p = new Products(newProduct);
       await p.save();
       logger.info(
-        'Product sku well created in product repository',
+        'Product well created in product repository',
         product.itemNumber
       );
     }
+    return;
   } catch (err) {
     logger.error(`Error trying to process product repository: ${err.message}`);
     throw new Error(err.message);
@@ -278,12 +279,9 @@ const uploadAndProcessLotsProducts = async (req, res) => {
         .status(201)
         .send({ message: 'All products well created in both repositories' });
     } catch (err) {
-      throw new Error(
-        `Error processing itemNumber ${excelProduct.itemNumber} ${err.message}`
-      );
+      throw new Error(`Error processing batch products ${err.message}`);
     }
-  } catch (error) {
-    logger.log(error);
+  } catch (err) {
     res.status(500).send({
       message: `Could not upload the file: ${req.file.originalname}: ${err.message}`,
     });
