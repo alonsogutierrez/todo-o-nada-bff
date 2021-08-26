@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Todo o nada tatto art bff",
   "main": "index.js",
+  "engines": {
+    "node": "14.17.2",
+    "npm": "6.14.13"
+  },
   "scripts": {
     "start": "node src/index.js",
     "dev": "env-cmd -f ./src/config/dev.env nodemon src/index.js",
