@@ -81,9 +81,7 @@ const processSearchRepository = async (product) => {
   try {
     const query = {
       match: {
-        itemNumber: {
-          query: parseInt(product.itemNumber, 10),
-        },
+        itemNumber: parseInt(product.itemNumber, 10),
       },
     };
     const productFoundElasticRepository =
