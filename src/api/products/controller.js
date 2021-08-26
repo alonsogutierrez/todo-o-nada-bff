@@ -50,11 +50,10 @@ const updateProductSizes = (actualProductSizes, productSize) => {
     actualProductSizes,
     productSize
   );
-  let newProductsSizes = actualProductSizes;
-  newProductsSizes = newProductsSizes.some((size) => size === productSize)
-    ? newProductsSizes
-    : newProductsSizes.concat(productSize);
-  logger.info('New product sizes ', newProductsSizes);
+  let newProductsSizes = [];
+  newProductsSizes = actualProductSizes.includes(productSize)
+    ? actualProductSizes
+    : actualProductSizes.concat(productSize);
   return newProductsSizes;
 };
 
@@ -81,11 +80,9 @@ const updateProductDetails = (actualProductDetails, product) => {
 const processSearchRepository = async (product) => {
   try {
     const query = {
-      bool: {
-        must: {
-          match: {
-            itemNumber: parseInt(product.itemNumber, 10),
-          },
+      match: {
+        itemNumber: {
+          query: parseInt(product.itemNumber, 10),
         },
       },
     };
@@ -155,11 +152,11 @@ const processProductRepository = async (product) => {
     const productFound = await Products.findOne({
       itemNumber: product.itemNumber,
     });
-    if (productFound) {
+
+    if (productFound && Object.keys(productFound.length > 0)) {
       const skuFound = productFound.details.some(
         (subProduct) => subProduct.sku === parseInt(product.sku, 10)
       );
-      logger.info('Sub product sku founded in product repository ', skuFound);
       if (skuFound) {
         const newProductDetails = productFound.details.map((subProduct) => {
           if (subProduct.sku === product.sku) {
@@ -267,7 +264,7 @@ const uploadAndProcessLotsProducts = async (req, res) => {
     productsExcelMapped = setProductsFromExcel(rows);
 
     try {
-      logger.log('Procesaremos ', productsExcelMapped.length, ' productos');
+      logger.info('Procesaremos ', productsExcelMapped.length, ' productos');
 
       for (const excelProduct of productsExcelMapped) {
         logger.info('Processing actual product from excel: ', excelProduct);
@@ -282,6 +279,9 @@ const uploadAndProcessLotsProducts = async (req, res) => {
       throw new Error(`Error processing batch products ${err.message}`);
     }
   } catch (err) {
+    logger.error(
+      `Could not upload the file: ${req.file.originalname}: ${err.message}`
+    );
     res.status(500).send({
       message: `Could not upload the file: ${req.file.originalname}: ${err.message}`,
     });

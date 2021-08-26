@@ -31,7 +31,6 @@ const isClientRunning = async () => {
 
 const SearchRequest = async (index, query, from = 0, size = 10) => {
   try {
-    logger.log('Begin search request for: ', JSON.stringify(query));
     const isElasticSearchClientRunning = await isClientRunning();
 
     const elasticProductIndex = await elasticSearchClient.indices.exists({
@@ -63,17 +62,14 @@ const SearchRequest = async (index, query, from = 0, size = 10) => {
 
 const UpdateRequest = async (index, id, body) => {
   try {
-    logger.log('Begin update request for id: ', id, body);
     const isElasticSearchClientRunning = await isClientRunning();
 
     if (isElasticSearchClientRunning) {
-      logger.info('Trying to update document ', index, id, body);
       const response = await elasticSearchClient.index({
         id,
         index,
         body,
       });
-      logger.info('Response update request: ', response);
       return response;
     }
     throw new Error('ElasticSearch cluster is down');
@@ -84,7 +80,6 @@ const UpdateRequest = async (index, id, body) => {
 
 const CreateRequest = async (index, body) => {
   try {
-    logger.log('Begin create request for body: ', body);
     const isElasticSearchClientRunning = await isClientRunning();
 
     const elasticProductIndex = await elasticSearchClient.indices.exists({
