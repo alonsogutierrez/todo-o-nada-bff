@@ -88,6 +88,10 @@ const processSearchRepository = async (product) => {
       await ElasticSearchRestData.SearchRequest('products', { query });
 
     const { hits } = productFoundElasticRepository;
+    logger.info(
+      'productFoundElasticRepository: ',
+      JSON.stringify(productFoundElasticRepository)
+    );
     if (hits && Object.keys(hits).length > 0) {
       const { total } = hits;
       if (total > 0) {
