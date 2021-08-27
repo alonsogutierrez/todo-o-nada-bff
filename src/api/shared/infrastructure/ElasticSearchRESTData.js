@@ -102,7 +102,6 @@ const CreateRequest = async (index, body) => {
           body,
         })
         .then((response) => {
-          logger.info('Product well created in elastic Search');
           return response;
         })
         .catch((err) => {
