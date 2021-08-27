@@ -25,17 +25,17 @@ const setProductsFromExcel = (excelProducts) => {
       stock,
     ] = excelProduct;
     const product = {
+      itemNumber,
+      sku,
       name,
       description: description === null ? '' : description,
       category: categories.split(',').map((cat) => cat.trim().toLowerCase()),
       size,
       color,
-      sku,
-      itemNumber,
       price: {
-        basePriceSales: parseInt(basePriceSales),
-        basePriceReference: parseInt(basePriceReference),
-        discount: parseInt(discount),
+        basePriceSales: parseInt(basePriceSales, 10),
+        basePriceReference: parseInt(basePriceReference, 10),
+        discount: parseInt(discount, 10),
       },
       stock,
     };
@@ -59,11 +59,14 @@ const updateProductSizes = (actualProductSizes, productSize) => {
 
 const updateProductDetails = (actualProductDetails, product) => {
   if (actualProductDetails[product.sku]) {
-    const actualProductQuantity = actualProductDetails[product.sku].quantity;
+    const actualProductQuantity = parseInt(
+      actualProductDetails[product.sku].quantity,
+      10
+    );
     return {
       ...actualProductDetails,
       [product.sku]: {
-        quantity: actualProductQuantity + product.stock,
+        quantity: actualProductQuantity + parseInt(product.stock, 10),
         size: product.size,
       },
     };
@@ -71,7 +74,7 @@ const updateProductDetails = (actualProductDetails, product) => {
   return {
     ...actualProductDetails,
     [product.sku]: {
-      quantity: product.stock,
+      quantity: parseInt(product.stock, 10),
       size: product.size,
     },
   };
@@ -81,7 +84,7 @@ const processSearchRepository = async (product) => {
   try {
     const query = {
       match: {
-        itemNumber: parseInt(product.itemNumber, 10),
+        itemNumber: product.itemNumber,
       },
     };
     const productFoundElasticRepository =
@@ -119,11 +122,11 @@ const processSearchRepository = async (product) => {
       } else {
         const newProductDetails = {};
         newProductDetails[product.sku] = {
-          quantity: product.stock,
+          quantity: parseInt(product.stock, 10),
           size: product.size,
         };
         const newProduct = {
-          itemNumber: parseInt(product.itemNumber, 10),
+          itemNumber: product.itemNumber,
           name: product.name,
           categories: product.category,
           description: product.description,
@@ -215,7 +218,7 @@ const processProductRepository = async (product) => {
       }
     } else {
       const newProduct = {
-        itemNumber: parseInt(product.itemNumber, 10),
+        itemNumber: product.itemNumber,
         category: product.category,
         name: product.name,
         description: product.description,

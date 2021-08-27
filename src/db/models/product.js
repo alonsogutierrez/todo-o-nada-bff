@@ -30,7 +30,7 @@ const productSchema = new mongoose.Schema(
     },
     hasInventory: 'Boolean',
     hasSizes: 'Boolean',
-    itemNumber: 'Number',
+    itemNumber: 'String',
     name: {
       required: true,
       type: 'String',
