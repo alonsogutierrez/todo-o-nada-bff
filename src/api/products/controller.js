@@ -88,7 +88,7 @@ const processSearchRepository = async (product) => {
       },
     };
     const productFoundElasticRepository =
-      await ElasticSearchRestData.SearchRequest('products', { query });
+      await ElasticSearchRestData.SearchRequest('products', { query }, 0, 1);
 
     const { hits } = productFoundElasticRepository;
     logger.info(

@@ -34,12 +34,12 @@ const SearchRequest = async (index, query, from = 0, size = 10) => {
     const isElasticSearchClientRunning = await isClientRunning();
 
     const elasticProductIndex = await elasticSearchClient.indices.exists({
-      index: 'products',
+      index,
     });
     if (!elasticProductIndex) {
       logger.info('Trying to create elasticSearch index');
       await elasticSearchClient.indices.create({
-        index: 'products',
+        index,
         includeTypeName: true,
       });
       logger.info('Index created');
@@ -87,19 +87,29 @@ const CreateRequest = async (index, body) => {
       index: 'products',
     });
     if (!elasticProductIndex) {
-      logger.log('Trying to create elasticSearch index');
+      logger.info('Trying to create elasticSearch index');
       await elasticSearchClient.indices.create({
         index: 'products',
         includeTypeName: true,
       });
-      logger.log('Index created');
+      logger.info('Index created');
     }
 
     if (isElasticSearchClientRunning) {
-      const response = await elasticSearchClient.index({
-        index,
-        body,
-      });
+      const response = elasticSearchClient
+        .index({
+          index,
+          body,
+        })
+        .then((response) => {
+          logger.info('Product well created in elastic Search');
+          return response;
+        })
+        .catch((err) => {
+          return {
+            message: `Error trying to create document: ${err.message}`,
+          };
+        });
       return response;
     }
     throw new Error('ElasticSearch cluster is down');
