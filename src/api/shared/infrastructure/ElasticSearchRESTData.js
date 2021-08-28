@@ -1,4 +1,4 @@
-const ElasticSearch = require('elasticsearch');
+const { Client } = require('elasticsearch');
 
 const logger = console;
 
@@ -16,105 +16,139 @@ const RESOURCES = {
   },
 };
 
-const elasticSearchClient = new ElasticSearch.Client({
+const elasticSearchClient = new Client({
   host: SERVICES.ELASTICSEARCH_API,
+  maxRetries: 8,
+  requestTimeout: 60000,
 });
 
-const isClientRunning = async () => {
-  try {
-    const pingResponse = await elasticSearchClient.ping();
-    return pingResponse;
-  } catch (err) {
-    throw new Error(`ElasticSearch cluster is down: ${err.message}`);
-  }
+const isClientRunning = () => {
+  return new Promise((resolve, reject) => {
+    try {
+      elasticSearchClient.ping({}, (err, response) => {
+        if (err) {
+          reject(`ElasticSearch cluster is down: ${err.message}`);
+        }
+        resolve(response);
+      });
+    } catch (err) {
+      reject(`ElasticSearch cluster is down: ${err.message}`);
+    }
+  });
 };
 
-const SearchRequest = async (index, query, from = 0, size = 10) => {
-  try {
-    const isElasticSearchClientRunning = await isClientRunning();
-
-    const elasticProductIndex = await elasticSearchClient.indices.exists({
-      index,
-    });
-    if (!elasticProductIndex) {
-      logger.info('Trying to create elasticSearch index');
-      await elasticSearchClient.indices.create({
+const SearchRequest = (index, query, from = 0, size = 10) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const isElasticSearchClientRunning = await isClientRunning();
+      const elasticProductIndex = await elasticSearchClient.indices.exists({
         index,
-        includeTypeName: true,
       });
-      logger.info('Index created');
-    }
-
-    if (isElasticSearchClientRunning) {
-      const response = await elasticSearchClient.search({
-        index,
-        body: query,
-        from,
-        size,
-      });
-      return response;
-    }
-    throw new Error('ElasticSearch cluster is down');
-  } catch (err) {
-    logger.error(`Error trying to search in elasticSearch: ${err.message}`);
-    throw new Error(`Error trying to search in elasticSearch: ${err.message}`);
-  }
-};
-
-const UpdateRequest = async (index, id, body) => {
-  try {
-    const isElasticSearchClientRunning = await isClientRunning();
-
-    if (isElasticSearchClientRunning) {
-      const response = await elasticSearchClient.index({
-        id,
-        index,
-        body,
-      });
-      return response;
-    }
-    throw new Error('ElasticSearch cluster is down');
-  } catch (err) {
-    throw new Error(`Error trying to update in elasticSearch: ${err.message}`);
-  }
-};
-
-const CreateRequest = async (index, body) => {
-  try {
-    const isElasticSearchClientRunning = await isClientRunning();
-
-    const elasticProductIndex = await elasticSearchClient.indices.exists({
-      index: 'products',
-    });
-    if (!elasticProductIndex) {
-      logger.info('Trying to create elasticSearch index');
-      await elasticSearchClient.indices.create({
-        index: 'products',
-        includeTypeName: true,
-      });
-      logger.info('Index created');
-    }
-
-    if (isElasticSearchClientRunning) {
-      const response = elasticSearchClient
-        .index({
+      if (!elasticProductIndex) {
+        logger.info('Trying to create elasticSearch index');
+        await elasticSearchClient.indices.create({
           index,
-          body,
-        })
-        .then((response) => {
-          return response;
-        })
-        .catch((err) => {
-          return {
-            message: `Error trying to create document: ${err.message}`,
-          };
+          includeTypeName: true,
         });
-      return response;
+        logger.info('Index created');
+      }
+
+      if (isElasticSearchClientRunning) {
+        elasticSearchClient.search(
+          {
+            index,
+            body: query,
+            from,
+            size,
+          },
+          (err, response) => {
+            if (err) {
+              reject(err);
+            }
+            resolve(response);
+          }
+        );
+      }
+    } catch (err) {
+      logger.error(`Error trying to search in elasticSearch: ${err.message}`);
+      reject(`Error trying to search in elasticSearch: ${err.message}`);
     }
-    throw new Error('ElasticSearch cluster is down');
-  } catch (err) {
-    throw new Error(`Error trying to create in elasticSearch: ${err.message}`);
-  }
+  });
+};
+
+const UpdateRequest = (index, id, body) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const isElasticSearchClientRunning = await isClientRunning();
+
+      if (isElasticSearchClientRunning) {
+        elasticSearchClient.index(
+          {
+            id,
+            index,
+            body,
+          },
+          (err, response) => {
+            if (err) {
+              logger.error(
+                `Can't update product in elastic search ${err.message}`
+              );
+              reject({
+                message: `Can't update product in elastic search ${err.message}`,
+              });
+            }
+            resolve(response);
+          }
+        );
+      }
+    } catch (err) {
+      logger.error(`Error trying to update in elasticSearch: ${err.message}`);
+      reject({
+        message: `Error trying to update in elasticSearch: ${err.message}`,
+      });
+    }
+  });
+};
+
+const CreateRequest = (index, body) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const isElasticSearchClientRunning = await isClientRunning();
+
+      const elasticProductIndex = await elasticSearchClient.indices.exists({
+        index: 'products',
+      });
+      if (!elasticProductIndex) {
+        logger.info('Trying to create elasticSearch index');
+        await elasticSearchClient.indices.create({
+          index: 'products',
+          includeTypeName: true,
+        });
+        logger.info('Index created');
+      }
+
+      if (isElasticSearchClientRunning) {
+        elasticSearchClient.index(
+          {
+            index,
+            body,
+          },
+          (err, response) => {
+            if (err) {
+              logger.error(`Error trying to create document: ${err.message}`);
+              reject({
+                message: `Error trying to create document: ${err.message}`,
+              });
+            }
+            logger.info('Product well saved into elasticSearch');
+            resolve(response);
+          }
+        );
+      }
+    } catch (err) {
+      reject(`Error trying to create in elasticSearch: ${err.message}`);
+    }
+  });
 };
 
 module.exports = {

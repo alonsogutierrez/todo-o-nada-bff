@@ -25,7 +25,7 @@ const setProductsFromExcel = (excelProducts) => {
       stock,
     ] = excelProduct;
     const product = {
-      itemNumber,
+      itemNumber: `${itemNumber}`.trim(),
       sku,
       name,
       description: description === null ? '' : description,
@@ -84,11 +84,11 @@ const processSearchRepository = async (product) => {
   try {
     const query = {
       match: {
-        itemNumber: product.itemNumber,
+        itemNumber: `${product.itemNumber}`,
       },
     };
     const productFoundElasticRepository =
-      await ElasticSearchRestData.SearchRequest('products', { query }, 0, 1);
+      await ElasticSearchRestData.SearchRequest('products', { query });
 
     const { hits } = productFoundElasticRepository;
     logger.info(
@@ -126,7 +126,7 @@ const processSearchRepository = async (product) => {
           size: product.size,
         };
         const newProduct = {
-          itemNumber: product.itemNumber,
+          itemNumber: `${product.itemNumber}`,
           name: product.name,
           categories: product.category,
           description: product.description,
