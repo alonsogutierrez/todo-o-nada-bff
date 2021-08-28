@@ -37,7 +37,7 @@ const isClientRunning = () => {
   });
 };
 
-const SearchRequest = (index, query, from = 0, size = 10) => {
+const SearchRequest = (index, query, from = 0, size = 10, bulk = false) => {
   return new Promise(async (resolve, reject) => {
     try {
       const isElasticSearchClientRunning = await isClientRunning();
@@ -54,23 +54,40 @@ const SearchRequest = (index, query, from = 0, size = 10) => {
       }
 
       if (isElasticSearchClientRunning) {
-        setTimeout(() => {
-          logger.info('search after 1 second');
-          elasticSearchClient.search(
-            {
-              index,
-              body: query,
-              from,
-              size,
-            },
-            (err, response) => {
-              if (err) {
-                reject(err);
+        if (bulk) {
+          setTimeout(() => {
+            logger.info('search after 1 second');
+            elasticSearchClient.search(
+              {
+                index,
+                body: query,
+                from,
+                size,
+              },
+              (err, response) => {
+                if (err) {
+                  reject(err);
+                }
+                resolve(response);
               }
-              resolve(response);
+            );
+          }, 1 * 1000);
+        }
+      } else {
+        elasticSearchClient.search(
+          {
+            index,
+            body: query,
+            from,
+            size,
+          },
+          (err, response) => {
+            if (err) {
+              reject(err);
             }
-          );
-        }, 1 * 1000);
+            resolve(response);
+          }
+        );
       }
     } catch (err) {
       logger.error(`Error trying to search in elasticSearch: ${err.message}`);

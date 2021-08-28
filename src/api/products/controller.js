@@ -94,7 +94,13 @@ const processSearchRepository = async (product) => {
     //   );
     // logger.info('isProductInSearchRepository: ', isProductInSearchRepository);
     const productFoundElasticRepository =
-      await ElasticSearchRestData.SearchRequest('products', { query }, 0, 1);
+      await ElasticSearchRestData.SearchRequest(
+        'products',
+        { query },
+        0,
+        1,
+        true
+      );
 
     const { hits } = productFoundElasticRepository;
     logger.info(
