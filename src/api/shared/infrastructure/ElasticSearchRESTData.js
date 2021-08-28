@@ -116,12 +116,12 @@ const CreateRequest = (index, body) => {
       const isElasticSearchClientRunning = await isClientRunning();
 
       const elasticProductIndex = await elasticSearchClient.indices.exists({
-        index: 'products',
+        index,
       });
       if (!elasticProductIndex) {
         logger.info('Trying to create elasticSearch index');
         await elasticSearchClient.indices.create({
-          index: 'products',
+          index,
           includeTypeName: true,
         });
         logger.info('Index created');
@@ -151,10 +151,49 @@ const CreateRequest = (index, body) => {
   });
 };
 
+const ExistProductDocumentRequest = (index, itemNumber) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const isElasticSearchClientRunning = await isClientRunning();
+
+      const elasticProductIndex = await elasticSearchClient.indices.exists({
+        index,
+      });
+      if (!elasticProductIndex) {
+        logger.info('Trying to create elasticSearch index');
+        await elasticSearchClient.indices.create({
+          index,
+          includeTypeName: true,
+        });
+        logger.info('Index created');
+      }
+
+      if (isElasticSearchClientRunning) {
+        elasticSearchClient.exists(
+          {
+            index,
+            itemNumber,
+          },
+          (err, response) => {
+            if (err) {
+              reject(err);
+            }
+            resolve(response);
+          }
+        );
+      }
+    } catch (err) {
+      logger.error(`Error trying to verify if document exists: ${err.message}`);
+      reject(`Error trying to verify if document exists: ${err.message}`);
+    }
+  });
+};
+
 module.exports = {
   CreateRequest,
   SearchRequest,
   UpdateRequest,
+  ExistProductDocumentRequest,
   SERVICES,
   RESOURCES,
 };
