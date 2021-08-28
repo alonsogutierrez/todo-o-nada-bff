@@ -15,7 +15,8 @@ const getProducts = async (searchText, page, size = 20) => {
     'products',
     { query },
     page,
-    size
+    size,
+    false
   );
 
   return elasticSearchResponse.hits;
@@ -33,7 +34,8 @@ const getProductsByCategory = async (categoryName, page, size = 20) => {
     'products',
     { query },
     page,
-    size
+    size,
+    false
   );
   return elasticSearchResponse.hits;
 };
@@ -52,7 +54,8 @@ const getMoreInterestingProducts = async (page = 0, size = 5) => {
     'products',
     { query },
     page,
-    size
+    size,
+    false
   );
   return elasticSearchResponse.hits;
 };
@@ -65,7 +68,8 @@ const getAdminProducts = async (page = 0, size = 20) => {
     'products',
     { query },
     page,
-    size
+    size,
+    false
   );
   return elasticSearchResponse.hits;
 };

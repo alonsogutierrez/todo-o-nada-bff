@@ -44,6 +44,7 @@ const SearchRequest = (index, query, from = 0, size = 10, bulk = false) => {
       const elasticProductIndex = await elasticSearchClient.indices.exists({
         index,
       });
+
       if (!elasticProductIndex) {
         logger.info('Trying to create elasticSearch index');
         await elasticSearchClient.indices.create({
@@ -55,6 +56,7 @@ const SearchRequest = (index, query, from = 0, size = 10, bulk = false) => {
 
       if (isElasticSearchClientRunning) {
         if (bulk) {
+          logger.info('bulk search');
           setTimeout(() => {
             logger.info('search after 1 second');
             elasticSearchClient.search(
@@ -72,22 +74,23 @@ const SearchRequest = (index, query, from = 0, size = 10, bulk = false) => {
               }
             );
           }, 1 * 1000);
-        }
-      } else {
-        elasticSearchClient.search(
-          {
-            index,
-            body: query,
-            from,
-            size,
-          },
-          (err, response) => {
-            if (err) {
-              reject(err);
+        } else {
+          logger.info('not bulk search');
+          elasticSearchClient.search(
+            {
+              index,
+              body: query,
+              from,
+              size,
+            },
+            (err, response) => {
+              if (err) {
+                reject(err);
+              }
+              resolve(response);
             }
-            resolve(response);
-          }
-        );
+          );
+        }
       }
     } catch (err) {
       logger.error(`Error trying to search in elasticSearch: ${err.message}`);
