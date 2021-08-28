@@ -54,20 +54,23 @@ const SearchRequest = (index, query, from = 0, size = 10) => {
       }
 
       if (isElasticSearchClientRunning) {
-        elasticSearchClient.search(
-          {
-            index,
-            body: query,
-            from,
-            size,
-          },
-          (err, response) => {
-            if (err) {
-              reject(err);
+        setTimeout(() => {
+          logger.info('search after 1 second');
+          elasticSearchClient.search(
+            {
+              index,
+              body: query,
+              from,
+              size,
+            },
+            (err, response) => {
+              if (err) {
+                reject(err);
+              }
+              resolve(response);
             }
-            resolve(response);
-          }
-        );
+          );
+        }, 1 * 1000);
       }
     } catch (err) {
       logger.error(`Error trying to search in elasticSearch: ${err.message}`);
