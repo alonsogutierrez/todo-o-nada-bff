@@ -1,5 +1,5 @@
 const express = require('express');
-const saveProduct = require('./useCases/saveProduct');
+const processProduct = require('./useCases/processProduct');
 const auth = require('./../../middlewares/auth');
 const uploadFileToServer = require('../../middlewares/uploadFileToServer');
 const uploadS3 = require('../../middlewares/uploadS3');
@@ -17,14 +17,15 @@ router.post(
 router.post('/product', [auth, uploadS3.uploadImagesS3], async (req, res) => {
   try {
     const { locationArray } = req.imagesS3Service;
+    logger.info('req.body: ', req.body);
     const newProduct = {
       ...req.body,
       pictures: locationArray,
-      details: JSON.parse(req.body.details),
       price: JSON.parse(req.body.price),
-      category: JSON.parse(req.body.category),
+      details: JSON.parse(req.body.details),
     };
-    const productIndexed = await saveProduct(newProduct);
+    logger.info('newProduct: ', newProduct);
+    const productIndexed = await processProduct(newProduct);
     res.status(201).send({ status: 201, data: productIndexed });
   } catch (e) {
     logger.error('Can`t save product: ', e.message);
