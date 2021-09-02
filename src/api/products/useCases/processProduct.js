@@ -33,7 +33,7 @@ const processInProductRepository = async (productData) => {
     newProductDetail.size = details[sku].size;
     newProductDetail.sku = sku;
     newProductDetail.stock = details[sku].quantity;
-    newProductDetails.push(newProductDetail);
+    newProductsDetails.push(newProductDetail);
   }
   const newProduct = {
     itemNumber,
@@ -67,16 +67,24 @@ const processInSearchRepository = async (productData) => {
     sizes,
   } = productData;
 
+  let productToIndexSizes = [];
+
+  for (let sku in details) {
+    if (details[sku].quantity > 0) {
+      productToIndexSizes.push(details[sku].size);
+    }
+  }
+
   const productToIndex = {
     itemNumber,
     name,
-    categories: category.split(','),
+    categories: category,
     description,
     color,
     price,
     picture: `${process.env.S3_BASE_URL}/images/products/${itemNumber}.jpg`,
     details,
-    sizes: [],
+    sizes: productToIndexSizes,
   };
   logger.info('Trying to save product document in elasticSearch');
   await ElasticSearchRestData.CreateRequest('products', productToIndex);
