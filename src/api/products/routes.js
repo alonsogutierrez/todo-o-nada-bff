@@ -17,14 +17,12 @@ router.post(
 router.post('/product', [auth, uploadS3.uploadImagesS3], async (req, res) => {
   try {
     const { locationArray } = req.imagesS3Service;
-    logger.info('req.body: ', req.body);
     const newProduct = {
       ...req.body,
       pictures: locationArray,
       price: JSON.parse(req.body.price),
       details: JSON.parse(req.body.details),
     };
-    logger.info('newProduct: ', newProduct);
     const productIndexed = await processProduct(newProduct);
     res.status(201).send({ status: 201, data: productIndexed });
   } catch (e) {
