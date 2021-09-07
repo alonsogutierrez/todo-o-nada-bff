@@ -87,12 +87,6 @@ const processSearchRepository = async (product) => {
         itemNumber: `${product.itemNumber}`,
       },
     };
-    // const isProductInSearchRepository =
-    //   await ElasticSearchRestData.ExistProductDocumentRequest(
-    //     'products',
-    //     product.itemNumber
-    //   );
-    // logger.info('isProductInSearchRepository: ', isProductInSearchRepository);
     const productFoundElasticRepository =
       await ElasticSearchRestData.SearchRequest(
         'products',

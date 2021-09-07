@@ -4,6 +4,14 @@ const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const productSchema = new mongoose.Schema(
   {
+    itemNumber: {
+      required: true,
+      type: 'String',
+    },
+    name: {
+      required: true,
+      type: 'String',
+    },
     category: [
       {
         required: true,
@@ -30,11 +38,6 @@ const productSchema = new mongoose.Schema(
     },
     hasInventory: 'Boolean',
     hasSizes: 'Boolean',
-    itemNumber: 'String',
-    name: {
-      required: true,
-      type: 'String',
-    },
     price: {
       basePriceReference: {
         required: true,
@@ -53,7 +56,6 @@ const productSchema = new mongoose.Schema(
       default: false,
       type: 'Boolean',
     },
-    quantity: 'Number',
     specifications: [
       {
         name: {
