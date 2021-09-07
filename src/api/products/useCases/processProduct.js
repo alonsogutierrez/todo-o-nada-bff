@@ -13,35 +13,31 @@ const processProduct = async (productInput) => {
 
 const processInProductRepository = async (productData) => {
   try {
-    const {
-      itemNumber,
-      name,
-      category,
-      description,
-      color,
-      price,
-      details,
-      sizes,
-      pictures,
-    } = productData;
+    const { itemNumber, name, category, description, color, price, details } =
+      productData;
     const productFound = await Product.findOne({
       itemNumber: itemNumber,
     });
+    const categories = category.split(',');
 
     if (productFound && Object.keys(productFound.length > 0)) {
       let skuFound = false;
-      skuFound = productFound.details.some((subProduct) => {
-        for (let sku in details) {
-          if (sku === subProduct.sku) return true;
-        }
-      });
+      skuFound = productFound.details.some(
+        (subProduct) =>
+          details[subProduct.sku.toString()] &&
+          Object.keys(details[subProduct.sku.toString()]).length > 0
+      );
       if (skuFound) {
         const newProductDetails = productFound.details.map((subProduct) => {
-          for (let sku in details) {
-            if (sku === subProduct.sku) {
-              subProduct.size = details[sku].size;
-              subProduct.stock += parseInt(details[sku].stock, 10);
-            }
+          if (
+            details[subProduct.sku.toString()] &&
+            Object.keys(details[subProduct.sku.toString()]).length > 0
+          ) {
+            subProduct.size = details[subProduct.sku.toString()].size;
+            subProduct.stock = parseInt(
+              details[subProduct.sku.toString()].stock,
+              10
+            );
           }
           return subProduct;
         });
@@ -49,7 +45,7 @@ const processInProductRepository = async (productData) => {
           details: newProductDetails,
           name: name,
           description: description,
-          category: category,
+          category: categories,
           price: {
             basePriceSales: price.basePriceSales,
             basePriceReference: price.basePriceReference,
@@ -64,31 +60,29 @@ const processInProductRepository = async (productData) => {
           itemNumber
         );
       } else {
-        //Save sku's not found
-        let skuNotFoundList = [];
         for (let sku in details) {
           let isSKUinProductFound = productFound.details.find((subProduct) => {
-            if (sku !== subProduct.sku) {
+            if (
+              details[subProduct.sku.toString()] &&
+              Object.keys(details[subProduct.sku.toString()]).length > 0
+            ) {
               return true;
             }
           });
           if (!isSKUinProductFound) {
-            skuNotFoundList.push(sku);
+            let newProductDetails = {
+              sku: parseInt(sku, 10),
+              size: product.size,
+              stock: parseInt(details[sku].stock, 10),
+            };
+            productFound.details.push(newProductDetails);
           }
         }
-        skuNotFoundList.forEach((skuNotFound) => {
-          let newProductDetails = {
-            sku: parseInt(sku, 10),
-            size: product.size,
-            stock: parseInt(details[skuNotFound].stock, 10),
-          };
-          productFound.details.push(newProductDetails);
-        });
 
         const newProductData = {
           name: name,
           description: description,
-          category: category,
+          category: categories,
           color: color,
           price: price,
           details: productFound.details,
@@ -100,23 +94,12 @@ const processInProductRepository = async (productData) => {
         );
       }
     } else {
-      const {
-        itemNumber,
-        name,
-        category,
-        description,
-        color,
-        price,
-        details,
-        sizes,
-        pictures,
-      } = productData;
       let newProductsDetails = [];
       for (let sku in details) {
         const newProductDetail = {};
         newProductDetail.size = details[sku].size;
         newProductDetail.sku = sku;
-        newProductDetail.stock = details[sku].quantity;
+        newProductDetail.stock = details[sku].stock;
         newProductsDetails.push(newProductDetail);
       }
       const newProduct = {
@@ -145,27 +128,12 @@ const processInProductRepository = async (productData) => {
     logger.error(`Error trying to process product repository: ${err.message}`);
     throw new Error(err.message);
   }
-  logger.info(
-    'Trying to save product in MongoDB: ',
-    JSON.stringify(productData)
-  );
-
-  logger.info('Product document well saved in MongoDB');
-  return;
 };
 
 const processInSearchRepository = async (productData) => {
   try {
-    const {
-      itemNumber,
-      name,
-      category,
-      description,
-      color,
-      price,
-      details,
-      sizes,
-    } = productData;
+    const { itemNumber, name, category, description, color, price, details } =
+      productData;
     const query = {
       match: {
         itemNumber: `${itemNumber}`,
@@ -181,7 +149,15 @@ const processInSearchRepository = async (productData) => {
       );
 
     const { hits } = productFoundElasticRepository;
+    const newProductDetails = {};
+    for (let sku in details) {
+      newProductDetails[sku.toString()] = {
+        quantity: parseInt(details[sku].stock, 10),
+        size: details[sku].size,
+      };
+    }
     if (hits && Object.keys(hits).length > 0) {
+      const categories = category.split(',');
       const { total } = hits;
       if (total > 0) {
         const finalHits = hits.hits;
@@ -189,11 +165,11 @@ const processInSearchRepository = async (productData) => {
         const newProductData = {
           ...actualProduct,
           name: name,
-          categories: category,
+          categories,
           description: description,
           color: color,
           price: price,
-          details: details,
+          details: newProductDetails,
           sizes: getProductSizes(details),
         };
         await ElasticSearchRestData.UpdateRequest(
@@ -216,12 +192,12 @@ const processInSearchRepository = async (productData) => {
         const productToIndex = {
           itemNumber,
           name,
-          categories: category,
+          categories,
           description,
           color,
           price,
           picture: `${process.env.S3_BASE_URL}/images/products/${itemNumber}.jpg`,
-          details,
+          details: newProductDetails,
           sizes: productToIndexSizes,
         };
         await ElasticSearchRestData.CreateRequest('products', productToIndex);
