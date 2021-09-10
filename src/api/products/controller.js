@@ -138,7 +138,7 @@ const processSearchRepository = async (product) => {
           description: product.description,
           color: product.color,
           price: product.price,
-          picture: `${process.env.S3_BASE_URL}/images/products/${product.itemNumber}.jpg`,
+          picture: '',
           details: newProductDetails,
           sizes: [product.size],
         };
@@ -230,9 +230,7 @@ const processProductRepository = async (product) => {
         description: product.description,
         price: product.price,
         color: product.color,
-        pictures: [
-          `${process.env.S3_BASE_URL}/images/products/${product.itemNumber}.jpg`,
-        ],
+        pictures: [''],
         details: [
           {
             sku: parseInt(product.sku, 10),

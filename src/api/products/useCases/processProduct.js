@@ -13,8 +13,16 @@ const processProduct = async (productInput) => {
 
 const processInProductRepository = async (productData) => {
   try {
-    const { itemNumber, name, category, description, color, price, details } =
-      productData;
+    const {
+      itemNumber,
+      name,
+      category,
+      description,
+      color,
+      price,
+      details,
+      pictures,
+    } = productData;
     const productFound = await Product.findOne({
       itemNumber: itemNumber,
     });
@@ -132,8 +140,16 @@ const processInProductRepository = async (productData) => {
 
 const processInSearchRepository = async (productData) => {
   try {
-    const { itemNumber, name, category, description, color, price, details } =
-      productData;
+    const {
+      itemNumber,
+      name,
+      category,
+      description,
+      color,
+      price,
+      details,
+      pictures,
+    } = productData;
     const query = {
       match: {
         itemNumber: `${itemNumber}`,
@@ -169,6 +185,7 @@ const processInSearchRepository = async (productData) => {
           description: description,
           color: color,
           price: price,
+          picture: pictures[0],
           details: newProductDetails,
           sizes: getProductSizes(details),
         };
@@ -196,7 +213,7 @@ const processInSearchRepository = async (productData) => {
           description,
           color,
           price,
-          picture: `${process.env.S3_BASE_URL}/images/products/${itemNumber}.jpg`,
+          picture: pictures[0],
           details: newProductDetails,
           sizes: productToIndexSizes,
         };
