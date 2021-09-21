@@ -24,8 +24,19 @@ try {
 
 const app = express();
 
+const whitelist = [process.env.FE_URL];
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error());
+    }
+  },
+};
+
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(healthRouter);
 app.use(orderRouter);
