@@ -24,15 +24,9 @@ try {
 
 const app = express();
 
-const whitelist = [process.env.FE_URL];
+const corsWhiteList = [process.env.FE_URL, process.env.BASE_URL_BFF];
 const corsOptions = {
-  origin: (origin, callback) => {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error());
-    }
-  },
+  origin: corsWhiteList,
 };
 
 app.use(bodyParser.urlencoded({ extended: false }));
