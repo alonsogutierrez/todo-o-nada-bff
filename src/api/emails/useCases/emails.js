@@ -7,14 +7,31 @@ const sendTo = async (msg) => {
   logger.info('msg: ', msg);
   const msgByDefault = {
     to: 'alonso.gutierrez@mail.udp.cl', // Change to your recipient
-    from: 'alonso.gutierrez@mail.udp.cl', // Change to your verified sender
-    subject: 'Sending with SendGrid is Fun',
-    text: 'and easy to do anywhere, even with Node.js',
+    from: 'contacto@todoonadatattooart.cl', //'alonso.gutierrez@mail.udp.cl', // Change to your verified sender
+    subject: 'Compra Todo o Nada',
+    text: 'Todo o Nada Tattoo Art Web',
     html: '<strong>and easy to do anywhere, even with Node.js</strong>',
-    templateId: 'd-cdfbff5212bc420688cc03b85d992197',
+    templateId: process.env.SENDGRID_CONFIRMATION_TEMPLATE,
     substitutions: {
-      name: 'Some One',
-      city: 'Denver',
+      orderNumber: 123,
+      deliveryDateLabel: 'Fecha de entrega',
+      deliveryDate: '2021/09/21',
+      addressLabel: 'Dirección de entrega',
+      address: 'Calle 123, Stgo',
+      customerName: 'Jose',
+      items: [
+        {
+          name: 'product1',
+          picture:
+            'https://todo-o-nada-imagenes.s3.us-east-2.amazonaws.com/images/products/7.jpg',
+          price: '1.200',
+        },
+      ],
+      subTotal: '$15.000',
+      dispatchCost: '$0',
+      total: '$15.000',
+      senderName: 'contacto@todoonadatattooart.cl',
+      senderAddress: 'stgo',
     },
   };
   try {
