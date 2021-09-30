@@ -40,12 +40,12 @@ const getProductsByCategory = async (categoryName, page, size = 20) => {
   return elasticSearchResponse.hits;
 };
 
-const getMoreInterestingProducts = async (page = 0, size = 5) => {
+const getMoreInterestingProducts = async (page = 0, size = 6) => {
   const query = {
     bool: {
       filter: {
         terms: {
-          itemNumber: [1, 4, 6, 7, 8],
+          itemNumber: [9, 1, 4, 10, 8],
         },
       },
     },
