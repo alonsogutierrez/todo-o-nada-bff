@@ -5,10 +5,10 @@ const logger = console;
 
 const action = async (req, res) => {
   try {
-    const getCategoriesResponse =
+    const getCategoriesNavLinksResponse =
       await GETCategoryNavLinksUseCases.getCategoriesNavLinks();
-    logger.log('Request finished: ', getCategoriesResponse);
-    res.status(HTTPCodes.StatusCodes.OK).send(getCategoriesResponse);
+    logger.log('Request finished: ', getCategoriesNavLinksResponse);
+    res.status(HTTPCodes.StatusCodes.OK).send(getCategoriesNavLinksResponse);
   } catch (err) {
     res.status(HTTPCodes.StatusCodes.INTERNAL_SERVER_ERROR).send({
       error: `Can't get categories: ${err.message}`,
