@@ -185,7 +185,10 @@ const processInSearchRepository = async (productData) => {
           description: description,
           color: color,
           price: price,
-          picture: pictures[0],
+          picture:
+            pictures && pictures.length > 0 && pictures[0].length > 0
+              ? pictures[0]
+              : actualProduct.picture,
           details: newProductDetails,
           sizes: getProductSizes(details),
         };
