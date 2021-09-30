@@ -22,7 +22,6 @@ router[POSTCreateCategories.method.toLocaleLowerCase()](
 
 router[GETCategoriesNavLinks.method.toLocaleLowerCase()](
   GETCategoriesNavLinks.route,
-  auth,
   GETCategoriesNavLinks.action
 );
 
