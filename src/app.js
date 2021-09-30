@@ -11,6 +11,7 @@ const downloadReportRouter = require('./api/reports/betweenDates/routes/betweenD
 const orderReportRouter = require('./api/reports/orders/routes/orders');
 const healthRouter = require('./api/health/routes/health');
 const searchRouter = require('./api/search/routes/search');
+const categoriesRouter = require('./api/categories/insfrastructure/routes/category');
 
 const healthCheckCron = require('./cron/healthCheck');
 
@@ -40,6 +41,7 @@ app.use(reportRouter);
 app.use(downloadReportRouter);
 app.use(orderReportRouter);
 app.use(searchRouter);
+app.use(categoriesRouter);
 
 cron.schedule('*/10 * * * *', async function () {
   await healthCheckCron();
