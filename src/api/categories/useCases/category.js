@@ -79,7 +79,6 @@ const getCategoriesNavLinks = async () => {
         icon: 'home',
         child_routes: null,
       },
-      ,
       {
         path: '/category/accesiorios',
         menu_title: 'Accesorios',
