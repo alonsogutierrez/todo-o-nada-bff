@@ -80,7 +80,7 @@ const getCategoriesNavLinks = async () => {
         child_routes: null,
       },
       {
-        path: '/category/accesiorios',
+        path: '/category/accesorios',
         menu_title: 'Accesorios',
         category_name: 'accesorios',
         icon: 'arrow_right_alt',
