@@ -16,6 +16,7 @@ router.post(
 
 router.post('/product', [auth, uploadS3.uploadImagesS3], async (req, res) => {
   try {
+    logger.info('Begin to create product');
     const { locationArray } = req.imagesS3Service;
     const newProduct = {
       ...req.body,
@@ -24,6 +25,7 @@ router.post('/product', [auth, uploadS3.uploadImagesS3], async (req, res) => {
       details: JSON.parse(req.body.details),
     };
     const productIndexed = await processProduct(newProduct);
+    logger.info('Product well created');
     res.status(201).send({ status: 201, data: productIndexed });
   } catch (e) {
     logger.error('Can`t save product: ', e.message);

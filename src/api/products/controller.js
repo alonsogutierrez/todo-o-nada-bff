@@ -317,6 +317,7 @@ const findProductByItemNumber = async (req, res) => {
       published: false,
       _id: '',
       itemNumber: 0,
+      productSizeType: '',
       name: '',
       description: '',
       details: {},
@@ -332,6 +333,7 @@ const findProductByItemNumber = async (req, res) => {
     productUpdated.published = product.published;
     productUpdated._id = product._id;
     productUpdated.itemNumber = product.itemNumber;
+    productUpdated.productSizeType = product.productSizeType;
     productUpdated.name = product.name;
     productUpdated.description = product.description;
     productUpdated.details = newProductDetails;
