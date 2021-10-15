@@ -6,6 +6,7 @@ const getCategories = async (categoriesConfig) => {
     const categoriesResponse = [
       'accesorios',
       'bananos',
+      'bandanas',
       'beanies',
       'colorear',
       'cuadro',
@@ -192,6 +193,12 @@ const getCategoriesNavLinks = async () => {
           {
             path: '/category/snapbacks',
             menu_title: 'Snapbacks',
+            icon: 'arrow_right_alt',
+            child_routes: null,
+          },
+          {
+            path: '/category/bandanas',
+            menu_title: 'Bandanas',
             icon: 'arrow_right_alt',
             child_routes: null,
           },
