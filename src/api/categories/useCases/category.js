@@ -79,63 +79,7 @@ const getCategoriesNavLinks = async () => {
         icon: 'home',
         child_routes: null,
       },
-      {
-        path: '/category/accesorios',
-        menu_title: 'Accesorios',
-        category_name: 'accesorios',
-        icon: 'arrow_right_alt',
-        type: 'subMenu',
-        child_routes: [
-          {
-            path: '/category/gorros',
-            menu_title: 'Gorros',
-            icon: 'arrow_right_alt',
-            child_routes: null,
-          },
-          {
-            path: '/category/snapbacks',
-            menu_title: 'Snapbacks',
-            icon: 'arrow_right_alt',
-            child_routes: null,
-          },
-          {
-            path: '/category/beanies',
-            menu_title: 'Beanies',
-            icon: 'arrow_right_alt',
-            child_routes: null,
-          },
-          {
-            path: '/category/bananos',
-            menu_title: 'Bananos',
-            icon: 'arrow_right_alt',
-            child_routes: null,
-          },
-          {
-            path: '/category/estuches',
-            menu_title: 'Estuches',
-            icon: 'arrow_right_alt',
-            child_routes: null,
-          },
-          {
-            path: '/category/pecheras',
-            menu_title: 'Pecheras',
-            icon: 'arrow_right_alt',
-            child_routes: null,
-          },
-          {
-            path: '/category/parches',
-            menu_title: 'Parches',
-            icon: 'arrow_right_alt',
-            child_routes: null,
-          },
-          {
-            path: '/category/pins',
-            menu_title: 'Pins',
-            icon: 'arrow_right_alt',
-            child_routes: null,
-          },
-        ],
-      },
+
       {
         path: '/category/hombre',
         menu_title: 'Hombres',
@@ -227,6 +171,63 @@ const getCategoriesNavLinks = async () => {
           {
             path: '/category/marcos',
             menu_title: 'Marcos',
+            icon: 'arrow_right_alt',
+            child_routes: null,
+          },
+        ],
+      },
+      {
+        path: '/category/accesorios',
+        menu_title: 'Accesorios',
+        category_name: 'accesorios',
+        icon: 'arrow_right_alt',
+        type: 'subMenu',
+        child_routes: [
+          {
+            path: '/category/gorros',
+            menu_title: 'Gorros',
+            icon: 'arrow_right_alt',
+            child_routes: null,
+          },
+          {
+            path: '/category/snapbacks',
+            menu_title: 'Snapbacks',
+            icon: 'arrow_right_alt',
+            child_routes: null,
+          },
+          {
+            path: '/category/beanies',
+            menu_title: 'Beanies',
+            icon: 'arrow_right_alt',
+            child_routes: null,
+          },
+          {
+            path: '/category/bananos',
+            menu_title: 'Bananos',
+            icon: 'arrow_right_alt',
+            child_routes: null,
+          },
+          {
+            path: '/category/estuches',
+            menu_title: 'Estuches',
+            icon: 'arrow_right_alt',
+            child_routes: null,
+          },
+          {
+            path: '/category/pecheras',
+            menu_title: 'Pecheras',
+            icon: 'arrow_right_alt',
+            child_routes: null,
+          },
+          {
+            path: '/category/parches',
+            menu_title: 'Parches',
+            icon: 'arrow_right_alt',
+            child_routes: null,
+          },
+          {
+            path: '/category/pins',
+            menu_title: 'Pins',
             icon: 'arrow_right_alt',
             child_routes: null,
           },
