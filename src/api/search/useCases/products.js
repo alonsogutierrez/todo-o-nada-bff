@@ -60,7 +60,7 @@ const getMoreInterestingProducts = async (page = 0, size = 6) => {
   return elasticSearchResponse.hits;
 };
 
-const getAdminProducts = async (page = 0, size = 20) => {
+const getAdminProducts = async (page = 0, size = 100) => {
   const query = {
     match_all: {},
   };

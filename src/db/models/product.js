@@ -18,6 +18,10 @@ const productSchema = new mongoose.Schema(
         type: 'String',
       },
     ],
+    productSizeType: {
+      required: true,
+      type: 'String',
+    },
     description: {
       required: true,
       type: 'String',
@@ -76,6 +80,5 @@ const productSchema = new mongoose.Schema(
 );
 
 productSchema.plugin(mongoosePaginate);
-//productSchema.plugin(AutoIncrement, { inc_field: 'itemNumber' });
 
 module.exports = mongoose.model('Product', productSchema);

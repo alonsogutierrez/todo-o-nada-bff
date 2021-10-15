@@ -4,35 +4,35 @@ const getCategories = async (categoriesConfig) => {
   try {
     logger.info('Get categories', categoriesConfig);
     const categoriesResponse = [
+      'accesorios',
+      'bananos',
+      'beanies',
+      'colorear',
+      'cuadro',
+      'estuches',
+      'gorros',
       'hombre',
+      'irezumi',
+      'liquidaciones',
+      'marcos',
       'mujer',
       'niña',
       'niño',
       'niñxs',
-      'unisex',
-      'irezumi',
-      'traditional',
-      'tattoo-collection',
-      'print-art',
-      'cuadro',
-      'sin-cuadro',
-      'stickers',
-      'marcos',
+      'parches',
+      'pecheras',
+      'pins',
       'poleras',
       'polerones',
-      'colorear',
+      'print-art',
       'remate',
-      'liquidacion',
-      'accesorios',
-      'gorros',
+      'sin-cuadro',
       'snapbacks',
-      'beanies',
-      'bananos',
-      'estuches',
-      'pecheras',
-      'parches',
-      'pins',
-    ];
+      'stickers',
+      'tattoo-collection',
+      'traditional',
+      'unisex',
+    ].sort();
 
     return categoriesResponse;
   } catch (err) {
@@ -60,7 +60,7 @@ const createCategories = async (categoriesConfig) => {
       'polerones',
       'colorear',
       'remate',
-      'liquidacion',
+      'liquidaciones',
     ];
 
     return categoriesResponse;
@@ -181,7 +181,7 @@ const getCategoriesNavLinks = async () => {
       {
         path: '/category/niñxs',
         menu_title: 'Niñxs',
-        category_name: 'niñx',
+        category_name: 'niñxs',
         icon: 'arrow_right_alt',
         type: 'subMenu',
         child_routes: [
@@ -214,13 +214,13 @@ const getCategoriesNavLinks = async () => {
         child_routes: [
           {
             path: '/category/print-art',
-            menu_title: 'Print Art Serigrafía',
+            menu_title: 'Print-Art',
             icon: 'arrow_right_alt',
             child_routes: null,
           },
           {
             path: '/category/stickers',
-            menu_title: 'Stickers en Serigrafía',
+            menu_title: 'Stickers',
             icon: 'arrow_right_alt',
             child_routes: null,
           },
@@ -234,7 +234,7 @@ const getCategoriesNavLinks = async () => {
       },
       {
         path: '/category/remate',
-        menu_title: 'Remates',
+        menu_title: 'Remate',
         category_name: 'remate',
         icon: 'arrow_right_alt',
         type: 'subMenu',
@@ -246,7 +246,7 @@ const getCategoriesNavLinks = async () => {
             child_routes: null,
           },
           {
-            path: '/category/liquidacion',
+            path: '/category/liquidaciones',
             menu_title: 'Liquidaciones',
             icon: 'arrow_right_alt',
             child_routes: null,
