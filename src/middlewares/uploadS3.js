@@ -7,6 +7,8 @@ const s3 = new AWS.S3({
   secretAccessKey: process.env.SECRET_KEY_AWS_ACCESS,
 });
 
+const logger = console;
+
 const uploadS3 = multer({
   storage: multerS3({
     s3: s3,
@@ -21,53 +23,56 @@ const uploadS3 = multer({
     },
   }),
   limits: { fileSize: 20000000 },
-}).array('pictures', 3);
+}).array('pictures', 4);
 
 exports.uploadImagesS3 = async (req, res, next) => {
-  uploadS3(req, res, (error) => {
-    console.log('files', req.files);
-    if (error) {
-      console.log('errors', error);
-      res.status(500).json({
-        status: 'fail',
-        error: error,
-      });
-    } else {
-      // If File not found
-      if (req.files === undefined) {
-        console.log('uploadProductsImages Error: No File Selected!');
+  try {
+    uploadS3(req, res, (error) => {
+      if (error) {
+        logger.error('Error uploadImagesS3: ', error);
         res.status(500).json({
           status: 'fail',
-          message: 'Error: No File Selected',
+          error: error,
         });
       } else {
-        // If Success
-        let fileArray = req.files,
-          fileLocation;
-        const images = [];
-        for (let i = 0; i < fileArray.length; i++) {
-          fileLocation = fileArray[i].location;
-          console.log('filenm', fileLocation);
-          images.push(fileLocation);
+        // If File not found
+        if (req.files === undefined) {
+          console.log('uploadProductsImages Error: No File Selected!');
+          res.status(500).json({
+            status: 'fail',
+            message: 'Error: No File Selected',
+          });
+        } else {
+          // If Success
+          let fileArray = req.files,
+            fileLocation;
+          const images = [];
+          for (let i = 0; i < fileArray.length; i++) {
+            fileLocation = fileArray[i].location;
+            console.log('filenm', fileLocation);
+            images.push(fileLocation);
+          }
+          console.log({
+            status: 'ok',
+            filesArray: fileArray,
+            locationArray: images,
+          });
+          // Save the file name into database
+          /*return res.status(200).json({
+                      status: 'ok',
+                      filesArray: fileArray,
+                      locationArray: images
+                  });*/
+          req.imagesS3Service = {
+            status: 'ok',
+            filesArray: fileArray,
+            locationArray: images,
+          };
+          next();
         }
-        console.log({
-          status: 'ok',
-          filesArray: fileArray,
-          locationArray: images,
-        });
-        // Save the file name into database
-        /*return res.status(200).json({
-                    status: 'ok',
-                    filesArray: fileArray,
-                    locationArray: images
-                });*/
-        req.imagesS3Service = {
-          status: 'ok',
-          filesArray: fileArray,
-          locationArray: images,
-        };
-        next();
       }
-    }
-  });
+    });
+  } catch (err) {
+    logger.error('Error in uploadImagesS3 Middleware: ', err.message);
+  }
 };

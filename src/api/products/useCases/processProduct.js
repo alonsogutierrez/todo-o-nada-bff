@@ -61,6 +61,7 @@ const processInProductRepository = async (productData) => {
             discount: price.discount,
           },
           color: color,
+          pictures,
         };
 
         await Product.updateOne({ itemNumber: itemNumber }, newProductData);
@@ -95,6 +96,7 @@ const processInProductRepository = async (productData) => {
           color: color,
           price: price,
           details: productFound.details,
+          pictures,
         };
         await Product.updateOne({ itemNumber: itemNumber }, newProductData);
         logger.info(
