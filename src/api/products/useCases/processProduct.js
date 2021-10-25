@@ -50,19 +50,35 @@ const processInProductRepository = async (productData) => {
           }
           return subProduct;
         });
-        const newProductData = {
-          details: newProductDetails,
-          name: name,
-          description: description,
-          category: categories,
-          price: {
-            basePriceSales: price.basePriceSales,
-            basePriceReference: price.basePriceReference,
-            discount: price.discount,
-          },
-          color: color,
-          pictures,
-        };
+        let newProductData = {};
+        if (pictures && pictures.length > 0) {
+          newProductData = {
+            details: newProductDetails,
+            name: name,
+            description: description,
+            category: categories,
+            price: {
+              basePriceSales: price.basePriceSales,
+              basePriceReference: price.basePriceReference,
+              discount: price.discount,
+            },
+            color: color,
+            pictures,
+          };
+        } else {
+          newProductData = {
+            details: newProductDetails,
+            name: name,
+            description: description,
+            category: categories,
+            price: {
+              basePriceSales: price.basePriceSales,
+              basePriceReference: price.basePriceReference,
+              discount: price.discount,
+            },
+            color: color,
+          };
+        }
 
         await Product.updateOne({ itemNumber: itemNumber }, newProductData);
         logger.info(
@@ -88,16 +104,28 @@ const processInProductRepository = async (productData) => {
             productFound.details.push(newProductDetails);
           }
         }
+        let newProductData = {};
+        if (pictures && pictures.length > 0) {
+          newProductData = {
+            name: name,
+            description: description,
+            category: categories,
+            color: color,
+            price: price,
+            details: productFound.details,
+            pictures,
+          };
+        } else {
+          newProductData = {
+            name: name,
+            description: description,
+            category: categories,
+            color: color,
+            price: price,
+            details: productFound.details,
+          };
+        }
 
-        const newProductData = {
-          name: name,
-          description: description,
-          category: categories,
-          color: color,
-          price: price,
-          details: productFound.details,
-          pictures,
-        };
         await Product.updateOne({ itemNumber: itemNumber }, newProductData);
         logger.info(
           'Sub product sku well created in product repository ',
