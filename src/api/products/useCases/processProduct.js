@@ -79,9 +79,6 @@ const updateProductInProductRepository = async (productData, productFound) => {
   }
 
   let newProductData = {};
-  if (pictures && pictures.length > 0) {
-    newProductData.pictures = pictures;
-  }
   newProductData = {
     name: name,
     description: description,
@@ -95,6 +92,9 @@ const updateProductInProductRepository = async (productData, productFound) => {
     },
     details: newProductDetails,
   };
+  if (pictures && pictures.length > 0) {
+    newProductData.pictures = pictures;
+  }
 
   await Product.updateOne({ itemNumber: itemNumber }, newProductData);
   logger.info('Sub product sku well updated in product repository', itemNumber);
