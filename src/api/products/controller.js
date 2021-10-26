@@ -51,9 +51,11 @@ const updateProductSizes = (actualProductSizes, productSize) => {
     productSize
   );
   let newProductsSizes = [];
-  newProductsSizes = actualProductSizes.includes(productSize)
+  newProductsSizes = actualProductSizes.includes(
+    productSize.trim().toUpperCase()
+  )
     ? actualProductSizes
-    : actualProductSizes.concat(productSize);
+    : actualProductSizes.concat(productSize.trim().toUpperCase());
   return newProductsSizes;
 };
 
@@ -67,7 +69,7 @@ const updateProductDetails = (actualProductDetails, product) => {
       ...actualProductDetails,
       [product.sku]: {
         quantity: actualProductQuantity + parseInt(product.stock, 10),
-        size: product.size,
+        size: product.size.trim().toUpperCase(),
       },
     };
   }
@@ -75,7 +77,7 @@ const updateProductDetails = (actualProductDetails, product) => {
     ...actualProductDetails,
     [product.sku]: {
       quantity: parseInt(product.stock, 10),
-      size: product.size,
+      size: product.size.trim().toUpperCase(),
     },
   };
 };
@@ -129,7 +131,7 @@ const processSearchRepository = async (product) => {
         const newProductDetails = {};
         newProductDetails[product.sku] = {
           quantity: parseInt(product.stock, 10),
-          size: product.size,
+          size: product.size.trim().toUpperCase(),
         };
         const newProduct = {
           itemNumber: `${product.itemNumber}`,
@@ -140,7 +142,7 @@ const processSearchRepository = async (product) => {
           price: product.price,
           picture: '',
           details: newProductDetails,
-          sizes: [product.size],
+          sizes: [product.size.trim().toUpperCase()],
         };
         await ElasticSearchRestData.CreateRequest('products', newProduct);
         logger.info(
@@ -170,8 +172,8 @@ const processProductRepository = async (product) => {
       );
       if (skuFound) {
         const newProductDetails = productFound.details.map((subProduct) => {
-          if (subProduct.sku === product.sku) {
-            subProduct.size = product.size;
+          if (subProduct.sku === product.sku.trim().toUpperCase()) {
+            subProduct.size = product.size.trim().toUpperCase();
             subProduct.stock += parseInt(product.stock, 10);
           }
           return subProduct;
@@ -201,7 +203,7 @@ const processProductRepository = async (product) => {
       } else {
         const newProductDetails = {
           sku: parseInt(product.sku, 10),
-          size: product.size,
+          size: product.size.trim().toUpperCase(),
           stock: parseInt(product.stock, 10),
         };
         const newProductData = {
@@ -234,7 +236,7 @@ const processProductRepository = async (product) => {
         details: [
           {
             sku: parseInt(product.sku, 10),
-            size: product.size,
+            size: product.size.trim().toUpperCase(),
             stock: parseInt(product.stock, 10),
           },
         ],

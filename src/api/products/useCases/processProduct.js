@@ -28,7 +28,7 @@ const createProductInProductRepository = async (productData) => {
 
   for (let sku in details) {
     const newProductDetail = {};
-    newProductDetail.size = details[sku].size;
+    newProductDetail.size = details[sku].size.trim().toUpperCase();
     newProductDetail.sku = sku;
     newProductDetail.stock = details[sku].stock;
     newProductsDetails.push(newProductDetail);
@@ -71,7 +71,7 @@ const updateProductInProductRepository = async (productData, productFound) => {
 
   for (let sku in details) {
     newDetail = {
-      size: details[sku].size,
+      size: details[sku].size.trim().toUpperCase(),
       stock: details[sku].stock,
       sku,
     };
@@ -148,7 +148,7 @@ const processInSearchRepository = async (productData) => {
     for (let sku in details) {
       newProductDetails[sku.toString()] = {
         quantity: parseInt(details[sku].stock, 10),
-        size: details[sku].size,
+        size: details[sku].size.trim().toUpperCase(),
       };
     }
     if (hits && Object.keys(hits).length > 0) {
@@ -184,7 +184,9 @@ const processInSearchRepository = async (productData) => {
         let productToIndexSizes = [];
         for (let sku in newProductDetails) {
           if (newProductDetails[sku].quantity > 0) {
-            productToIndexSizes.push(newProductDetails[sku].size);
+            productToIndexSizes.push(
+              newProductDetails[sku].size.trim().toUpperCase()
+            );
           }
         }
 
@@ -219,7 +221,9 @@ const getProductSizes = (actualProductDetails) => {
   let newProductsSizes = [];
   for (let sku in actualProductDetails) {
     if (actualProductDetails[sku].size)
-      newProductsSizes.push(actualProductDetails[sku].size);
+      newProductsSizes.push(
+        actualProductDetails[sku].size.trim().toUpperCase()
+      );
   }
   return newProductsSizes;
 };
