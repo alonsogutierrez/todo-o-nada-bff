@@ -11,9 +11,7 @@ const save = async (orderData) => {
 
 const findOne = async (filters) => {
   try {
-    console.log('filters: ', filters);
     const order = await Order.findOne(filters);
-    console.log('order: ', order);
     if (order) {
       return order.toJSON();
     }

@@ -7,7 +7,6 @@ const router = express.Router();
 
 router[GETOrderPaymentStatus.method.toLocaleLowerCase()](
   GETOrderPaymentStatus.route,
-  auth,
   GETOrderPaymentStatus.action
 );
 module.exports = router;

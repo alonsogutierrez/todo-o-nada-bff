@@ -6,7 +6,7 @@ const logger = console;
 
 const action = async (req, res) => {
   try {
-    const { query } = req.query;
+    const query = req.query;
     if (!isValidQuery({ query })) {
       res.status(HTTPCodes.StatusCodes.BAD_REQUEST).send({
         error: 'Invalid params',
@@ -15,7 +15,7 @@ const action = async (req, res) => {
     }
     logger.log('Begining to get order payment status');
     const orderPaymentStatusResponse =
-      await GETOrderPaymentStatus.getPaymentStatus(orderNumber);
+      await GETOrderPaymentStatus.getPaymentStatus(query.orderNumber);
     logger.log('Request finished: ', orderPaymentStatusResponse);
     res.status(HTTPCodes.StatusCodes.OK).send(orderPaymentStatusResponse);
   } catch (err) {
