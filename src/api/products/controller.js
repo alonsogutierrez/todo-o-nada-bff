@@ -23,6 +23,7 @@ const setProductsFromExcel = (excelProducts) => {
       basePriceReference,
       discount,
       stock,
+      productSizeType,
     ] = excelProduct;
     const product = {
       itemNumber: `${itemNumber}`.trim(),
@@ -38,6 +39,7 @@ const setProductsFromExcel = (excelProducts) => {
         discount: parseInt(discount, 10),
       },
       stock,
+      productSizeType,
     };
     productsFromExcelMapped.push(product);
   });
@@ -189,6 +191,7 @@ const processProductRepository = async (product) => {
             discount: product.price.discount,
           },
           color: product.color,
+          productSizeType: product.productSizeType,
         };
 
         await Products.updateOne(
@@ -213,6 +216,7 @@ const processProductRepository = async (product) => {
           color: product.color,
           price: product.price,
           details: productFound.details.concat(newProductDetails),
+          productSizeType: product.productSizeType,
         };
         await Products.updateOne(
           { itemNumber: product.itemNumber },
@@ -240,6 +244,7 @@ const processProductRepository = async (product) => {
             stock: parseInt(product.stock, 10),
           },
         ],
+        productSizeType: product.productSizeType,
       };
       const p = new Products(newProduct);
       await p.save();
