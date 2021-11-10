@@ -1,6 +1,6 @@
 const Order = require('../../../db/models/order');
 
-const save = async orderData => {
+const save = async (orderData) => {
   try {
     const order = new Order(orderData);
     return await order.save();
@@ -9,10 +9,13 @@ const save = async orderData => {
   }
 };
 
-const findOne = async filters => {
+const findOne = async (filters) => {
   try {
     const order = await Order.findOne(filters);
-    return order.toJSON();
+    if (order) {
+      return order.toJSON();
+    }
+    throw new Error('Order not exist');
   } catch (err) {
     throw new Error(`Can't find order in repository: ${err.message}`);
   }

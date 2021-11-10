@@ -1,13 +1,19 @@
 const express = require('express');
 
 const auth = require('./../../../middlewares/auth');
+const GETOrderByOrderNumber = require('./../insfrastructure/GETOrderByOrderNumber.route');
 const POSTCreateOrderPayment = require('../insfrastructure/POSTCreateOrderPayment.route');
 const POSTPaymentConfirm = require('../insfrastructure/POSTPaymentConfirm.route');
 const Order = require('../../../db/models/order');
+const { getOrderByOrderNUmber } = require('../useCases/orders');
 
 const router = express.Router();
 const logger = console;
 
+router[GETOrderByOrderNumber.method.toLocaleLowerCase()](
+  GETOrderByOrderNumber.route,
+  GETOrderByOrderNumber.action
+);
 router[POSTCreateOrderPayment.method.toLocaleLowerCase()](
   POSTCreateOrderPayment.route,
   POSTCreateOrderPayment.action

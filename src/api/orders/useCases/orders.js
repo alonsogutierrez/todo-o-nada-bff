@@ -23,6 +23,18 @@ const STATUS_PAYMENT_RESPONSE = {
 
 const logger = console;
 
+const getOrderByOrderNumber = async (orderNumber) => {
+  try {
+    const orderData = await OrderRepository.findOne({
+      orderNumber,
+    });
+    return orderData;
+  } catch (err) {
+    logger.error('Cant found order  by orderNumber: ', err.message);
+    throw new Error(`Cant found order by orderNumber: ${err.message}`);
+  }
+};
+
 const createOrderPayment = async (order) => {
   try {
     logger.info('Creating order payment', order);
@@ -79,8 +91,6 @@ const confirmOrderPayment = async (token) => {
     };
     const signedMessage = signMessage(objectToSign);
     const paymentStatusResponse = await PaymentAPI.getPaymentStatus(
-      FLOW_API_KEY,
-      token,
       signedMessage
     );
     const { status, commerceOrder } = paymentStatusResponse;
@@ -493,4 +503,8 @@ const isValidPaymentResponse = (paymentResponse) => {
   return isValid;
 };
 
-module.exports = { createOrderPayment, confirmOrderPayment };
+module.exports = {
+  getOrderByOrderNumber,
+  createOrderPayment,
+  confirmOrderPayment,
+};
