@@ -55,7 +55,14 @@ const getPaymentStatus = async (orderNumber) => {
         {}
       );
       logger.info('getPaymentStatusResponse: ', getPaymentStatusResponse);
-      return getPaymentStatusResponse;
+      const paymentStatus = {
+        isValid: false,
+      };
+      const { status } = getPaymentStatusResponse;
+      if (status && status === 2) {
+        paymentStatus.isValid = true;
+      }
+      return paymentStatus;
     }
     throw new Error('Order not found');
   } catch (err) {
