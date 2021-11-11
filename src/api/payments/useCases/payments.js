@@ -49,7 +49,7 @@ const getPaymentStatus = async (orderNumber) => {
         getPaymentStatusRoute,
         {
           apiKey: FLOW_API_KEY,
-          flowOrder: parseInt(flowOrder, 10),
+          flowOrder: flowOrder,
           s: signedMessage,
         },
         {}
@@ -65,7 +65,7 @@ const getPaymentStatus = async (orderNumber) => {
 
 const signPaymentMessage = (messageToSignData) => {
   let messageToSign = '';
-  for (const key in messageToSign) {
+  for (const key in messageToSignData) {
     messageToSign += key + messageToSignData[key];
   }
   const signedMessage = CryptoJS.HmacSHA256(
