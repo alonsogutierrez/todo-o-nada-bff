@@ -1,6 +1,5 @@
 const express = require('express');
 
-const auth = require('./../../../middlewares/auth');
 const GETOrderPaymentStatus = require('../insfrastructure/GETOrderPaymentStatus.route');
 
 const router = express.Router();
