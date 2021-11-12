@@ -4,7 +4,7 @@ const PAYMENT_API_BASE_URL = process.env.FLOW_API_BASE_URL;
 const createPaymentRoute = '/payment/create';
 const getPaymentStatusRoute = '/payment/getStatus';
 
-const createPayment = async paymentData => {
+const createPayment = async (paymentData) => {
   try {
     const createPaymentResponse = await RemoteRestData.POSTRequest(
       PAYMENT_API_BASE_URL,
@@ -23,7 +23,7 @@ const getPaymentStatus = async (apiKey, token, s) => {
     const getPaymentStatusResponse = await RemoteRestData.GETRequest(
       PAYMENT_API_BASE_URL,
       getPaymentStatusRoute,
-      {apiKey, token, s},
+      { apiKey, token, s },
       {}
     );
     return getPaymentStatusResponse;

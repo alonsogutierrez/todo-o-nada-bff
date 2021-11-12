@@ -15,13 +15,16 @@ async function GETRequest(baseURL, url, query = {}, body = {}, headers = {}) {
     });
     return response.data;
   } catch (e) {
-    logger.error(HttpStatus.getStatusText(HttpStatus.SERVICE_UNAVAILABLE), {
-      statusCode: HttpStatus.SERVICE_UNAVAILABLE,
-      baseURL,
-      url,
-      query,
-      errorDescription: e.message,
-    });
+    logger.error(
+      HttpStatus.getStatusText(HttpStatus.StatusCodes.SERVICE_UNAVAILABLE),
+      {
+        statusCode: HttpStatus.StatusCodes.SERVICE_UNAVAILABLE,
+        baseURL,
+        url,
+        query,
+        errorDescription: e.message,
+      }
+    );
     throw e;
   }
 }
@@ -38,13 +41,16 @@ async function POSTRequest(baseURL, url, query, body) {
     });
     return response.data;
   } catch (e) {
-    logger.error(HttpStatus.getStatusText(HttpStatus.SERVICE_UNAVAILABLE), {
-      statusCode: HttpStatus.SERVICE_UNAVAILABLE,
-      baseURL,
-      url,
-      query,
-      errorDescription: e.message,
-    });
+    logger.error(
+      HttpStatus.getStatusText(HttpStatus.StatusCodes.SERVICE_UNAVAILABLE),
+      {
+        statusCode: HttpStatus.StatusCodes.SERVICE_UNAVAILABLE,
+        baseURL,
+        url,
+        query,
+        errorDescription: e.message,
+      }
+    );
     throw e;
   }
 }

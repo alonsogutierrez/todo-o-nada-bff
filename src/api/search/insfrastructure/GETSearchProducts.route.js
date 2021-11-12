@@ -9,7 +9,7 @@ const action = async (req, res) => {
     const { query } = req.query;
     logger.log('Validating query');
     if (!isValidQuery({ query })) {
-      res.status(HTTPCodes.BAD_REQUEST).send({
+      res.status(HTTPCodes.StatusCodes.BAD_REQUEST).send({
         error: 'Invalid params',
       });
       return;
@@ -20,10 +20,10 @@ const action = async (req, res) => {
       0 //TODO: Add number page params
     );
     logger.log('Request finished: ', searchProductsResponse);
-    res.status(HTTPCodes.OK).send(searchProductsResponse);
+    res.status(HTTPCodes.StatusCodes.OK).send(searchProductsResponse);
   } catch (err) {
     logger.error(`Can't search products: ${err.message}`);
-    res.status(HTTPCodes.INTERNAL_SERVER_ERROR).send({
+    res.status(HTTPCodes.StatusCodes.INTERNAL_SERVER_ERROR).send({
       error: `Can't search products: ${err.message}`,
     });
   }

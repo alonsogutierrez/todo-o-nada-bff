@@ -7,6 +7,8 @@ const s3 = new AWS.S3({
   secretAccessKey: process.env.SECRET_KEY_AWS_ACCESS,
 });
 
+const S3_IMAGES_PATH = process.env.S3_IMAGES_PATH;
+
 const logger = console;
 
 const uploadS3 = multer({
@@ -18,7 +20,7 @@ const uploadS3 = multer({
       callBack(null, { fieldName: file.fieldname });
     },
     key: (req, file, callBack) => {
-      const fullPath = 'images/products/' + file.originalname; //If you want to save into a folder concat de name of the folder to the path
+      const fullPath = S3_IMAGES_PATH + file.originalname; //If you want to save into a folder concat de name of the folder to the path
       callBack(null, fullPath);
     },
   }),
@@ -35,34 +37,26 @@ exports.uploadImagesS3 = async (req, res, next) => {
           error: error,
         });
       } else {
-        // If File not found
         if (req.files === undefined) {
-          console.log('uploadProductsImages Error: No File Selected!');
+          logger.log('uploadProductsImages Error: No File Selected!');
           res.status(500).json({
             status: 'fail',
             message: 'Error: No File Selected',
           });
         } else {
-          // If Success
           let fileArray = req.files,
             fileLocation;
           const images = [];
           for (let i = 0; i < fileArray.length; i++) {
             fileLocation = fileArray[i].location;
-            console.log('filenm', fileLocation);
+            logger.log('filenm', fileLocation);
             images.push(fileLocation);
           }
-          console.log({
+          logger.log({
             status: 'ok',
             filesArray: fileArray,
             locationArray: images,
           });
-          // Save the file name into database
-          /*return res.status(200).json({
-                      status: 'ok',
-                      filesArray: fileArray,
-                      locationArray: images
-                  });*/
           req.imagesS3Service = {
             status: 'ok',
             filesArray: fileArray,
