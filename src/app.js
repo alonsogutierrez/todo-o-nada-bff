@@ -12,6 +12,8 @@ const orderReportRouter = require('./api/reports/orders/routes/orders');
 const healthRouter = require('./api/health/routes/health');
 const searchRouter = require('./api/search/routes/search');
 const emailsRouter = require('./api/emails/routes/emails');
+const categoriesRouter = require('./api/categories/insfrastructure/routes/category');
+const paymentsRouter = require('./api/payments/insfrastructure/routes');
 
 const healthCheckCron = require('./cron/healthCheck');
 
@@ -25,8 +27,13 @@ try {
 
 const app = express();
 
+const corsWhiteList = [process.env.FE_URL, process.env.BASE_URL_BFF];
+const corsOptions = {
+  origin: corsWhiteList,
+};
+
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(healthRouter);
 app.use(orderRouter);
@@ -37,6 +44,8 @@ app.use(downloadReportRouter);
 app.use(orderReportRouter);
 app.use(searchRouter);
 app.use(emailsRouter);
+app.use(categoriesRouter);
+app.use(paymentsRouter);
 
 cron.schedule('*/10 * * * *', async function () {
   await healthCheckCron();

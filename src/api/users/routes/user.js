@@ -21,9 +21,9 @@ router.post('/users/login', async (req, res) => {
     const token = await user.generateAuthToken();
     logger.log('User succesfully login');
     res.send({ user, token });
-  } catch (e) {
-    logger.error('Cant login user');
-    res.status(401).send(e.message);
+  } catch (err) {
+    logger.error('Cant login user: ', err.message);
+    res.status(401).send(err.message);
   }
 });
 
