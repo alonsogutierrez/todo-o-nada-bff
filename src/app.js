@@ -11,6 +11,7 @@ const downloadReportRouter = require('./api/reports/betweenDates/routes/betweenD
 const orderReportRouter = require('./api/reports/orders/routes/orders');
 const healthRouter = require('./api/health/routes/health');
 const searchRouter = require('./api/search/routes/search');
+const emailsRouter = require('./api/emails/routes/emails');
 const categoriesRouter = require('./api/categories/insfrastructure/routes/category');
 const paymentsRouter = require('./api/payments/insfrastructure/routes');
 
@@ -42,6 +43,7 @@ app.use(reportRouter);
 app.use(downloadReportRouter);
 app.use(orderReportRouter);
 app.use(searchRouter);
+app.use(emailsRouter);
 app.use(categoriesRouter);
 app.use(paymentsRouter);
 

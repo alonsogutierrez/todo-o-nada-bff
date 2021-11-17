@@ -6,8 +6,9 @@ const logger = console;
 
 const action = async (req, res) => {
   try {
+    logger.log('Begin Search by category finished');
     const { categoryName } = req.params;
-    logger.log('Validating query: ', categoryName);
+    logger.log('Validating category query query: ', categoryName);
     if (!isValidQuery({ categoryName })) {
       res.status(HTTPCodes.BAD_REQUEST).send({
         error: 'Invalid params',
@@ -21,9 +22,9 @@ const action = async (req, res) => {
         0 //TODO: Add number page params
       );
     logger.log('Request finished: ', searchProductsResponse);
-    res.status(HTTPCodes.OK).send(searchProductsResponse);
+    res.status(HTTPCodes.StatusCodes.OK).send(searchProductsResponse);
   } catch (err) {
-    res.status(HTTPCodes.INTERNAL_SERVER_ERROR).send({
+    res.status(HTTPCodes.StatusCodes.INTERNAL_SERVER_ERROR).send({
       error: `Can't search products by category: ${err.message}`,
     });
   }
