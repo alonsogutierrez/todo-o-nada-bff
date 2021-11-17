@@ -15,7 +15,7 @@ const action = async (req, res) => {
       return;
     }
     logger.log('Begining to send email');
-    const sendEmailResponse = await SendEmailUseCases.sendTo(query);
+    const sendEmailResponse = await SendEmailUseCases.sendEmail(query);
     logger.log('Request finished: ', sendEmailResponse);
     res.status(HTTPCodes.StatusCodes.OK).send(sendEmailResponse);
   } catch (err) {
