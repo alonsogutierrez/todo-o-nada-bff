@@ -6,7 +6,7 @@ const senderEmail = process.env.SENDER_EMAIL;
 const logger = console;
 
 const getProductsData = (products) => {
-  products.map((product) => {
+  return products.map((product) => {
     return {
       name: product.name,
       picture: product.pictures,
@@ -41,7 +41,13 @@ const getMessageData = (orderPaid) => {
           ? 'Dirección de entrega'
           : 'Dirección de retiro',
       address:
-        address.address + ', ' + address.num_address + '. ' + address.commune,
+        dispatchData === 'HOME_DELIVERY'
+          ? address.address +
+            ', ' +
+            address.num_address +
+            '. ' +
+            address.commune
+          : 'Catedral 2116, Santiago',
       customerName: user.firstName,
       items: getProductsData(products),
       subTotal:
