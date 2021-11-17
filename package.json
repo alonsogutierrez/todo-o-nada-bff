@@ -16,6 +16,7 @@
   "author": "GG Team - Alonso Gutiérrez - Cristian Gutiérrez",
   "license": "ISC",
   "dependencies": {
+    "@sendgrid/mail": "^7.4.6",
     "aws-sdk": "^2.918.0",
     "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",

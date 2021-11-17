@@ -6,6 +6,7 @@ const ElasticSearchRestData = require('../../shared/infrastructure/ElasticSearch
 const PaymentAPI = require('../insfrastructure/PaymentAPI');
 const OrderRepository = require('../insfrastructure/OrderRepository');
 const ProductRepository = require('../insfrastructure/ProductRepository');
+const SendEmailUseCases = require('./../../emails/useCases/emails');
 
 const idBuilder = require('../idBuilder');
 
@@ -133,6 +134,14 @@ const confirmOrderPayment = async (token) => {
           'paid'
         );
         logger.info('Order well updated: ', orderPaidUpdated);
+
+        orderPaid = await OrderRepository.findOne({
+          orderNumber: commerceOrder,
+        });
+
+        //Call async to EMAIL API to send payment confirm template
+        SendEmailUseCases.sendEmail(orderPaid);
+
         return {
           orderPaidUpdated,
           message: 'Order well updated',
