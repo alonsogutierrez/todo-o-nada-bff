@@ -10,11 +10,9 @@ const getProductsData = (products) => {
     return {
       name: product.name,
       picture: product.pictures,
-      price:
-        '$' +
-        product.price.basePriceSales
-          .toFixed(0)
-          .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1.'),
+      price: product.price.basePriceSales
+        .toFixed(0)
+        .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1.'),
     };
   });
 };
