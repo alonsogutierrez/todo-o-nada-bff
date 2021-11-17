@@ -91,6 +91,8 @@ const confirmOrderPayment = async (token) => {
     };
     const signedMessage = signMessage(objectToSign);
     const paymentStatusResponse = await PaymentAPI.getPaymentStatus(
+      FLOW_API_KEY,
+      token,
       signedMessage
     );
     const { status, commerceOrder } = paymentStatusResponse;
