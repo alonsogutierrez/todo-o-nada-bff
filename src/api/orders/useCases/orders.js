@@ -135,13 +135,12 @@ const confirmOrderPayment = async (token) => {
         );
         logger.info('Order well updated: ', orderPaidUpdated);
 
-        //GET order updated
         orderPaid = await OrderRepository.findOne({
           orderNumber: commerceOrder,
         });
 
-        //Call to EMAIL API to send payment confirm template
-        await SendEmailUseCases.sendEmail(orderPaid);
+        //Call async to EMAIL API to send payment confirm template
+        SendEmailUseCases.sendEmail(orderPaid);
 
         return {
           orderPaidUpdated,
