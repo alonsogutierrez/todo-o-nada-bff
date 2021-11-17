@@ -34,8 +34,8 @@ const getMessageData = (orderPaid) => {
           : 'Fecha de retiro',
       deliveryDate:
         dispatchData === 'HOME_DELIVERY'
-          ? '5 días hábiles desde su compra'
-          : 'Desde las 10:00 AM hasta 19:00 PM puedes retirar en nuestra tienda',
+          ? '5 días hábiles'
+          : 'Coordinar por WhatsApp/Instagram',
       addressLabel:
         dispatchData === 'HOME_DELIVERY'
           ? 'Dirección de entrega'
@@ -47,17 +47,17 @@ const getMessageData = (orderPaid) => {
       subTotal:
         '$' +
         transaction.subTotal
-          .toFixed(2)
+          .toFixed(0)
           .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1.'),
       dispatchCost:
         '$' +
         transaction.shipping
-          .toFixed(2)
+          .toFixed(0)
           .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1.'),
       total:
         '$' +
         (transaction.shipping + transaction.subTotal)
-          .toFixed(2)
+          .toFixed(0)
           .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1.'),
       senderName: senderEmail,
       senderAddress: 'Catedral 2116, Santiago',
