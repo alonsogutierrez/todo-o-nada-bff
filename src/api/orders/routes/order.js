@@ -96,6 +96,7 @@ router.get('/orders/admin', auth, async (req, res) => {
       paymentData: order.paymentData,
       products: order.products,
       createdAt: order.createdAt,
+      dispatchData: order.dispatchData,
     };
     res.status(200).send(order);
   } catch (e) {
