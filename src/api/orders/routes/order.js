@@ -5,7 +5,6 @@ const GETOrderByOrderNumber = require('./../insfrastructure/GETOrderByOrderNumbe
 const POSTCreateOrderPayment = require('../insfrastructure/POSTCreateOrderPayment.route');
 const POSTPaymentConfirm = require('../insfrastructure/POSTPaymentConfirm.route');
 const Order = require('../../../db/models/order');
-const { getOrderByOrderNUmber } = require('../useCases/orders');
 
 const router = express.Router();
 const logger = console;
