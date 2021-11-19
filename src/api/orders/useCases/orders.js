@@ -96,7 +96,7 @@ const confirmOrderPayment = async (token) => {
       token,
       signedMessage
     );
-    const { status, commerceOrder } = paymentStatusResponse;
+    const { status, commerceOrder, pending_info } = paymentStatusResponse;
     logger.info('Payment status response: ', status);
     switch (status) {
       case STATUS_PAYMENT_RESPONSE['PAYED']:
@@ -131,6 +131,7 @@ const confirmOrderPayment = async (token) => {
           commerceOrder,
           productsConfirmed,
           orderPaid.paymentData,
+          pending_info,
           'paid'
         );
         logger.info('Order well updated: ', orderPaidUpdated);
@@ -369,11 +370,19 @@ const updateOrderStatus = async (
   orderNumber,
   productsUpdated,
   paymentData,
+  pending_info,
   status
 ) => {
   let paymentDataUpdated = paymentData;
   paymentDataUpdated.state = status;
-  paymentData.state = status;
+  if (
+    pending_info &&
+    Object.keys(payment_info).length > 0 &&
+    payment_info.media &&
+    payment_info.media.length > 0
+  ) {
+    paymentDataUpdated.transaction.media = payment_info.media;
+  }
   return await OrderRepository.updateOne(
     {
       orderNumber,

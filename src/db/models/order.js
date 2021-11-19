@@ -118,6 +118,9 @@ const orderSchema = new mongoose.Schema(
           type: Number,
           required: true,
         },
+        media: {
+          type: String,
+        },
       },
       apiResponse: {
         type: Object,
