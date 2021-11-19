@@ -1,5 +1,4 @@
 const excel = require('exceljs');
-const dateFns = require('date-fns');
 
 module.exports = class Report {
   constructor(creator, rows, mapper) {
@@ -34,10 +33,17 @@ module.exports = class Report {
 
   setHeadersColumns() {
     this.sheet.columns = [
-      { header: 'Nº orden', key: 'numOrder', width: 20 },
+      { header: 'Nº orden', key: 'numOrder', width: 10 },
       { header: 'Fecha venta', key: 'creationDate', width: 15 },
       { header: 'Cliente', key: 'clientNames', width: 20 },
+      { header: 'Tipo despacho', key: 'dispatchType', width: 20 },
       { header: 'Email', key: 'clientEmail', width: 30 },
+      { header: 'Rut', key: 'clientDni', width: 15 },
+      { header: 'Dirección', key: 'clientAddress', width: 30 },
+      { header: 'Depto/Num casa', key: 'clientNumAddress', width: 10 },
+      { header: 'Comuna', key: 'clientCommune', width: 15 },
+      { header: 'Region', key: 'clientRegion', width: 30 },
+      { header: 'País', key: 'clientCountry', width: 10 },
       { header: 'Sub total order', key: 'subTotal', width: 15 },
       { header: 'Envío', key: 'shippingTotal', width: 5 },
       { header: 'Total order', key: 'total', width: 15 },
@@ -56,7 +62,14 @@ module.exports = class Report {
         const numOrder = this.mapper.getOrderNumber(order);
         const creationDate = this.mapper.getTransactionDate(order);
         const clientNames = this.mapper.getClientNames(order);
+        const dispatchType = this.mapper.getDispatchType(order);
         const clientEmail = this.mapper.getClientEmail(order);
+        const clientDni = this.mapper.getClientDni(order);
+        const clientAddress = this.mapper.getClientAddress(order);
+        const clientNumAddress = this.mapper.getClientNumAddress(order);
+        const clientCommune = this.mapper.getClientCommune(order);
+        const clientRegion = this.mapper.getClientRegion(order);
+        const clientCountry = this.mapper.getClientCountry(order);
         const subTotal = this.mapper.getSubTotal(order);
         const shippingTotal = this.mapper.getShippingTotal(order);
         const total = this.mapper.getTotal(order);
@@ -71,7 +84,14 @@ module.exports = class Report {
             numOrder,
             creationDate,
             clientNames,
+            dispatchType,
             clientEmail,
+            clientDni,
+            clientAddress,
+            clientNumAddress,
+            clientCommune,
+            clientRegion,
+            clientCountry,
             subTotal,
             shippingTotal,
             total,

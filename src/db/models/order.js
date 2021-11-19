@@ -67,6 +67,10 @@ const orderSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
+        dni: {
+          type: String,
+          required: true,
+        },
         phone: {
           type: String,
           required: true,
@@ -98,7 +102,7 @@ const orderSchema = new mongoose.Schema(
         },
       },
       state: {
-        type: String, // created, paid, cancel
+        type: String,
         required: true,
       },
       transaction: {
