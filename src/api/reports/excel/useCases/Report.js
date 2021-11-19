@@ -36,6 +36,7 @@ module.exports = class Report {
       { header: 'Nº orden', key: 'numOrder', width: 20 },
       { header: 'Fecha venta', key: 'creationDate', width: 15 },
       { header: 'Cliente', key: 'clientNames', width: 20 },
+      { header: 'Tipo despacho', key: 'dispatchType', width: 30 },
       { header: 'Email', key: 'clientEmail', width: 30 },
       { header: 'Rut', key: 'clientDni', width: 30 },
       { header: 'Dirección', key: 'clientAddress', width: 50 },
@@ -61,6 +62,7 @@ module.exports = class Report {
         const numOrder = this.mapper.getOrderNumber(order);
         const creationDate = this.mapper.getTransactionDate(order);
         const clientNames = this.mapper.getClientNames(order);
+        const dispatchType = this.mapper.getDispatchType(order);
         const clientEmail = this.mapper.getClientEmail(order);
         const clientDni = this.mapper.getClientDni(order);
         const clientAddress = this.mapper.getClientAddress(order);
@@ -82,6 +84,7 @@ module.exports = class Report {
             numOrder,
             creationDate,
             clientNames,
+            dispatchType,
             clientEmail,
             clientDni,
             clientAddress,

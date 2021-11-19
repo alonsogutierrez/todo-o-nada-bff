@@ -36,6 +36,16 @@ const getClientNames = (data) => {
   return firstName + ' ' + lastName;
 };
 
+const getDispatchType = (data) => {
+  const { dispatchData } = data;
+  if (dispatchData === undefined) {
+    throw new Error(`invalid dispatchData ${data.orderNumber}`);
+  }
+  return dispatchData === 'HOME_DELIVERY'
+    ? 'Despacho a domicilio'
+    : 'Retiro en tienda';
+};
+
 const getClientEmail = (data) => {
   const { paymentData } = data;
   if (paymentData === undefined) {
@@ -245,6 +255,7 @@ module.exports = {
   getOrderNumber,
   getTransactionDate,
   getClientNames,
+  getDispatchType,
   getClientEmail,
   getClientDni,
   getClientAddress,
