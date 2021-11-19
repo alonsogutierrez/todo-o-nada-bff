@@ -52,6 +52,105 @@ const getClientEmail = (data) => {
   return email;
 };
 
+const getClientDni = (data) => {
+  const { paymentData } = data;
+  if (paymentData === undefined) {
+    throw new Error(`invalid paymentData ${data.orderNumber}`);
+  }
+  const { user } = paymentData;
+  if (user === undefined) {
+    throw new Error(`invalid user ${data.orderNumber}`);
+  }
+  const { dni } = user;
+  return dni && dni.length > 0 ? dni : '';
+};
+
+const getClientAddress = (data) => {
+  const { paymentData } = data;
+  if (paymentData === undefined) {
+    throw new Error(`invalid paymentData ${data.orderNumber}`);
+  }
+  const { user } = paymentData;
+  if (user === undefined) {
+    throw new Error(`invalid user ${data.orderNumber}`);
+  }
+  const { address } = user;
+  if (address === undefined) {
+    throw new Error(`invalid address ${data.orderNumber}`);
+  }
+  return address.address && address.address.length > 0 ? address.address : '';
+};
+
+const getClientNumAddress = (data) => {
+  const { paymentData } = data;
+  if (paymentData === undefined) {
+    throw new Error(`invalid paymentData ${data.orderNumber}`);
+  }
+  const { user } = paymentData;
+  if (user === undefined) {
+    throw new Error(`invalid user ${data.orderNumber}`);
+  }
+  const { address } = user;
+  if (address === undefined) {
+    throw new Error(`invalid address ${data.orderNumber}`);
+  }
+
+  return address.num_address && address.num_address.length > 0
+    ? address.num_address
+    : '';
+};
+
+const getClientCommune = (data) => {
+  const { paymentData } = data;
+  if (paymentData === undefined) {
+    throw new Error(`invalid paymentData ${data.orderNumber}`);
+  }
+  const { user } = paymentData;
+  if (user === undefined) {
+    throw new Error(`invalid user ${data.orderNumber}`);
+  }
+  const { address } = user;
+  if (address === undefined) {
+    throw new Error(`invalid address ${data.orderNumber}`);
+  }
+
+  return address.commune && address.commune.length > 0 ? address.commune : '';
+};
+
+const getClientRegion = (data) => {
+  const { paymentData } = data;
+  if (paymentData === undefined) {
+    throw new Error(`invalid paymentData ${data.orderNumber}`);
+  }
+  const { user } = paymentData;
+  if (user === undefined) {
+    throw new Error(`invalid user ${data.orderNumber}`);
+  }
+  const { address } = user;
+  if (address === undefined) {
+    throw new Error(`invalid address ${data.orderNumber}`);
+  }
+
+  return address.city && address.city.length > 0 ? address.city : '';
+};
+
+const getClientCountry = (data) => {
+  const { paymentData } = data;
+  if (paymentData === undefined) {
+    throw new Error(`invalid paymentData ${data.orderNumber}`);
+  }
+  const { user } = paymentData;
+  if (user === undefined) {
+    throw new Error(`invalid user ${data.orderNumber}`);
+  }
+  const { address } = user;
+  if (address === undefined) {
+    throw new Error(`invalid address ${data.orderNumber}`);
+  }
+
+  return address.country && address.country.length > 0 ? address.country : '';
+};
+
 const getSubTotal = (data) => {
   const { paymentData } = data;
   if (paymentData === undefined) {
@@ -147,6 +246,12 @@ module.exports = {
   getTransactionDate,
   getClientNames,
   getClientEmail,
+  getClientDni,
+  getClientAddress,
+  getClientNumAddress,
+  getClientCommune,
+  getClientRegion,
+  getClientCountry,
   getSubTotal,
   getShippingTotal,
   getTotal,

@@ -1,5 +1,4 @@
 const excel = require('exceljs');
-const dateFns = require('date-fns');
 
 module.exports = class Report {
   constructor(creator, rows, mapper) {
@@ -38,6 +37,12 @@ module.exports = class Report {
       { header: 'Fecha venta', key: 'creationDate', width: 15 },
       { header: 'Cliente', key: 'clientNames', width: 20 },
       { header: 'Email', key: 'clientEmail', width: 30 },
+      { header: 'Rut', key: 'clientDni', width: 30 },
+      { header: 'Dirección', key: 'clientAddress', width: 50 },
+      { header: 'Depto/Num casa', key: 'clientNumAddress', width: 20 },
+      { header: 'Comuna', key: 'clientCommune', width: 30 },
+      { header: 'Region', key: 'clientRegion', width: 30 },
+      { header: 'País', key: 'clientCountry', width: 30 },
       { header: 'Sub total order', key: 'subTotal', width: 15 },
       { header: 'Envío', key: 'shippingTotal', width: 5 },
       { header: 'Total order', key: 'total', width: 15 },
@@ -57,6 +62,12 @@ module.exports = class Report {
         const creationDate = this.mapper.getTransactionDate(order);
         const clientNames = this.mapper.getClientNames(order);
         const clientEmail = this.mapper.getClientEmail(order);
+        const clientDni = this.mapper.getClientDni(order);
+        const clientAddress = this.mapper.getClientAddress(order);
+        const clientNumAddress = this.mapper.getClientNumAddress(order);
+        const clientCommune = this.mapper.getClientCommune(order);
+        const clientRegion = this.mapper.getClientRegion(order);
+        const clientCountry = this.mapper.getClientCountry(order);
         const subTotal = this.mapper.getSubTotal(order);
         const shippingTotal = this.mapper.getShippingTotal(order);
         const total = this.mapper.getTotal(order);
@@ -72,6 +83,12 @@ module.exports = class Report {
             creationDate,
             clientNames,
             clientEmail,
+            clientDni,
+            clientAddress,
+            clientNumAddress,
+            clientCommune,
+            clientRegion,
+            clientCountry,
             subTotal,
             shippingTotal,
             total,
