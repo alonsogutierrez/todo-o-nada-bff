@@ -7,7 +7,7 @@ const logger = console;
 
 const action = async (req, res) => {
   try {
-    const { orderNumber } = req.params;
+    const { orderNumber } = req.query;
     logger.log('Validating query to send email');
     if (!isValidQuery({ orderNumber })) {
       res.status(HTTPCodes.StatusCodes.BAD_REQUEST).send({
