@@ -1,27 +1,11 @@
 const sendEmailSchema = {
   title: 'SendEmailSchema',
-  description: 'describes properties required to end an email',
+  description: 'describes properties required to send an email',
   type: 'object',
   properties: {
-    to: {
+    orderNumber: {
       type: 'string',
-      description: 'email who will receive our email',
-    },
-    from: {
-      type: 'string',
-      description: 'email who will send our email',
-    },
-    subject: {
-      type: 'string',
-      description: 'email subject',
-    },
-    text: {
-      type: 'string',
-      description: 'text in email',
-    },
-    html: {
-      type: 'string',
-      description: 'html code in email',
+      description: 'orderNumber that identifies order associated to send email',
     },
   },
 };
