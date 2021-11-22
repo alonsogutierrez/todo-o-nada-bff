@@ -1,5 +1,6 @@
 const HTTPCodes = require('http-status-codes');
 const SendEmailUseCases = require('../useCases/emails');
+const OrderUseCases = require('./../../orders/useCases/orders');
 const isValidQuery = require('../adapters/POSTSendEmailValidation.validation');
 
 const logger = console;
