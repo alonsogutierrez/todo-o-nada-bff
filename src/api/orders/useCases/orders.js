@@ -137,7 +137,7 @@ const confirmOrderPayment = async (token) => {
           commerceOrder,
           productsConfirmed,
           orderPaid.paymentData,
-          paymentData,
+          flowPaymentData,
           'paid'
         );
         logger.info('Order well updated: ', orderPaidUpdated);
