@@ -6,17 +6,22 @@ const logger = console;
 
 const action = async (req, res) => {
   try {
-    const { query } = req.query;
+    const { orderNumber } = req.params;
     logger.log('Validating query to send email');
-    if (!isValidQuery({ query })) {
+    if (!isValidQuery({ orderNumber })) {
       res.status(HTTPCodes.StatusCodes.BAD_REQUEST).send({
         error: 'Invalid params to send email',
       });
       return;
     }
+    logger.log('Begining to get order by orderNumber: ', orderNumber);
+    const orderResponse = await OrderUseCases.getOrderByOrderNumber(
+      orderNumber
+    );
+    logger.log('Order found: ', orderResponse);
     logger.log('Begining to send email');
-    const sendEmailResponse = await SendEmailUseCases.sendEmail(query);
-    logger.log('Request finished: ', sendEmailResponse);
+    const sendEmailResponse = await SendEmailUseCases.sendEmail(orderResponse);
+    logger.log('Request finished and send email response: ', sendEmailResponse);
     res.status(HTTPCodes.StatusCodes.OK).send(sendEmailResponse);
   } catch (err) {
     logger.error(`Can't send email: ${err.message}`);
