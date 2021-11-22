@@ -127,6 +127,8 @@ const confirmOrderPayment = async (token) => {
             },
           };
         });
+
+        logger.info('Going to update order', commerceOrder, pending_info);
         const orderPaidUpdated = await updateOrderStatus(
           commerceOrder,
           productsConfirmed,
@@ -383,6 +385,7 @@ const updateOrderStatus = async (
   ) {
     paymentDataUpdated.transaction.media = payment_info.media;
   }
+  logger.info('New paymentData: ', paymentDataUpdated);
   return await OrderRepository.updateOne(
     {
       orderNumber,
