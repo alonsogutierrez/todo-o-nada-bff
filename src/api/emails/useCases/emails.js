@@ -21,6 +21,14 @@ const getMessageData = (orderPaid) => {
   const { products, paymentData, dispatchData, orderNumber } = orderPaid;
   const { user, transaction } = paymentData;
   const { address } = user;
+  const dispatchMessage =
+    dispatchData === 'HOME_DELIVERY' && transaction.shipping === 0
+      ? 'Despacho por pagar'
+      : '$' +
+        transaction.shipping
+          .toFixed(0)
+          .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1.') +
+        ' (Retiro en tienda)';
   return {
     to: user.email,
     from: senderEmail,
@@ -49,7 +57,7 @@ const getMessageData = (orderPaid) => {
             address.num_address +
             '. ' +
             address.commune
-          : 'Catedral 2116, Santiago',
+          : 'Calle del Arzobispo #0607, Providencia, Chile',
       customerName: user.firstName,
       items: getProductsData(products),
       subTotal:
@@ -57,18 +65,14 @@ const getMessageData = (orderPaid) => {
         transaction.subTotal
           .toFixed(0)
           .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1.'),
-      dispatchCost:
-        '$' +
-        transaction.shipping
-          .toFixed(0)
-          .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1.'),
+      dispatchCost: dispatchMessage,
       total:
         '$' +
         (transaction.shipping + transaction.subTotal)
           .toFixed(0)
           .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1.'),
       senderName: senderEmail,
-      senderAddress: 'Catedral 2116, Santiago',
+      senderAddress: 'Calle del Arzobispo #0607, Providencia, Chile',
     },
   };
 };
