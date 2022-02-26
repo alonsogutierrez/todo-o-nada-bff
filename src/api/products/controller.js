@@ -66,19 +66,6 @@ const updateProductSizes = (actualProductSizes, productSize) => {
 };
 
 const updateProductDetails = (actualProductDetails, product) => {
-  if (actualProductDetails[product.sku]) {
-    const actualProductQuantity = parseInt(
-      actualProductDetails[product.sku].quantity,
-      10
-    );
-    return {
-      ...actualProductDetails,
-      [product.sku]: {
-        quantity: actualProductQuantity + parseInt(product.stock, 10),
-        size: product.size.toString().trim().toUpperCase(),
-      },
-    };
-  }
   return {
     ...actualProductDetails,
     [product.sku]: {
@@ -183,7 +170,7 @@ const processProductRepository = async (product) => {
             product.sku.toString().trim().toUpperCase()
           ) {
             subProduct.size = product.size.toString().trim().toUpperCase();
-            subProduct.stock += parseInt(product.stock, 10);
+            subProduct.stock = parseInt(product.stock, 10);
           }
           return subProduct;
         });
