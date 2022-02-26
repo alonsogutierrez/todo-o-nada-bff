@@ -108,6 +108,7 @@ const processSearchRepository = async (product) => {
           description: product.description,
           color: product.color,
           price: product.price,
+          picture: product.images.split(',')[0],
           details: updateProductDetails(actualProduct.details, product),
           sizes: updateProductSizes(actualProduct.sizes, product.size),
         };
@@ -133,7 +134,7 @@ const processSearchRepository = async (product) => {
           description: product.description,
           color: product.color,
           price: product.price,
-          picture: '',
+          picture: product.images.split(',')[0],
           details: newProductDetails,
           sizes: [product.size.toString().trim().toUpperCase()],
         };
@@ -179,6 +180,7 @@ const processProductRepository = async (product) => {
           name: product.name,
           description: product.description,
           category: product.category,
+          pictures: product.images.split(','),
           price: {
             basePriceSales: product.price.basePriceSales,
             basePriceReference: product.price.basePriceSales,
@@ -209,6 +211,7 @@ const processProductRepository = async (product) => {
           category: product.category,
           color: product.color,
           price: product.price,
+          pictures: product.images.split(','),
           details: productFound.details.concat(newProductDetails),
           productSizeType: product.productSizeType,
         };
