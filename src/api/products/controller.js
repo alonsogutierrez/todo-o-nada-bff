@@ -24,6 +24,7 @@ const setProductsFromExcel = (excelProducts) => {
       discount,
       stock,
       productSizeType,
+      images,
     ] = excelProduct;
     const product = {
       itemNumber: `${itemNumber}`.trim(),
@@ -42,6 +43,7 @@ const setProductsFromExcel = (excelProducts) => {
       },
       stock,
       productSizeType,
+      images,
     };
     productsFromExcelMapped.push(product);
   });
@@ -176,7 +178,10 @@ const processProductRepository = async (product) => {
       );
       if (skuFound) {
         const newProductDetails = productFound.details.map((subProduct) => {
-          if (subProduct.sku === product.sku.toString().trim().toUpperCase()) {
+          if (
+            subProduct.sku.toString() ===
+            product.sku.toString().trim().toUpperCase()
+          ) {
             subProduct.size = product.size.toString().trim().toUpperCase();
             subProduct.stock += parseInt(product.stock, 10);
           }
