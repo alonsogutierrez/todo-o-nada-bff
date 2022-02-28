@@ -73,7 +73,7 @@ const SearchRequest = (index, query, from = 0, size = 10, bulk = false) => {
                 resolve(response);
               }
             );
-          }, 0.5 * 1000);
+          }, 1 * 1000);
         } else {
           logger.info('not bulk search');
           elasticSearchClient.search(
