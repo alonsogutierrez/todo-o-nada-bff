@@ -1,9 +1,14 @@
-const { Client } = require('elasticsearch');
+const { Client } = require('@elastic/elasticsearch');
 
 const logger = console;
 
 const SERVICES = {
   ELASTICSEARCH_API: process.env.ELASTIC_SEARCH_URL,
+};
+
+const USER_CREDENTIALS = {
+  ELASTIC_SEARCH_USERNAME: process.env.ELASTIC_SEARCH_USER,
+  ELASTIC_SEARCH_PASSWORD: process.env.ELASTIC_SEARCH_PASSWORD,
 };
 
 const RESOURCES = {
@@ -17,9 +22,13 @@ const RESOURCES = {
 };
 
 const elasticSearchClient = new Client({
-  host: SERVICES.ELASTICSEARCH_API,
+  node: SERVICES.ELASTICSEARCH_API,
+  auth: {
+    username: USER_CREDENTIALS.ELASTIC_SEARCH_USERNAME,
+    password: USER_CREDENTIALS.ELASTIC_SEARCH_PASSWORD,
+  },
   maxRetries: 8,
-  requestTimeout: 60000,
+  requestTimeout: 30 * 1000,
 });
 
 const isClientRunning = () => {
