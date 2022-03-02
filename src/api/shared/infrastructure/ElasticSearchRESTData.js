@@ -23,10 +23,10 @@ const RESOURCES = {
 
 const elasticSearchClient = new Client({
   node: SERVICES.ELASTICSEARCH_API,
-  auth: {
+  /*auth: {
     username: USER_CREDENTIALS.ELASTIC_SEARCH_USERNAME,
     password: USER_CREDENTIALS.ELASTIC_SEARCH_PASSWORD,
-  },
+  },*/
   maxRetries: 8,
   requestTimeout: 30 * 1000,
 });
