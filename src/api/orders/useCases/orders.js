@@ -312,24 +312,22 @@ const updateSearchProductRepository = async (itemNumber, sku, quantity) => {
       query,
     });
     logger.info(
-      `Product found in elastic repository: itemNumber ${itemNumber} & SKU ${sku}`
-    );
-    const { hits } = productFound;
-    if (!hits && !Object.keys(hits).length > 0) {
-      throw new Error(`Invalid hits`);
-    }
-    logger.info(
       'Product found in search repository',
       itemNumber,
       sku,
       productFound
     );
-    const { total } = hits;
+    const { body } = productFound;
+    if (!body && !Object.keys(body).length > 0) {
+      throw new Error(`Invalid body`);
+    }
+
+    const { total } = body.hits;
     logger.info('Total hits: ', total);
     if (!(total > 0)) {
       throw new Error(`Total is negative`);
     }
-    const finalHits = hits.hits;
+    const finalHits = body.hits.hits;
     const actualProduct = finalHits[0]._source;
     logger.info('Actual product data: ', actualProduct);
     let productDetailsUpdated = {};

@@ -91,15 +91,15 @@ const processSearchRepository = async (product) => {
         true
       );
 
-    const { hits } = productFoundElasticRepository;
+    const { body } = productFoundElasticRepository;
     logger.info(
       'productFoundElasticRepository: ',
       JSON.stringify(productFoundElasticRepository)
     );
-    if (hits && Object.keys(hits).length > 0) {
-      const { total } = hits;
+    if (body.hits && Object.keys(body.hits).length > 0) {
+      const { total } = body.hits;
       if (total > 0) {
-        const finalHits = hits.hits;
+        const finalHits = body.hits.hits;
         const actualProduct = finalHits[0]._source;
         const newProductData = {
           ...actualProduct,

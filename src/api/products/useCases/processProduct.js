@@ -143,7 +143,7 @@ const processInSearchRepository = async (productData) => {
         true
       );
 
-    const { hits } = productFoundElasticRepository;
+    const { body } = productFoundElasticRepository;
     const newProductDetails = {};
     for (let sku in details) {
       newProductDetails[sku.toString()] = {
@@ -151,11 +151,11 @@ const processInSearchRepository = async (productData) => {
         size: details[sku].size.trim().toUpperCase(),
       };
     }
-    if (hits && Object.keys(hits).length > 0) {
+    if (body.hits && Object.keys(body.hits).length > 0) {
       const categories = category.split(',');
-      const { total } = hits;
+      const { total } = body.hits;
       if (total > 0) {
-        const finalHits = hits.hits;
+        const finalHits = body.hits.hits;
         const actualProduct = finalHits[0]._source;
         const newProductData = {
           ...actualProduct,
