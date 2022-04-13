@@ -14,7 +14,7 @@ router.post(
   controller.uploadAndProcessLotsProducts
 );
 
-router.post('/product', [auth, uploadS3.uploadImagesS3], async (req, res) => {
+router.post('/product', [auth, uploadS3.handleImages], async (req, res) => {
   try {
     logger.info('Begin to create product');
     const { locationArray } = req.imagesS3Service;

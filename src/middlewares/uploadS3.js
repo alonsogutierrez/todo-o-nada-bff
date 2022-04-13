@@ -23,22 +23,27 @@ const uploadS3 = multer({
       const fullPath = S3_IMAGES_PATH + file.originalname; //If you want to save into a folder concat de name of the folder to the path
       callBack(null, fullPath);
     },
+    multiple: true,
+    resize: {
+      width: 450,
+      height: 450,
+    },
   }),
   limits: { fileSize: 20000000 },
 }).array('pictures', 4);
 
-exports.uploadImagesS3 = async (req, res, next) => {
+exports.handleImages = async (req, res, next) => {
   try {
     uploadS3(req, res, (error) => {
       if (error) {
-        logger.error('Error uploadImagesS3: ', error);
+        logger.error('handleImages Error: ', error);
         res.status(500).json({
           status: 'fail',
           error: error,
         });
       } else {
         if (req.files === undefined) {
-          logger.log('uploadProductsImages Error: No File Selected!');
+          logger.log('handleImages Error: No File Selected!');
           res.status(500).json({
             status: 'fail',
             message: 'Error: No File Selected',
@@ -67,6 +72,6 @@ exports.uploadImagesS3 = async (req, res, next) => {
       }
     });
   } catch (err) {
-    logger.error('Error in uploadImagesS3 Middleware: ', err.message);
+    logger.error('Error in handleImages Middleware: ', err.message);
   }
 };
