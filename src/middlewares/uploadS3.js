@@ -1,17 +1,19 @@
 const AWS = require('aws-sdk');
-const multerS3 = require('multer-s3');
+const multerS3 = require('multer-s3-transform');
 const multer = require('multer');
+const sharp = require('sharp');
 
 const s3 = new AWS.S3({
   accessKeyId: process.env.SECRET_KEY_AWS_ID,
   secretAccessKey: process.env.SECRET_KEY_AWS_ACCESS,
 });
 
+const S3_BASE_URL = process.env.S3_BASE_URL;
 const S3_IMAGES_PATH = process.env.S3_IMAGES_PATH;
 
 const logger = console;
 
-const uploadS3 = multer({
+const multerOptions = {
   storage: multerS3({
     s3: s3,
     acl: 'public-read',
@@ -21,20 +23,41 @@ const uploadS3 = multer({
     },
     key: (req, file, callBack) => {
       const fullPath = S3_IMAGES_PATH + file.originalname; //If you want to save into a folder concat de name of the folder to the path
+      console.log('fullPath: ', fullPath);
       callBack(null, fullPath);
     },
-    multiple: true,
-    resize: {
-      width: 450,
-      height: 450,
-    },
+    shouldTransform: true,
+    transforms: [
+      {
+        id: 'original',
+        key: function (req, file, cb) {
+          console.log('transform');
+          cb(null, S3_IMAGES_PATH + file.originalname);
+        },
+        transform: function (req, file, cb) {
+          //Perform desired transformations
+          console.log('Transform with sharp');
+          cb(null, sharp().resize(500, 500).jpeg());
+        },
+      },
+    ],
   }),
   limits: { fileSize: 20000000 },
-}).array('pictures', 4);
+};
+
+const multerS3Instance = multer(multerOptions);
+
+const uploadS3 = multerS3Instance.array('pictures', 4);
 
 exports.handleImages = async (req, res, next) => {
   try {
+    const startTime = Date.now();
     uploadS3(req, res, (error) => {
+      const durationMulterTime = Date.now() - startTime;
+      logger.log(
+        'Duration multer execution and transform: ',
+        durationMulterTime / 1000 + ' seconds'
+      );
       if (error) {
         logger.error('handleImages Error: ', error);
         res.status(500).json({
@@ -42,7 +65,7 @@ exports.handleImages = async (req, res, next) => {
           error: error,
         });
       } else {
-        if (req.files === undefined) {
+        if (!req.files) {
           logger.log('handleImages Error: No File Selected!');
           res.status(500).json({
             status: 'fail',
@@ -51,12 +74,13 @@ exports.handleImages = async (req, res, next) => {
         } else {
           let fileArray = req.files,
             fileLocation;
+          console.log('fileArray: ', fileArray);
           const images = [];
-          for (let i = 0; i < fileArray.length; i++) {
-            fileLocation = fileArray[i].location;
-            logger.log('filenm', fileLocation);
-            images.push(fileLocation);
-          }
+          fileArray.forEach((file) => {
+            urlFile = S3_BASE_URL + '/' + S3_IMAGES_PATH + file.originalname;
+            logger.log('urlFile', urlFile);
+            images.push(urlFile);
+          });
           logger.log({
             status: 'ok',
             filesArray: fileArray,
