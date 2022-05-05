@@ -9,6 +9,20 @@ const save = async (discountCouponData) => {
   }
 };
 
+const find = async () => {
+  try {
+    const discountCoupon = await DiscountCoupon.find();
+    console.log('discountCoupon find: ', discountCoupon);
+    if (discountCoupon) {
+      return discountCoupon;
+    }
+    throw new Error('discount coupon not exist');
+  } catch (err) {
+    logger.error(`Can't find discount coupon in repository: ${err.message}`);
+    throw new Error(`Can't find discount coupon in repository: ${err.message}`);
+  }
+};
+
 const findOne = async (filters) => {
   try {
     const discountCoupon = await DiscountCoupon.findOne(filters);
@@ -31,4 +45,4 @@ const updateOne = async (filters, newData) => {
   }
 };
 
-module.exports = { save, findOne, updateOne };
+module.exports = { save, find, findOne, updateOne };

@@ -45,12 +45,12 @@ const getByCode = async (code) => {
 const getAll = async () => {
   try {
     logger.log('Trying to find all coupon in repository');
-    const discountCouponResult = await DiscountCouponRespository.findOne({});
+    const discountCouponResult = await DiscountCouponRespository.find();
     logger.log(
       'Discount all coupon well find in repository: ',
       discountCouponResult ? discountCouponResult : ''
     );
-    return { discountCouponResult };
+    return discountCouponResult;
   } catch (err) {
     logger.error(
       'Error when trying to all find discount coupon in repository: ',

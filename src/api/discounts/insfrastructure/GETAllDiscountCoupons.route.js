@@ -10,7 +10,9 @@ const action = async (req, res) => {
       'Request finished and get all discount coupon response: ',
       discountCouponResponse
     );
-    res.status(HTTPCodes.StatusCodes.OK).send(discountCouponResponse);
+    res
+      .status(HTTPCodes.StatusCodes.OK)
+      .send({ discounts: discountCouponResponse });
   } catch (err) {
     logger.error(`Can't get all coupon response: ${err.message}`);
     res.status(HTTPCodes.StatusCodes.INTERNAL_SERVER_ERROR).send({
