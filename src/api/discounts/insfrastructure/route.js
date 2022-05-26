@@ -11,7 +11,6 @@ const router = express.Router();
 router[POSTCreateDiscountCoupon.method.toLocaleLowerCase()](
   POSTCreateDiscountCoupon.route,
   auth,
-  uploadS3.handleImages,
   POSTCreateDiscountCoupon.action
 );
 

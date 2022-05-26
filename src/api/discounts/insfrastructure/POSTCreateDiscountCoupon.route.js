@@ -15,7 +15,7 @@ const action = async (req, res) => {
       });
       return;
     }
-    const discountCouponResponse = await DiscountCouponlUseCases.create(
+    const discountCouponResponse = await DiscountCouponlUseCases.process(
       discountCoupon
     );
     logger.log(

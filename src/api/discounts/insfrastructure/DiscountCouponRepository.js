@@ -1,5 +1,7 @@
 const DiscountCoupon = require('../../../db/models/discount');
 
+const logger = console;
+
 const save = async (discountCouponData) => {
   try {
     const discountCoupon = new DiscountCoupon(discountCouponData);
@@ -12,7 +14,6 @@ const save = async (discountCouponData) => {
 const find = async () => {
   try {
     const discountCoupon = await DiscountCoupon.find();
-    console.log('discountCoupon find: ', discountCoupon);
     if (discountCoupon) {
       return discountCoupon;
     }
@@ -29,7 +30,7 @@ const findOne = async (filters) => {
     if (discountCoupon) {
       return discountCoupon.toJSON();
     }
-    throw new Error('discount coupon not exist');
+    return {};
   } catch (err) {
     logger.error(`Can't find discount coupon in repository: ${err.message}`);
     throw new Error(`Can't find discount coupon in repository: ${err.message}`);
