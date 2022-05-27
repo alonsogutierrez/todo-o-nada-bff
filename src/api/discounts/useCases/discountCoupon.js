@@ -28,9 +28,16 @@ const getByCode = async (couponCode) => {
       code: couponCode,
     });
     logger.log('Discount coupon get from repository: ', discountCouponResult);
-    const { amount, code, isActive, isPercentual } = discountCouponResult;
-    const couponByCode = { amount, code, isActive, isPercentual };
-    return couponByCode;
+    if (discountCouponResult && Object.keys(discountCouponResult).length > 0) {
+      const { amount, code, isActive, isPercentual, expireDate } =
+        discountCouponResult;
+      const isValidCouponByDate = Date.now() <= new Date(expireDate).getTime();
+      const isValid = isActive && isValidCouponByDate;
+      const couponByCode = { amount, code, isActive, isPercentual, isValid };
+      return couponByCode;
+    }
+    const couponNotExists = {};
+    return couponNotExists;
   } catch (err) {
     logger.error(
       'Error when trying to get discount coupon in repository: ',
