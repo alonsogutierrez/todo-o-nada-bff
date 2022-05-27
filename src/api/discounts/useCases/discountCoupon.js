@@ -22,4 +22,22 @@ const create = async (discountCoupon) => {
   }
 };
 
-module.exports = { create };
+const getByCode = async (couponCode) => {
+  try {
+    const discountCouponResult = await DiscountCouponRespository.findOne({
+      code: couponCode,
+    });
+    logger.log('Discount coupon get from repository: ', discountCouponResult);
+    const { amount, code, isActive, isPercentual } = discountCouponResult;
+    const couponByCode = { amount, code, isActive, isPercentual };
+    return couponByCode;
+  } catch (err) {
+    logger.error(
+      'Error when trying to get discount coupon in repository: ',
+      err.message
+    );
+    throw new Error(err.message);
+  }
+};
+
+module.exports = { create, getByCode };
