@@ -1,11 +1,26 @@
 const DiscountCoupon = require('../../../db/models/discount');
 
+const logger = console;
+
 const save = async (discountCouponData) => {
   try {
     const discountCoupon = new DiscountCoupon(discountCouponData);
     return await discountCoupon.save();
   } catch (err) {
     throw new Error(`Can't save discount coupon in repository: ${err.message}`);
+  }
+};
+
+const find = async () => {
+  try {
+    const discountCoupons = await DiscountCoupon.find();
+    if (discountCoupons) {
+      return discountCoupons;
+    }
+    return [];
+  } catch (err) {
+    logger.error(`Can't find discount coupon in repository: ${err.message}`);
+    return [];
   }
 };
 
@@ -30,4 +45,4 @@ const updateOne = async (filters, newData) => {
   }
 };
 
-module.exports = { save, findOne, updateOne };
+module.exports = { save, findOne, updateOne, find };

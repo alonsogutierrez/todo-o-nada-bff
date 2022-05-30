@@ -1,11 +1,11 @@
-const DiscountCouponRespository = require('./../insfrastructure/DiscountCouponRepository');
+const DiscountCouponRepository = require('./../insfrastructure/DiscountCouponRepository');
 
 const logger = console;
 
 const create = async (discountCoupon) => {
   try {
     console.log('discountCoupon: ', discountCoupon);
-    const discountCouponResult = await DiscountCouponRespository.save(
+    const discountCouponResult = await DiscountCouponRepository.save(
       discountCoupon
     );
     logger.log(
@@ -24,7 +24,7 @@ const create = async (discountCoupon) => {
 
 const getByCode = async (couponCode) => {
   try {
-    const discountCouponResult = await DiscountCouponRespository.findOne({
+    const discountCouponResult = await DiscountCouponRepository.findOne({
       code: couponCode,
     });
     logger.log('Discount coupon get from repository: ', discountCouponResult);
@@ -33,7 +33,14 @@ const getByCode = async (couponCode) => {
         discountCouponResult;
       const isValidCouponByDate = Date.now() <= new Date(expireDate).getTime();
       const isValid = isActive && isValidCouponByDate;
-      const couponByCode = { amount, code, isActive, isPercentual, isValid };
+      const couponByCode = {
+        amount,
+        code,
+        isActive,
+        isPercentual,
+        isValid,
+        expireDate,
+      };
       return couponByCode;
     }
     const couponNotExists = {};
@@ -47,4 +54,33 @@ const getByCode = async (couponCode) => {
   }
 };
 
-module.exports = { create, getByCode };
+const find = async () => {
+  try {
+    const discountCouponList = await DiscountCouponRepository.find();
+    return discountCouponList;
+  } catch (err) {
+    logger.error(
+      'Error when trying to get discounts coupon in repository: ',
+      err.message
+    );
+    return [];
+  }
+};
+
+const updateOne = async (code, discountCouponData) => {
+  try {
+    const discountCouponUpdated = await DiscountCouponRepository.updateOne(
+      { code },
+      discountCouponData
+    );
+    return discountCouponUpdated;
+  } catch (err) {
+    logger.error(
+      'Error when trying to update discount coupon in repository: ',
+      err.message
+    );
+    return {};
+  }
+};
+
+module.exports = { create, getByCode, find, updateOne };
