@@ -24,7 +24,7 @@ const create = async (discountCoupon) => {
 const update = async (discountCoupon, discountFound) => {
   try {
     const { code } = discountFound;
-    const discountUpdated = await DiscountCouponRespository.updateOne(
+    const discountUpdated = await DiscountCouponRepository.updateOne(
       {
         code: code,
       },
@@ -40,7 +40,7 @@ const update = async (discountCoupon, discountFound) => {
 const process = async (discountCoupon) => {
   try {
     const { code } = discountCoupon;
-    const discountFound = await DiscountCouponRespository.findOne({
+    const discountFound = await DiscountCouponRepository.findOne({
       code: code,
     });
 
@@ -50,7 +50,9 @@ const process = async (discountCoupon) => {
     return await create(discountCoupon);
   } catch (err) {
     logger.error(`Error trying to process discount use case: ${err.message}`);
-    throw new Error(err.message);
+    throw new Error(
+      `Error trying to process discount use case: ${err.message}`
+    );
   }
 };
 
