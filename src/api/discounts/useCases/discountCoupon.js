@@ -4,7 +4,6 @@ const logger = console;
 
 const create = async (discountCoupon) => {
   try {
-    console.log('discountCoupon: ', discountCoupon);
     const discountCouponResult = await DiscountCouponRepository.save(
       discountCoupon
     );
@@ -16,8 +15,41 @@ const create = async (discountCoupon) => {
   } catch (err) {
     logger.error(
       'Error when trying to save discount coupon in repository: ',
-      discountCouponResult
+      err.message
     );
+    throw new Error(err.message);
+  }
+};
+
+const update = async (discountCoupon, discountFound) => {
+  try {
+    const { code } = discountFound;
+    const discountUpdated = await DiscountCouponRespository.updateOne(
+      {
+        code: code,
+      },
+      discountCoupon
+    );
+    return discountUpdated;
+  } catch (err) {
+    logger.error(`Error trying to update discount use case: ${err.message}`);
+    throw new Error(err.message);
+  }
+};
+
+const process = async (discountCoupon) => {
+  try {
+    const { code } = discountCoupon;
+    const discountFound = await DiscountCouponRespository.findOne({
+      code: code,
+    });
+
+    if (discountFound && Object.keys(discountFound).length > 0) {
+      return await update(discountCoupon, discountFound);
+    }
+    return await create(discountCoupon);
+  } catch (err) {
+    logger.error(`Error trying to process discount use case: ${err.message}`);
     throw new Error(err.message);
   }
 };
@@ -93,4 +125,4 @@ const updateOne = async (code, discountCouponData) => {
   }
 };
 
-module.exports = { create, getByCode, find, updateOne };
+module.exports = { create, getByCode, find, updateOne, process };

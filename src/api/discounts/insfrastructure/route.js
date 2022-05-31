@@ -1,5 +1,6 @@
 const express = require('express');
 const auth = require('./../../../middlewares/auth');
+const uploadS3 = require('./../../../middlewares/uploadS3');
 
 const POSTCreateDiscountCoupon = require('../insfrastructure/POSTCreateDiscountCoupon.route');
 const GETDiscountCouponByCode = require('../insfrastructure/GETDiscountCouponByCode.route');

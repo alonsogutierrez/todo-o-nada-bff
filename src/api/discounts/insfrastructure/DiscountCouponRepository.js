@@ -30,8 +30,9 @@ const findOne = async (filters) => {
     if (discountCoupon) {
       return discountCoupon.toJSON();
     }
-    throw new Error('discount coupon not exist');
+    return {};
   } catch (err) {
+    logger.error(`Can't find discount coupon in repository: ${err.message}`);
     throw new Error(`Can't find discount coupon in repository: ${err.message}`);
   }
 };
