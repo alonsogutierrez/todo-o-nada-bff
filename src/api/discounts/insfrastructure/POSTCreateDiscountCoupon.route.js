@@ -35,6 +35,12 @@ const action = async (req, res) => {
       discountCoupon.code,
       discountCoupon
     );
+    if (
+      discountCouponResponse &&
+      Object.keys(discountCouponResponse).length === 0
+    ) {
+      throw new Error(`Cant update coupon code: ${discountCoupon.code}`);
+    }
     logger.log(
       'Request finished and update discount coupon response: ',
       discountCouponResponse

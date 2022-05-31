@@ -69,6 +69,16 @@ const find = async () => {
 
 const updateOne = async (code, discountCouponData) => {
   try {
+    if (discountCouponData.isPercentual) {
+      if (discountCouponData.amount <= 0 && discountCouponData.amount > 99) {
+        logger.error(
+          'Discount coupon amount percentual invalid: ',
+          discountCouponData.amount
+        );
+        const noUpdated = {};
+        return noUpdated;
+      }
+    }
     const discountCouponUpdated = await DiscountCouponRepository.updateOne(
       { code },
       discountCouponData
