@@ -54,44 +54,6 @@ const process = async (discountCoupon) => {
   }
 };
 
-const getByCode = async (code) => {
-  try {
-    logger.log('Trying to find coupon in repository: ', code);
-    const discountCouponResult = await DiscountCouponRespository.findOne({
-      code,
-    });
-    logger.log(
-      'Discount coupon well find in repository: ',
-      discountCouponResult ? discountCouponResult : ''
-    );
-    return { discountCouponResult };
-  } catch (err) {
-    logger.error(
-      'Error when trying to find discount coupon in repository: ',
-      discountCouponResult
-    );
-    throw new Error(err.message);
-  }
-};
-
-const getAll = async () => {
-  try {
-    logger.log('Trying to find all coupon in repository');
-    const discountCouponResult = await DiscountCouponRespository.find();
-    logger.log(
-      'Discount all coupon well find in repository: ',
-      discountCouponResult ? discountCouponResult : ''
-    );
-    return discountCouponResult;
-  } catch (err) {
-    logger.error(
-      'Error when trying to all find discount coupon in repository: ',
-      discountCouponResult
-    );
-    throw new Error(err.message);
-  }
-};
-
 const getByCode = async (couponCode) => {
   try {
     const discountCouponResult = await DiscountCouponRepository.findOne({
@@ -163,4 +125,4 @@ const updateOne = async (code, discountCouponData) => {
   }
 };
 
-module.exports = { create, getByCode, find, updateOne };
+module.exports = { create, getByCode, find, updateOne, process };
