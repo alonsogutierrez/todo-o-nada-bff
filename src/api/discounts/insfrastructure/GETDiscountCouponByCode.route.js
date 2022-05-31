@@ -1,28 +1,29 @@
 const HTTPCodes = require('http-status-codes');
-const DiscountCouponUseCases = require('../useCases/discountCoupon');
+const DiscountCouponlUseCases = require('../useCases/discountCoupon');
 
-const isValidQuery = require('../adapters/GETDiscountCouponByCode.validator');
+const isValidQuery = require('../adapters/GETDiscountByCode.validator');
 
 const logger = console;
 
 const action = async (req, res) => {
   try {
-    const { code } = req.params;
-    logger.log('Validating query to get discount coupon: ', code);
-    if (!isValidQuery({ code })) {
+    const couponCode = req.params.couponCode;
+    logger.log('Validating query to get discount coupon by code: ', couponCode);
+    if (!isValidQuery({ code: couponCode })) {
       res.status(HTTPCodes.StatusCodes.BAD_REQUEST).send({
-        error: 'Invalid params to get discount coupon',
+        error: 'Invalid params to get discount coupon by code',
       });
       return;
     }
-    const discountCouponResponse = await DiscountCouponUseCases.getByCode(code);
+    const discountCouponByCodeResponse =
+      await DiscountCouponlUseCases.getByCode(couponCode);
     logger.log(
-      'Request finished and get discount coupon response: ',
-      discountCouponResponse
+      'Request finished and get discount coupon by code response: ',
+      discountCouponByCodeResponse
     );
-    res.status(HTTPCodes.StatusCodes.OK).send(discountCouponResponse);
+    res.status(HTTPCodes.StatusCodes.OK).send(discountCouponByCodeResponse);
   } catch (err) {
-    logger.error(`Can't get coupon response: ${err.message}`);
+    logger.error(`Can't get coupon by code response: ${err.message}`);
     res.status(HTTPCodes.StatusCodes.INTERNAL_SERVER_ERROR).send({
       error: `Can't get coupon: ${err.message}`,
     });
@@ -31,6 +32,6 @@ const action = async (req, res) => {
 
 module.exports = {
   method: 'GET',
-  route: '/discount-coupon/:code',
+  route: '/discount-coupon/:couponCode',
   action,
 };

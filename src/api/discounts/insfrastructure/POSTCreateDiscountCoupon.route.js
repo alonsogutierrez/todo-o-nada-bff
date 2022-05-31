@@ -15,11 +15,34 @@ const action = async (req, res) => {
       });
       return;
     }
-    const discountCouponResponse = await DiscountCouponlUseCases.process(
+    const discountCouponFindResponse = await DiscountCouponlUseCases.find(
+      discountCoupon.code
+    );
+    if (
+      !discountCouponFindResponse &&
+      !Object.keys(discountCouponFindResponse).length > 0
+    ) {
+      const discountCouponResponse = await DiscountCouponlUseCases.create(
+        discountCoupon
+      );
+      logger.log(
+        'Request finished and create discount coupon response: ',
+        discountCouponResponse
+      );
+      res.status(HTTPCodes.StatusCodes.OK).send(discountCouponResponse);
+    }
+    const discountCouponResponse = await DiscountCouponlUseCases.updateOne(
+      discountCoupon.code,
       discountCoupon
     );
+    if (
+      discountCouponResponse &&
+      Object.keys(discountCouponResponse).length === 0
+    ) {
+      throw new Error(`Cant update coupon code: ${discountCoupon.code}`);
+    }
     logger.log(
-      'Request finished and create discount coupon response: ',
+      'Request finished and update discount coupon response: ',
       discountCouponResponse
     );
     res.status(HTTPCodes.StatusCodes.OK).send(discountCouponResponse);

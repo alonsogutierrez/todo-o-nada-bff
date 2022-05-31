@@ -1,6 +1,6 @@
-const getDiscountCouponSchema = {
-  title: 'getDiscountCouponSchema',
-  description: 'describes properties required to get a discount coupon',
+const getDiscountCouponByCodeSchema = {
+  title: 'GETDiscountCouponByCodeSchema',
+  description: 'describes properties required to get a discount coupon by code',
   type: 'object',
   properties: {
     code: {
@@ -10,4 +10,4 @@ const getDiscountCouponSchema = {
   },
 };
 
-module.exports = getDiscountCouponSchema;
+module.exports = getDiscountCouponByCodeSchema;

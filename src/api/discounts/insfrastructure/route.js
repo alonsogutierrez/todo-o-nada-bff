@@ -4,7 +4,7 @@ const uploadS3 = require('./../../../middlewares/uploadS3');
 
 const POSTCreateDiscountCoupon = require('../insfrastructure/POSTCreateDiscountCoupon.route');
 const GETDiscountCouponByCode = require('../insfrastructure/GETDiscountCouponByCode.route');
-const GETAllDiscountCoupon = require('../insfrastructure/GETAllDiscountCoupons.route');
+const GETFindAllDiscountCoupon = require('../insfrastructure/GETFindAllDiscountCoupon.route');
 
 const router = express.Router();
 
@@ -14,15 +14,14 @@ router[POSTCreateDiscountCoupon.method.toLocaleLowerCase()](
   POSTCreateDiscountCoupon.action
 );
 
-router[GETAllDiscountCoupon.method.toLocaleLowerCase()](
-  GETAllDiscountCoupon.route,
-  auth,
-  GETAllDiscountCoupon.action
-);
-
 router[GETDiscountCouponByCode.method.toLocaleLowerCase()](
   GETDiscountCouponByCode.route,
   GETDiscountCouponByCode.action
+);
+
+router[GETFindAllDiscountCoupon.method.toLocaleLowerCase()](
+  GETFindAllDiscountCoupon.route,
+  GETFindAllDiscountCoupon.action
 );
 
 module.exports = router;

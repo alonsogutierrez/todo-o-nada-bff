@@ -66,9 +66,14 @@ const getMessageData = (orderPaid) => {
           .toFixed(0)
           .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1.'),
       dispatchCost: dispatchMessage,
+      totalDiscount:
+        '$' +
+        transaction.discount
+          .toFixed(0)
+          .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1.'),
       total:
         '$' +
-        (transaction.shipping + transaction.subTotal)
+        (transaction.subTotal + transaction.shipping - transaction.discount)
           .toFixed(0)
           .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1.'),
       senderName: senderEmail,

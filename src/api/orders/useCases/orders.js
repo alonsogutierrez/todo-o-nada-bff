@@ -7,6 +7,7 @@ const PaymentAPI = require('../insfrastructure/PaymentAPI');
 const OrderRepository = require('../insfrastructure/OrderRepository');
 const ProductRepository = require('../insfrastructure/ProductRepository');
 const SendEmailUseCases = require('./../../emails/useCases/emails');
+const DiscountCouponUseCases = require('./../../discounts/useCases/discountCoupon');
 
 const idBuilder = require('../idBuilder');
 
@@ -312,24 +313,22 @@ const updateSearchProductRepository = async (itemNumber, sku, quantity) => {
       query,
     });
     logger.info(
-      `Product found in elastic repository: itemNumber ${itemNumber} & SKU ${sku}`
-    );
-    const { hits } = productFound;
-    if (!hits && !Object.keys(hits).length > 0) {
-      throw new Error(`Invalid hits`);
-    }
-    logger.info(
       'Product found in search repository',
       itemNumber,
       sku,
       productFound
     );
-    const { total } = hits;
+    const { body } = productFound;
+    if (!body && !Object.keys(body).length > 0) {
+      throw new Error(`Invalid body`);
+    }
+
+    const { total } = body.hits;
     logger.info('Total hits: ', total);
     if (!(total > 0)) {
       throw new Error(`Total is negative`);
     }
-    const finalHits = hits.hits;
+    const finalHits = body.hits.hits;
     const actualProduct = finalHits[0]._source;
     logger.info('Actual product data: ', actualProduct);
     let productDetailsUpdated = {};
@@ -404,19 +403,37 @@ const updateOrderStatus = async (
 const generateOrderData = async (order) => {
   const orderNumber = await idBuilder.generateOrderId();
   order.orderNumber = orderNumber;
-  let { paymentData, products } = order;
+  let { paymentData, products, discounts } = order;
   let subTotal = 0;
   products.forEach((product) => {
     subTotal +=
       parseInt(product.price.basePriceSales, 10) *
       parseInt(product.quantity, 10);
   });
+  // TODO: Get discount coupo, validate and apply discounts
+  const discountCouponResult = await DiscountCouponUseCases.getByCode(
+    discounts.code
+  );
+  let totalDiscount = 0;
+  if (
+    discountCouponResult &&
+    Object.keys(discountCouponResult).length > 0 &&
+    discountCouponResult.isValid
+  ) {
+    if (discountCouponResult.isPercentual) {
+      totalDiscount = parseInt(
+        Math.ceil(subTotal * (discountCouponResult.amount / 100))
+      );
+    } else {
+      totalDiscount = discountCouponResult.amount;
+    }
+  }
   paymentData.state = 'created';
   paymentData.transaction = {
     date: new Date(),
-    discount: 0,
+    discount: totalDiscount,
     subTotal: subTotal,
-    shipping: 0,
+    shipping: 0, // TODO: Change when we have a shipping estimation
   };
   order.uuid = nanoid();
   order.paymentData = paymentData;
@@ -464,14 +481,14 @@ const generateOrderData = async (order) => {
 const generatePaymentData = (order) => {
   const { paymentData, uuid } = order;
   const {
-    transaction: { subTotal, shipping },
+    transaction: { subTotal, shipping, discount },
     user: { email },
   } = paymentData;
   const urlReturn = `${BASE_URL_FE}?orderNumber=${order.orderNumber}&id=${uuid}`;
   logger.info('Url Return: ', urlReturn);
   // NOTE: All fields must be order alphabetically in asc way
   return {
-    amount: subTotal + shipping,
+    amount: subTotal + shipping - discount,
     apiKey: FLOW_API_KEY,
     commerceOrder: `${order.orderNumber}`,
     currency: 'CLP',

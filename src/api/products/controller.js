@@ -24,6 +24,7 @@ const setProductsFromExcel = (excelProducts) => {
       discount,
       stock,
       productSizeType,
+      images,
     ] = excelProduct;
     const product = {
       itemNumber: `${itemNumber}`.trim(),
@@ -42,6 +43,7 @@ const setProductsFromExcel = (excelProducts) => {
       },
       stock,
       productSizeType,
+      images,
     };
     productsFromExcelMapped.push(product);
   });
@@ -64,19 +66,6 @@ const updateProductSizes = (actualProductSizes, productSize) => {
 };
 
 const updateProductDetails = (actualProductDetails, product) => {
-  if (actualProductDetails[product.sku]) {
-    const actualProductQuantity = parseInt(
-      actualProductDetails[product.sku].quantity,
-      10
-    );
-    return {
-      ...actualProductDetails,
-      [product.sku]: {
-        quantity: actualProductQuantity + parseInt(product.stock, 10),
-        size: product.size.toString().trim().toUpperCase(),
-      },
-    };
-  }
   return {
     ...actualProductDetails,
     [product.sku]: {
@@ -102,15 +91,15 @@ const processSearchRepository = async (product) => {
         true
       );
 
-    const { hits } = productFoundElasticRepository;
+    const { body } = productFoundElasticRepository;
     logger.info(
       'productFoundElasticRepository: ',
       JSON.stringify(productFoundElasticRepository)
     );
-    if (hits && Object.keys(hits).length > 0) {
-      const { total } = hits;
+    if (body.hits && Object.keys(body.hits).length > 0) {
+      const { total } = body.hits;
       if (total > 0) {
-        const finalHits = hits.hits;
+        const finalHits = body.hits.hits;
         const actualProduct = finalHits[0]._source;
         const newProductData = {
           ...actualProduct,
@@ -119,6 +108,7 @@ const processSearchRepository = async (product) => {
           description: product.description,
           color: product.color,
           price: product.price,
+          picture: product.images.split(',')[0],
           details: updateProductDetails(actualProduct.details, product),
           sizes: updateProductSizes(actualProduct.sizes, product.size),
         };
@@ -144,7 +134,7 @@ const processSearchRepository = async (product) => {
           description: product.description,
           color: product.color,
           price: product.price,
-          picture: '',
+          picture: product.images.split(',')[0],
           details: newProductDetails,
           sizes: [product.size.toString().trim().toUpperCase()],
         };
@@ -176,9 +166,12 @@ const processProductRepository = async (product) => {
       );
       if (skuFound) {
         const newProductDetails = productFound.details.map((subProduct) => {
-          if (subProduct.sku === product.sku.toString().trim().toUpperCase()) {
+          if (
+            subProduct.sku.toString() ===
+            product.sku.toString().trim().toUpperCase()
+          ) {
             subProduct.size = product.size.toString().trim().toUpperCase();
-            subProduct.stock += parseInt(product.stock, 10);
+            subProduct.stock = parseInt(product.stock, 10);
           }
           return subProduct;
         });
@@ -187,6 +180,7 @@ const processProductRepository = async (product) => {
           name: product.name,
           description: product.description,
           category: product.category,
+          pictures: product.images.split(','),
           price: {
             basePriceSales: product.price.basePriceSales,
             basePriceReference: product.price.basePriceSales,
@@ -217,6 +211,7 @@ const processProductRepository = async (product) => {
           category: product.category,
           color: product.color,
           price: product.price,
+          pictures: product.images.split(','),
           details: productFound.details.concat(newProductDetails),
           productSizeType: product.productSizeType,
         };
