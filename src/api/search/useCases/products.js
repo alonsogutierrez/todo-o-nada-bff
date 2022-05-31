@@ -23,7 +23,7 @@ const getProducts = async (searchText, page, size = 20) => {
     false
   );
 
-  return elasticSearchResponse.hits;
+  return elasticSearchResponse.body.hits;
 };
 
 const getProductsByCategory = async (categoryName, page, size = 20) => {
@@ -41,7 +41,7 @@ const getProductsByCategory = async (categoryName, page, size = 20) => {
     size,
     false
   );
-  return elasticSearchResponse.hits;
+  return elasticSearchResponse.body.hits;
 };
 
 const getMoreInterestingProducts = async (page = 0, size = 6) => {
@@ -61,7 +61,8 @@ const getMoreInterestingProducts = async (page = 0, size = 6) => {
     size,
     false
   );
-  return elasticSearchResponse.hits;
+
+  return elasticSearchResponse.body.hits;
 };
 
 const getAdminProducts = async (page = 0, size = 100) => {
@@ -75,7 +76,7 @@ const getAdminProducts = async (page = 0, size = 100) => {
     size,
     false
   );
-  return elasticSearchResponse.hits;
+  return elasticSearchResponse.body.hits;
 };
 
 module.exports = {

@@ -19,6 +19,10 @@ const orderPaymentSchema = {
       description: 'dispatch data description',
       enum: [store_dispatch, home_delivery],
     },
+    discounts: {
+      type: 'object',
+      description: 'discount data info',
+    },
   },
 };
 
