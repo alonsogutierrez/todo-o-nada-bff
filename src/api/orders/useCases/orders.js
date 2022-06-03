@@ -51,15 +51,30 @@ const createOrderPayment = async (order) => {
       signedPaymentMessage
     );
     logger.info('Trying to create payment in api');
-    const paymentCreationResponse = await PaymentAPI.createPayment(
-      paymentFormData
-    );
+    let paymentCreationResponse = {};
+    try {
+      paymentCreationResponse = await PaymentAPI.createPayment(paymentFormData);
+    } catch (err) {
+      if (err.message == 'Request failed with status code 400') {
+        paymentCreationResponse = {
+          code: 400,
+          message: 'Invalid params',
+        };
+      } else {
+        paymentCreationResponse = {
+          code: 500,
+          message: 'Service unavailable',
+        };
+      }
+    }
 
     logger.info('Trying to validate payment api response');
     if (isValidPaymentResponse(paymentCreationResponse)) {
       const { token, url, flowOrder } = paymentCreationResponse;
       order.paymentData.apiResponse = { token, url, flowOrder };
       logger.info('Payment well created in API: ', token, url, flowOrder);
+      logger.info('Going to save order: ', order);
+
       const orderData = await OrderRepository.save(order);
       logger.info('Order well saved in repository');
       const createOrderPaymentResponse = {
@@ -69,16 +84,7 @@ const createOrderPayment = async (order) => {
       };
       return createOrderPaymentResponse;
     }
-    const { code, message } = paymentCreationResponse;
-    if (code && message) {
-      return { code, message };
-    } else {
-      throw new Error(
-        `Error in payment api responsse: ${JSON.stringify(
-          paymentCreationResponse
-        )}`
-      );
-    }
+    return paymentCreationResponse;
   } catch (err) {
     throw new Error(`Can't create order payment use cases: ${err.message}`);
   }
@@ -410,10 +416,18 @@ const generateOrderData = async (order) => {
       parseInt(product.price.basePriceSales, 10) *
       parseInt(product.quantity, 10);
   });
-  // TODO: Get discount coupo, validate and apply discounts
-  const discountCouponResult = await DiscountCouponUseCases.getByCode(
-    discounts.code
-  );
+  let discountCouponResult = {};
+  if (
+    discounts &&
+    Object.keys(discounts).length > 0 &&
+    discounts.code &&
+    discounts.code !== ''
+  ) {
+    discountCouponResult = await DiscountCouponUseCases.getByCode(
+      discounts.code
+    );
+  }
+
   let totalDiscount = 0;
   if (
     discountCouponResult &&

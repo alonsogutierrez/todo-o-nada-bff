@@ -17,6 +17,16 @@ const action = async (req, res) => {
     logger.log('Begining to create order payment: ', body);
     const createOrderPaymentResponse =
       await CreateOrderPaymentUseCases.createOrderPayment(body);
+    if (
+      createOrderPaymentResponse &&
+      Object.keys(createOrderPaymentResponse).length > 0 &&
+      createOrderPaymentResponse.code &&
+      createOrderPaymentResponse.code === 400
+    ) {
+      res
+        .status(HTTPCodes.StatusCodes.BAD_REQUEST)
+        .send(createOrderPaymentResponse);
+    }
     logger.log('Request finished: ', createOrderPaymentResponse);
     res.status(HTTPCodes.StatusCodes.OK).send(createOrderPaymentResponse);
   } catch (err) {

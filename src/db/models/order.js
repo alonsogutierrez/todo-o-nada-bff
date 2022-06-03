@@ -137,7 +137,7 @@ const orderSchema = new mongoose.Schema(
     discounts: {
       code: {
         type: String,
-        required: true,
+        required: false,
       },
     },
     uuid: {

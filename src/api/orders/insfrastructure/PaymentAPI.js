@@ -4,6 +4,8 @@ const PAYMENT_API_BASE_URL = process.env.FLOW_API_BASE_URL;
 const createPaymentRoute = '/payment/create';
 const getPaymentStatusRoute = '/payment/getStatus';
 
+const logger = console;
+
 const createPayment = async (paymentData) => {
   try {
     const createPaymentResponse = await RemoteRestData.POSTRequest(
@@ -14,7 +16,8 @@ const createPayment = async (paymentData) => {
     );
     return createPaymentResponse;
   } catch (err) {
-    throw new Error(`Can´t create payment in API: ${err.message} `);
+    logger.error(`Can´t create payment in API: ${err.message}`);
+    throw new Error(`${err.message}`);
   }
 };
 
