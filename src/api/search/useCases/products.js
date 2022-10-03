@@ -49,7 +49,7 @@ const getMoreInterestingProducts = async (page = 0, size = 6) => {
     bool: {
       filter: {
         terms: {
-          itemNumber: [25, 15, 33, 31, 28],
+          itemNumber: [1051, 1052, 23, 15, 9, 19, 30, 331, 21, 22],
         },
       },
     },
