@@ -4,6 +4,8 @@ const auth = require('./../../../middlewares/auth');
 const GETSearchProducts = require('../insfrastructure/GETSearchProducts.route');
 const GETSearchProductsByCategory = require('../insfrastructure/GETSearchProductsByCategory.route');
 const GETMoreInterestingProducts = require('../insfrastructure/GETMoreInterestingProducts.route');
+const GETMoreInterestingProducts2 = require('../insfrastructure/GETMoreInterestingProducts2.route');
+const GETMoreInterestingProducts3 = require('../insfrastructure/GETMoreInterestingProducts3.route');
 const GETAdminProducts = require('../insfrastructure/GETAdminProducts.route');
 
 const router = express.Router();
@@ -21,6 +23,16 @@ router[GETSearchProductsByCategory.method.toLocaleLowerCase()](
 router[GETMoreInterestingProducts.method.toLocaleLowerCase()](
   GETMoreInterestingProducts.route,
   GETMoreInterestingProducts.action
+);
+
+router[GETMoreInterestingProducts2.method.toLocaleLowerCase()](
+  GETMoreInterestingProducts2.route,
+  GETMoreInterestingProducts2.action
+);
+
+router[GETMoreInterestingProducts3.method.toLocaleLowerCase()](
+  GETMoreInterestingProducts3.route,
+  GETMoreInterestingProducts3.action
 );
 
 router[GETAdminProducts.method.toLocaleLowerCase()](

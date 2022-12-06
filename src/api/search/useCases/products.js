@@ -44,12 +44,21 @@ const getProductsByCategory = async (categoryName, page, size = 20) => {
   return elasticSearchResponse.body.hits;
 };
 
-const getMoreInterestingProducts = async (page = 0, size = 6) => {
+const getMoreInterestingProducts = async (
+  page = 0,
+  size = 6,
+  type = 'principal'
+) => {
+  const interestingProductsConfig = {
+    principal: [1051, 1052, 23, 15, 9, 19, 30, 331, 21, 22],
+    second: [300, 311, 309, 320, 319, 331],
+    third: [1001, 1052, 1051],
+  };
   const query = {
     bool: {
       filter: {
         terms: {
-          itemNumber: [1051, 1052, 23, 15, 9, 19, 30, 331, 21, 22],
+          itemNumber: interestingProductsConfig[type],
         },
       },
     },
