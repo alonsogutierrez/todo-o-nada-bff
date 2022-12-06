@@ -13,7 +13,11 @@ const action = async (req, res) => {
     if (!interestingProductsFromCache) {
       logger.info('Cache invalid to get more interesting products 1');
       moreInterestingProductsResponse =
-        await SearchProductsUseCases.getMoreInterestingProducts();
+        await SearchProductsUseCases.getMoreInterestingProducts(
+          0,
+          10,
+          'principal'
+        );
     } else {
       logger.info('Cache valid to get more interesting products 1');
       moreInterestingProductsResponse = interestingProductsFromCache;

@@ -50,7 +50,7 @@ const getMoreInterestingProducts = async (
   type = 'principal'
 ) => {
   const interestingProductsConfig = {
-    principal: [30, 7, 4, 1052, 1001, 1051, 23, 9, 19, 331, 22],
+    principal: [1037, 1038, 30, 7, 4, 1052, 1001, 1051, 23, 9, 19, 331, 22],
     second: [300, 311, 309, 320, 319, 331],
     third: [19, 15, 4, 10, 16, 2, 400],
     four: [35, 36, 31, 28, 33, 25],
