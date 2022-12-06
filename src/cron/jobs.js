@@ -35,10 +35,10 @@ const getInterestingProducts = async () => {
   try {
     logger.info('Begin to get interesting products to cache');
     const promisesResponses = new Array(4).fill(null);
-    promisesResponses[0] = await getMoreInterestingProducts();
-    promisesResponses[1] = await getMoreInterestingProducts(0, 6, 'second');
-    promisesResponses[2] = await getMoreInterestingProducts(0, 6, 'third');
-    promisesResponses[3] = await getMoreInterestingProducts(0, 6, 'four');
+    promisesResponses[0] = await getMoreInterestingProducts(0, 10, 'principal');
+    promisesResponses[1] = await getMoreInterestingProducts(0, 10, 'second');
+    promisesResponses[2] = await getMoreInterestingProducts(0, 10, 'third');
+    promisesResponses[3] = await getMoreInterestingProducts(0, 10, 'four');
 
     logger.info('Promises Responses: ', promisesResponses);
 
