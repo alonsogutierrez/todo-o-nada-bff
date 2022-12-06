@@ -17,7 +17,7 @@ const categoriesRouter = require('./api/categories/insfrastructure/routes/catego
 const paymentsRouter = require('./api/payments/insfrastructure/routes');
 const discountsRouter = require('./api/discounts/insfrastructure/route');
 
-const healthCheckCron = require('./cron/healthCheck');
+const { getInterestingProducts } = require('./cron/jobs');
 
 const logger = console;
 
@@ -38,6 +38,8 @@ const corsOptions = {
   origin: corsWhiteList,
 };
 
+const cronExpression = process.env.CRON_EXPRESSION;
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -55,8 +57,8 @@ app.use(categoriesRouter);
 app.use(paymentsRouter);
 app.use(discountsRouter);
 
-cron.schedule('*/10 * * * *', async function () {
-  await healthCheckCron();
+cron.schedule(cronExpression, async function () {
+  await getInterestingProducts();
 });
 
 module.exports = app;

@@ -7,8 +7,16 @@ const logger = console;
 const action = async (req, res) => {
   try {
     logger.log('Begining to get more interesting products 3');
-    const moreInterestingProductsResponse =
-      await SearchProductsUseCases.getMoreInterestingProducts(0, 6, 'third');
+    let moreInterestingProductsResponse = [];
+    const interestingProductsFromCache = interestingProductsConfig['third'];
+    if (!interestingProductsFromCache) {
+      logger.info('Cache invalid to get more interesting products 3');
+      moreInterestingProductsResponse =
+        await SearchProductsUseCases.getMoreInterestingProducts(0, 6, 'third');
+    } else {
+      logger.info('Cache valid to get more interesting products 3');
+      moreInterestingProductsResponse = interestingProductsFromCache;
+    }
     logger.log('Request finished: ', moreInterestingProductsResponse);
     res.status(HTTPCodes.StatusCodes.OK).send(moreInterestingProductsResponse);
   } catch (err) {
