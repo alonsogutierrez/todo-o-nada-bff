@@ -6,6 +6,7 @@ const GETSearchProductsByCategory = require('../insfrastructure/GETSearchProduct
 const GETMoreInterestingProducts = require('../insfrastructure/GETMoreInterestingProducts.route');
 const GETMoreInterestingProducts2 = require('../insfrastructure/GETMoreInterestingProducts2.route');
 const GETMoreInterestingProducts3 = require('../insfrastructure/GETMoreInterestingProducts3.route');
+const GETMoreInterestingProducts4 = require('../insfrastructure/GETMoreInterestingProducts4.route');
 const GETAdminProducts = require('../insfrastructure/GETAdminProducts.route');
 
 const router = express.Router();
@@ -33,6 +34,11 @@ router[GETMoreInterestingProducts2.method.toLocaleLowerCase()](
 router[GETMoreInterestingProducts3.method.toLocaleLowerCase()](
   GETMoreInterestingProducts3.route,
   GETMoreInterestingProducts3.action
+);
+
+router[GETMoreInterestingProducts4.method.toLocaleLowerCase()](
+  GETMoreInterestingProducts4.route,
+  GETMoreInterestingProducts4.action
 );
 
 router[GETAdminProducts.method.toLocaleLowerCase()](

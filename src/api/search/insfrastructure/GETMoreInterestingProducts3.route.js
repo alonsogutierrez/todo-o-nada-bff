@@ -8,7 +8,7 @@ const action = async (req, res) => {
   try {
     logger.log('Begining to get more interesting products 3');
     const moreInterestingProductsResponse =
-      await SearchProductsUseCases.getMoreInterestingProducts('third');
+      await SearchProductsUseCases.getMoreInterestingProducts(0, 6, 'third');
     logger.log('Request finished: ', moreInterestingProductsResponse);
     res.status(HTTPCodes.StatusCodes.OK).send(moreInterestingProductsResponse);
   } catch (err) {

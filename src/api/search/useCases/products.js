@@ -53,6 +53,7 @@ const getMoreInterestingProducts = async (
     principal: [1051, 1052, 23, 15, 9, 19, 30, 331, 21, 22],
     second: [300, 311, 309, 320, 319, 331],
     third: [1001, 1052, 1051],
+    four: [35, 36, 31, 28],
   };
   const query = {
     bool: {
