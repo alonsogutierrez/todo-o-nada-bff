@@ -1,14 +1,23 @@
 const HTTPCodes = require('http-status-codes');
 
 const SearchProductsUseCases = require('../useCases/products');
+const { interestingProductsConfig } = require('../../../cron/jobs');
 
 const logger = console;
 
 const action = async (req, res) => {
   try {
     logger.log('Begining to get more interesting products 4');
-    const moreInterestingProductsResponse =
-      await SearchProductsUseCases.getMoreInterestingProducts(0, 6, 'four');
+    let moreInterestingProductsResponse = [];
+    const interestingProductsFromCache = interestingProductsConfig['four'];
+    if (!interestingProductsFromCache) {
+      logger.info('Cache invalid to get more interesting products 4');
+      moreInterestingProductsResponse =
+        await SearchProductsUseCases.getMoreInterestingProducts(0, 6, 'four');
+    } else {
+      logger.info('Cache valid to get more interesting products 4');
+      moreInterestingProductsResponse = interestingProductsFromCache;
+    }
     logger.log('Request finished: ', moreInterestingProductsResponse);
     res.status(HTTPCodes.StatusCodes.OK).send(moreInterestingProductsResponse);
   } catch (err) {
