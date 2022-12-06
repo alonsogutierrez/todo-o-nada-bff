@@ -29,7 +29,11 @@ try {
 
 const app = express();
 
-const corsWhiteList = [process.env.FE_URL, process.env.BASE_URL_BFF];
+const corsWhiteList = [
+  process.env.FE_URL,
+  process.env.FE_URL_WITHOUT_DNS,
+  process.env.BASE_URL_BFF,
+];
 const corsOptions = {
   origin: corsWhiteList,
 };
