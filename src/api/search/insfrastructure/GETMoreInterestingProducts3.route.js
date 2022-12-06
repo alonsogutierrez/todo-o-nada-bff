@@ -1,6 +1,7 @@
 const HTTPCodes = require('http-status-codes');
 
 const SearchProductsUseCases = require('../useCases/products');
+const { interestingProductsConfig } = require('../../../cron/jobs');
 
 const logger = console;
 

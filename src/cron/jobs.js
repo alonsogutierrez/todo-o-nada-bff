@@ -12,6 +12,10 @@ const interestingProductsConfig = {
   four: [],
 };
 
+const initialLoad = async (type) => {
+  getInterestingProducts();
+};
+
 const healthCheck = async () => {
   try {
     logger.info('Beging Health check response');
@@ -48,6 +52,8 @@ const getInterestingProducts = async () => {
     logger.error('Cant get interesting products from cron: ', err.message);
   }
 };
+
+initialLoad();
 
 module.exports = {
   healthCheck,
