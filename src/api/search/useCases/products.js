@@ -50,10 +50,10 @@ const getMoreInterestingProducts = async (
   type = 'principal'
 ) => {
   const interestingProductsConfig = {
-    principal: [1051, 1052, 23, 15, 9, 19, 30, 331, 21, 22],
+    principal: [30, 7, 4, 1052, 1001, 1051, 23, 9, 19, 331, 22],
     second: [300, 311, 309, 320, 319, 331],
-    third: [1001, 1052, 1051],
-    four: [35, 36, 31, 28],
+    third: [19, 15, 4, 10, 16, 2, 400],
+    four: [35, 36, 31, 28, 33, 25],
   };
   const query = {
     bool: {
