@@ -33,6 +33,7 @@ const corsWhiteList = [
   process.env.FE_URL,
   process.env.FE_URL_WITHOUT_DNS,
   process.env.BASE_URL_BFF,
+  process.env.FE_URL_WITHOUT_WWW,
 ];
 const corsOptions = {
   origin: corsWhiteList,
