@@ -111,6 +111,7 @@ const processSearchRepository = async (product) => {
           picture: product.images.split(',')[0],
           details: updateProductDetails(actualProduct.details, product),
           sizes: updateProductSizes(actualProduct.sizes, product.size),
+          is_active: product.is_active,
         };
         await ElasticSearchRestData.UpdateRequest(
           'products',
@@ -137,6 +138,7 @@ const processSearchRepository = async (product) => {
           picture: product.images.split(',')[0],
           details: newProductDetails,
           sizes: [product.size.toString().trim().toUpperCase()],
+          is_active: product.is_active,
         };
         await ElasticSearchRestData.CreateRequest('products', newProduct);
         logger.info(
@@ -188,6 +190,7 @@ const processProductRepository = async (product) => {
           },
           color: product.color,
           productSizeType: product.productSizeType,
+          is_active: product.is_active,
         };
 
         await Products.updateOne(
@@ -214,6 +217,7 @@ const processProductRepository = async (product) => {
           pictures: product.images.split(','),
           details: productFound.details.concat(newProductDetails),
           productSizeType: product.productSizeType,
+          is_active: product.is_active,
         };
         await Products.updateOne(
           { itemNumber: product.itemNumber },
@@ -242,6 +246,7 @@ const processProductRepository = async (product) => {
           },
         ],
         productSizeType: product.productSizeType,
+        is_active: product.is_active,
       };
       const p = new Products(newProduct);
       await p.save();
@@ -330,6 +335,7 @@ const findProductByItemNumber = async (req, res) => {
       specifications: [],
       createdAt: new Date(),
       updatedAt: new Date(),
+      is_active: true,
       __v: 0,
     };
     productUpdated.price = product.price;
@@ -346,6 +352,7 @@ const findProductByItemNumber = async (req, res) => {
     productUpdated.specifications = product.specifications;
     productUpdated.createdAt = product.createdAt;
     productUpdated.updatedAt = product.updatedAt;
+    productUpdated.is_active = product.is_active;
     productUpdated.__v = product.__v;
     logger.log(`Product with itemNumber :${itemNumber} find successfully`);
     res.status(200).send(productUpdated);

@@ -73,6 +73,10 @@ const productSchema = new mongoose.Schema(
         },
       },
     ],
+    is_active: {
+      default: true,
+      type: 'Boolean',
+    },
   },
   {
     timestamps: true,

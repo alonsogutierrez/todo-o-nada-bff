@@ -13,7 +13,22 @@ const getProducts = async (searchText, page, size = 20) => {
     multiMatchOptions.type = 'most_fields';
   }
   const query = {
-    multi_match: multiMatchOptions,
+    bool: {
+      must: {
+        multi_match: multiMatchOptions,
+      },
+      filter: {
+        bool: {
+          must: [
+            {
+              match: {
+                is_active: true,
+              },
+            },
+          ],
+        },
+      },
+    },
   };
   const elasticSearchResponse = await ElasticSearchRestData.SearchRequest(
     'products',
@@ -28,10 +43,25 @@ const getProducts = async (searchText, page, size = 20) => {
 
 const getProductsByCategory = async (categoryName, page, size = 20) => {
   const query = {
-    multi_match: {
-      query: categoryName,
-      fields: ['categories'],
-      type: 'phrase_prefix',
+    bool: {
+      must: {
+        multi_match: {
+          query: categoryName,
+          fields: ['categories'],
+          type: 'phrase_prefix',
+        },
+      },
+      filter: {
+        bool: {
+          must: [
+            {
+              match: {
+                is_active: true,
+              },
+            },
+          ],
+        },
+      },
     },
   };
   const elasticSearchResponse = await ElasticSearchRestData.SearchRequest(
@@ -49,6 +79,7 @@ const getMoreInterestingProducts = async (
   size = 6,
   type = 'principal'
 ) => {
+  // TODO: Move thi values to database
   const interestingProductsConfig = {
     principal: [30, 7, 4, 1051, 1037, 1038],
     second: [300, 311, 309, 320, 319, 331],
@@ -58,9 +89,18 @@ const getMoreInterestingProducts = async (
   const query = {
     bool: {
       filter: {
-        terms: {
-          itemNumber: interestingProductsConfig[type],
-        },
+        must: [
+          {
+            terms: {
+              itemNumber: interestingProductsConfig[type],
+            },
+          },
+          {
+            match: {
+              is_active: true,
+            },
+          },
+        ],
       },
     },
   };

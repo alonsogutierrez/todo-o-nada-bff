@@ -23,6 +23,7 @@ router.post('/product', [auth, uploadS3.handleImages], async (req, res) => {
       pictures: locationArray,
       price: JSON.parse(req.body.price),
       details: JSON.parse(req.body.details),
+      is_active: true,
     };
     const productIndexed = await processProduct(newProduct);
     logger.info('Product well created');

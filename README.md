@@ -4,7 +4,7 @@ Backend for FrontEnd Todo o nada Ecommerce API (BFF) developed with Express, Nod
 
 ## Description
 
-Backend for FrontEnd Todo o nada Ecommerce project(BFF) with the purpose to serve data and process, backoffice for admin and clients, is a monolith architecture.
+Backend for FrontEnd Todo o nada Ecommerce project (BFF) with the purpose to serve data and process as API, also has feature as backoffice for admin and clients, is a monolith architecture.
 Integrations with MongoDB (orders, products, categories, config) and ElasticSearch (repository for search) to implement CQRS.
 API supported with Express from NodeJS, with Clean Architecture.
 Process payments with FlowAPI.
@@ -27,14 +27,6 @@ Process payments with FlowAPI.
 - Must create a "dev.env" file into src/config folder, request the secrets to admin.
 
 - Run dev mode: npm run dev
-
-## Help
-
-Any advise for common problems or issues.
-
-```
-Write to
-```
 
 ## Authors
 
