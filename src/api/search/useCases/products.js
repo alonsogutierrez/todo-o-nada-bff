@@ -81,9 +81,9 @@ const getMoreInterestingProducts = async (
 ) => {
   // TODO: Move thi values to database
   const interestingProductsConfig = {
-    principal: [30, 7, 4, 1051, 1037, 1038],
-    second: [300, 311, 309, 320, 319, 331],
-    third: [19, 15, 4, 10, 16, 2, 400],
+    principal: [1040, 30, 1039, 1052, 1037, 1038],
+    second: [19, 15, 4, 10, 16, 2, 400],
+    third: [300, 311, 309, 320, 319, 331],
     four: [35, 36, 31, 28, 33, 25],
   };
   const query = {
