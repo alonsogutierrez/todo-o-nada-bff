@@ -22,6 +22,7 @@ const createProductInProductRepository = async (productData) => {
     price,
     details,
     pictures,
+    is_active,
   } = productData;
   const categories = category.split(',');
   let newProductsDetails = [];
@@ -46,6 +47,7 @@ const createProductInProductRepository = async (productData) => {
     hasInventory: true,
     hasSizes: true,
     price,
+    is_active,
   };
   logger.info('Trying to save newProduct in MongoDB: ', productData);
   const product = new Product(newProduct);
@@ -64,6 +66,7 @@ const updateProductInProductRepository = async (productData, productFound) => {
     price,
     details,
     pictures,
+    is_active,
   } = productData;
   const categories = category.split(',');
   let newProductDetails = [];
@@ -91,6 +94,7 @@ const updateProductInProductRepository = async (productData, productFound) => {
       discount: price.discount,
     },
     details: newProductDetails,
+    is_active: is_active,
   };
   if (pictures && pictures.length > 0) {
     newProductData.pictures = pictures;
@@ -128,6 +132,7 @@ const processInSearchRepository = async (productData) => {
       price,
       details,
       pictures,
+      is_active,
     } = productData;
     const query = {
       match: {
@@ -170,6 +175,7 @@ const processInSearchRepository = async (productData) => {
               : actualProduct.picture,
           details: newProductDetails,
           sizes: getProductSizes(newProductDetails),
+          is_active: is_active,
         };
         await ElasticSearchRestData.UpdateRequest(
           'products',
@@ -200,6 +206,7 @@ const processInSearchRepository = async (productData) => {
           picture: pictures[0],
           details: newProductDetails,
           sizes: productToIndexSizes,
+          is_active,
         };
         await ElasticSearchRestData.CreateRequest('products', productToIndex);
         logger.info(
