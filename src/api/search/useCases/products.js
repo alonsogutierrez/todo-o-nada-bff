@@ -88,19 +88,15 @@ const getMoreInterestingProducts = async (
   };
   const query = {
     bool: {
+      must: {
+        terms: {
+          itemNumber: interestingProductsConfig[type],
+        },
+      },
       filter: {
-        must: [
-          {
-            terms: {
-              itemNumber: interestingProductsConfig[type],
-            },
-          },
-          {
-            match: {
-              is_active: true,
-            },
-          },
-        ],
+        term: {
+          is_active: true,
+        },
       },
     },
   };
