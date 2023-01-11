@@ -44,6 +44,7 @@ const setProductsFromExcel = (excelProducts) => {
       stock,
       productSizeType,
       images,
+      isActive: true,
     };
     productsFromExcelMapped.push(product);
   });
