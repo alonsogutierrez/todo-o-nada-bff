@@ -134,6 +134,11 @@ const getImages = (product) => {
   return pictures.join(',');
 };
 
+const getIsActive = (product) => {
+  const { is_active } = product;
+  return is_active;
+};
+
 module.exports = {
   getItemNumber,
   getSKU,
@@ -148,4 +153,5 @@ module.exports = {
   getQuantity,
   getProductSizeType,
   getImages,
+  getIsActive,
 };

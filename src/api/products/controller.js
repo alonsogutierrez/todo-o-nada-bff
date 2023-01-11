@@ -25,6 +25,7 @@ const setProductsFromExcel = (excelProducts) => {
       stock,
       productSizeType,
       images,
+      isActive,
     ] = excelProduct;
     const product = {
       itemNumber: `${itemNumber}`.trim(),
@@ -44,6 +45,7 @@ const setProductsFromExcel = (excelProducts) => {
       stock,
       productSizeType,
       images,
+      is_active: isActive.toLowerCase() == 'true' ? true : false,
     };
     productsFromExcelMapped.push(product);
   });

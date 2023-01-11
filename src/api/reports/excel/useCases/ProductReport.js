@@ -46,6 +46,7 @@ module.exports = class Report {
       { header: 'Stock', key: 'stock', width: 5 },
       { header: 'Tipo tamaño', key: 'productSizeType', width: 15 },
       { header: 'Images', key: 'images', width: 15 },
+      { header: 'Is_active', key: 'isActive', width: 6 },
     ];
   }
 
@@ -70,6 +71,7 @@ module.exports = class Report {
             const productSizeType =
               this.mapper.getProductSizeType(actualProduct);
             const images = this.mapper.getImages(actualProduct);
+            const is_active = this.mapper.getIsActive(actualProduct);
             this.sheet.addRow({
               itemNumber,
               sku,
@@ -85,6 +87,7 @@ module.exports = class Report {
               discount,
               productSizeType,
               images,
+              is_active,
             });
           }
         });
