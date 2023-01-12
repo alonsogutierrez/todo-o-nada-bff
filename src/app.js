@@ -16,6 +16,7 @@ const emailsRouter = require('./api/emails/routes/emails');
 const categoriesRouter = require('./api/categories/insfrastructure/routes/category');
 const paymentsRouter = require('./api/payments/insfrastructure/routes');
 const discountsRouter = require('./api/discounts/insfrastructure/route');
+const bannersRouter = require('./api/banners/insfrastructure/routes/banners');
 
 const { getInterestingProducts } = require('./cron/jobs');
 
@@ -57,6 +58,7 @@ app.use(emailsRouter);
 app.use(categoriesRouter);
 app.use(paymentsRouter);
 app.use(discountsRouter);
+app.use(bannersRouter);
 
 cron.schedule(cronExpression, async function () {
   await getInterestingProducts();
