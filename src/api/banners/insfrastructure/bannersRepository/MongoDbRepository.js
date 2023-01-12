@@ -12,6 +12,7 @@ class MongoDbRepository {
 
   async findAll() {
     try {
+      const filters = {};
       const bannersList = await Banner.find(filters);
       return bannersList;
     } catch (err) {
