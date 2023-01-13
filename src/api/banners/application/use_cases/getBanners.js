@@ -20,7 +20,7 @@ class GETBannersUseCases {
           images,
         };
       });
-      bannersData = bannersDataParsed;
+      bannersData = bannersDataParsed.sort((a, b) => a.position < b.position);
     } catch (err) {
       logger.error('Cant get banners errors in use case: ', err.message);
     }

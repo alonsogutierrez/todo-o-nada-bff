@@ -16,7 +16,16 @@ const action = async (req, res) => {
     }
     logger.log('Begining to create banner', body);
     const createBannerUseCase = new CreateBannerUseCase();
-    const createBannerResponse = await createBannerUseCase.create(body);
+    const { locationArray } = req.imagesS3Service;
+    const newBanner = {
+      ...req.body,
+      isActive: req.body.isActive.toLowerCase() === 'true' ? true : false,
+      images: {
+        desktop: locationArray[0] ? locationArray[0] : '',
+        mobile: locationArray.length == 2 ? locationArray[1] : '',
+      },
+    };
+    const createBannerResponse = await createBannerUseCase.create(newBanner);
     logger.log('Request finished: ', createBannerResponse);
     res.status(HTTPCodes.StatusCodes.OK).send(createBannerResponse);
   } catch (err) {

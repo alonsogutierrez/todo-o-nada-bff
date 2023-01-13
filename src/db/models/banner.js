@@ -13,7 +13,6 @@ const bannerSchema = new mongoose.Schema(
       },
       mobile: {
         type: String,
-        required: true,
       },
     },
     position: {
@@ -22,7 +21,6 @@ const bannerSchema = new mongoose.Schema(
     },
     isActive: {
       type: Boolean,
-      required: true,
     },
   },
   {

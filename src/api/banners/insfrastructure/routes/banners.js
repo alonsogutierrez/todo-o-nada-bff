@@ -1,8 +1,9 @@
 const express = require('express');
 
-const auth = require('../../../../middlewares/auth');
+const auth = require('./../../../../middlewares/auth');
+const uploadBannerS3 = require('./../../../../middlewares/s3/uploadBannerImages');
 const GETBanners = require('./GETBanners.route');
-const POSTCreateBanner = require('./PUTEditBanner.route');
+const POSTCreateBanner = require('./POSTCreateBanner.route');
 const PUTEditBanner = require('./PUTEditBanner.route');
 const DELETEDeleteBanner = require('./DELETEDeleteBanner.route');
 
@@ -15,7 +16,7 @@ router[GETBanners.method.toLocaleLowerCase()](
 
 router[POSTCreateBanner.method.toLocaleLowerCase()](
   POSTCreateBanner.route,
-  auth,
+  [auth, uploadBannerS3.handleBannerImages],
   POSTCreateBanner.action
 );
 

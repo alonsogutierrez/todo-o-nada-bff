@@ -9,7 +9,7 @@ const s3 = new AWS.S3({
 });
 
 const S3_BASE_URL = process.env.S3_BASE_URL;
-const S3_IMAGES_PATH = process.env.S3_IMAGES_PATH;
+const S3_BANNER_IMAGES_PATH = process.env.S3_BANNER_IMAGES_PATH;
 
 const logger = console;
 
@@ -22,8 +22,7 @@ const multerOptions = {
       callBack(null, { fieldName: file.fieldname });
     },
     key: (req, file, callBack) => {
-      const fullPath = S3_IMAGES_PATH + file.originalname; //If you want to save into a folder concat de name of the folder to the path
-      console.log('fullPath: ', fullPath);
+      const fullPath = S3_BANNER_IMAGES_PATH + file.originalname; //If you want to save into a folder concat de name of the folder to the path
       callBack(null, fullPath);
     },
     shouldTransform: true,
@@ -31,13 +30,12 @@ const multerOptions = {
       {
         id: 'original',
         key: function (req, file, cb) {
-          console.log('transform');
-          cb(null, S3_IMAGES_PATH + file.originalname);
+          cb(null, S3_BANNER_IMAGES_PATH + file.originalname);
         },
         transform: function (req, file, cb) {
           //Perform desired transformations
           console.log('Transform with sharp');
-          cb(null, sharp().resize(500, 500).jpeg());
+          cb(null, sharp().resize(1200, 800).jpeg());
         },
       },
     ],
@@ -47,26 +45,27 @@ const multerOptions = {
 
 const multerS3Instance = multer(multerOptions);
 
-const uploadS3 = multerS3Instance.array('pictures', 4);
+const uploadBannerS3 = multerS3Instance.array('images', 2);
 
-exports.handleImages = async (req, res, next) => {
+exports.handleBannerImages = async (req, res, next) => {
   try {
     const startTime = Date.now();
-    uploadS3(req, res, (error) => {
+    console.log('REQ.FILE:', req.file);
+    uploadBannerS3(req, res, (error) => {
       const durationMulterTime = Date.now() - startTime;
       logger.log(
         'Duration multer execution and transform: ',
         durationMulterTime / 1000 + ' seconds'
       );
       if (error) {
-        logger.error('handleImages Error: ', error);
+        logger.error('handleBannerImages Error: ', error);
         res.status(500).json({
           status: 'fail',
           error: error,
         });
       } else {
         if (!req.files) {
-          logger.log('handleImages Error: No File Selected!');
+          logger.log('handleBannerImages Error: No File Selected!');
           res.status(500).json({
             status: 'fail',
             message: 'Error: No File Selected',
@@ -77,7 +76,8 @@ exports.handleImages = async (req, res, next) => {
           console.log('fileArray: ', fileArray);
           const images = [];
           fileArray.forEach((file) => {
-            urlFile = S3_BASE_URL + '/' + S3_IMAGES_PATH + file.originalname;
+            urlFile =
+              S3_BASE_URL + '/' + S3_BANNER_IMAGES_PATH + file.originalname;
             logger.log('urlFile', urlFile);
             images.push(urlFile);
           });
@@ -96,6 +96,6 @@ exports.handleImages = async (req, res, next) => {
       }
     });
   } catch (err) {
-    logger.error('Error in handleImages Middleware: ', err.message);
+    logger.error('Error in handleBannerImages Middleware: ', err.message);
   }
 };
