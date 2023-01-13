@@ -35,7 +35,7 @@ const multerOptions = {
         transform: function (req, file, cb) {
           //Perform desired transformations
           console.log('Transform with sharp');
-          cb(null, sharp().resize(1200, 800).jpeg());
+          cb(null, sharp().resize(1800, 900).jpeg());
         },
       },
     ],
@@ -50,7 +50,6 @@ const uploadBannerS3 = multerS3Instance.array('images', 2);
 exports.handleBannerImages = async (req, res, next) => {
   try {
     const startTime = Date.now();
-    console.log('REQ.FILE:', req.file);
     uploadBannerS3(req, res, (error) => {
       const durationMulterTime = Date.now() - startTime;
       logger.log(
@@ -73,7 +72,6 @@ exports.handleBannerImages = async (req, res, next) => {
         } else {
           let fileArray = req.files,
             fileLocation;
-          console.log('fileArray: ', fileArray);
           const images = [];
           fileArray.forEach((file) => {
             urlFile =

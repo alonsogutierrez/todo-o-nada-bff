@@ -20,6 +20,17 @@ class MongoDbRepository {
     }
   }
 
+  async findOne(filters) {
+    try {
+      const banner = await Banner.findOne(filters);
+      return banner;
+    } catch (err) {
+      throw new Error(
+        `Can't get banner by banner number in repository: ${err.message}`
+      );
+    }
+  }
+
   async updateOne(filters, newData) {
     try {
       const bannerUpdated = await Banner.updateOne(filters, newData);

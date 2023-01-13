@@ -14,9 +14,25 @@ const action = async (req, res) => {
       });
       return;
     }
-    logger.log('Begining to edit banner', body);
+    const { bannerNumber } = req.params;
+    logger.log('Begining to edit banner', bannerNumber);
+    const filters = {
+      bannerNumber,
+    };
+    const { locationArray } = req.imagesS3Service;
+    const editBanner = {
+      ...req.body,
+      isActive: req.body.isActive.toLowerCase() === 'true' ? true : false,
+      images: {
+        desktop: locationArray[0] ? locationArray[0] : '',
+        mobile: locationArray.length == 2 ? locationArray[1] : '',
+      },
+    };
     const editBannerUseCase = new EditBannerUseCase();
-    const editBannerResponse = await editBannerUseCase.edit(body);
+    const editBannerResponse = await editBannerUseCase.edit(
+      filters,
+      editBanner
+    );
     logger.log('Request finished: ', editBannerResponse);
     res.status(HTTPCodes.StatusCodes.OK).send(editBannerResponse);
   } catch (err) {
@@ -30,6 +46,6 @@ const action = async (req, res) => {
 
 module.exports = {
   method: 'PUT',
-  route: '/banners',
+  route: '/banners/:bannerNumber',
   action,
 };

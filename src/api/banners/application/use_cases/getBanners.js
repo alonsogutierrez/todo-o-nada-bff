@@ -26,6 +26,29 @@ class GETBannersUseCases {
     }
     return bannersData;
   }
+
+  async getByBannerNumber(bannerNumberFilter) {
+    let bannerData = {};
+    try {
+      const filters = {
+        bannerNumber: bannerNumberFilter,
+      };
+      const bannerDataResponse = await this.bannersRepository.findOne(filters);
+      const { bannerNumber, position, isActive, images } = bannerDataResponse;
+      bannerData = {
+        bannerNumber,
+        position,
+        isActive,
+        images,
+      };
+    } catch (err) {
+      logger.error(
+        'Cant get banner by bannernumber errors in use case: ',
+        err.message
+      );
+    }
+    return bannerData;
+  }
 }
 
 module.exports = GETBannersUseCases;
