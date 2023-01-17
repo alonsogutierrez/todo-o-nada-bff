@@ -19,15 +19,31 @@ const action = async (req, res) => {
     const filters = {
       bannerNumber,
     };
-    const { locationArray } = req.imagesS3Service;
-    const editBanner = {
+
+    let editBanner = {
       ...req.body,
       isActive: req.body.isActive.toLowerCase() === 'true' ? true : false,
-      images: {
-        desktop: locationArray[0] ? locationArray[0] : '',
-        mobile: locationArray.length == 2 ? locationArray[1] : '',
-      },
     };
+    const { locationArray } = req.imagesS3Service;
+
+    if (locationArray.length > 0) {
+      editBanner.images = {};
+      editBanner.images.desktop = locationArray[0];
+      editBanner.images.mobile = locationArray[0];
+      if (locationArray.length > 1) {
+        editBanner.images.mobile = locationArray[1];
+      }
+    } else {
+      if (editBanner.images.length > 0) {
+        const imagesBannersUrlList = editBanner.images;
+        editBanner.images = {};
+        editBanner.images.desktop = imagesBannersUrlList[0];
+        editBanner.images.mobile = imagesBannersUrlList[0];
+        if (imagesBannersUrlList.length > 1) {
+          editBanner.images.mobile = imagesBannersUrlList[1];
+        }
+      }
+    }
     const editBannerUseCase = new EditBannerUseCase();
     const editBannerResponse = await editBannerUseCase.edit(
       filters,
