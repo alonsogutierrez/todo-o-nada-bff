@@ -11,16 +11,18 @@ class GETBannersUseCases {
     let bannersData = {};
     try {
       bannersData = await this.bannersRepository.findAll();
-      const bannersDataParsed = bannersData.map((bannerData) => {
-        const { bannerNumber, position, isActive, images } = bannerData;
-        return {
-          bannerNumber,
-          position,
-          isActive,
-          images,
-        };
-      });
-      bannersData = bannersDataParsed.sort((a, b) => a.position < b.position);
+      const bannersDataParsed = bannersData
+        .map((bannerData) => {
+          const { bannerNumber, position, isActive, images } = bannerData;
+          return {
+            bannerNumber,
+            position,
+            isActive,
+            images,
+          };
+        })
+        .sort((a, b) => a.position < b.position);
+      bannersData = bannersDataParsed;
     } catch (err) {
       logger.error('Cant get banners errors in use case: ', err.message);
     }

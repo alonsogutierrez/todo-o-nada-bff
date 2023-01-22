@@ -35,7 +35,10 @@ const multerOptions = {
         transform: function (req, file, cb) {
           //Perform desired transformations
           console.log('Transform with sharp');
-          cb(null, sharp().resize(1800, 900).jpeg());
+          cb(
+            null,
+            sharp().resize(2000, 900).toFormat('jpeg', { mozjpeg: true })
+          );
         },
       },
     ],
