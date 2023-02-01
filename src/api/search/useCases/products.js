@@ -81,7 +81,7 @@ const getMoreInterestingProducts = async (
 ) => {
   // TODO: Move thi values to database
   const interestingProductsConfig = {
-    principal: [6661312, 1312, 1033, 1666, 1040, 1039],
+    principal: [1312, 1033, 1666, 1040, 1039, 6661312],
     second: [19, 15, 4, 10, 16, 2, 400],
     third: [300, 311, 309, 320, 319, 331],
     four: [35, 36, 31, 28, 33, 25],
@@ -102,7 +102,7 @@ const getMoreInterestingProducts = async (
   };
   const elasticSearchResponse = await ElasticSearchRestData.SearchRequest(
     'products',
-    { query },
+    { query, sort: [{ _id: 'desc' }] },
     page,
     size,
     false
