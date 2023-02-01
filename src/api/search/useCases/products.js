@@ -102,7 +102,7 @@ const getMoreInterestingProducts = async (
   };
   const elasticSearchResponse = await ElasticSearchRestData.SearchRequest(
     'products',
-    { query },
+    { query, sort: [{ _id: 'desc' }] },
     page,
     size,
     false
