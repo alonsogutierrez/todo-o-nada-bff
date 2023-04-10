@@ -32,7 +32,7 @@ const getProducts = async (searchText, page, size = 20) => {
   };
   const elasticSearchResponse = await ElasticSearchRestData.SearchRequest(
     'products',
-    { query },
+    { query, sort: [{ _id: 'desc' }] },
     page,
     size,
     false
@@ -66,7 +66,7 @@ const getProductsByCategory = async (categoryName, page, size = 20) => {
   };
   const elasticSearchResponse = await ElasticSearchRestData.SearchRequest(
     'products',
-    { query },
+    { query, sort: [{ _id: 'desc' }] },
     page,
     size,
     false
