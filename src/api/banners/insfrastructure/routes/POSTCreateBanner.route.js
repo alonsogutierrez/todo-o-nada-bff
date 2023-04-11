@@ -22,7 +22,7 @@ const action = async (req, res) => {
       isActive: req.body.isActive.toLowerCase() === 'true' ? true : false,
       images: {
         desktop: locationArray[0] ? locationArray[0] : '',
-        mobile: locationArray.length == 2 ? locationArray[1] : '',
+        mobile: locationArray.length > 1 ? locationArray[1] : locationArray[0],
       },
     };
     const createBannerResponse = await createBannerUseCase.create(newBanner);
