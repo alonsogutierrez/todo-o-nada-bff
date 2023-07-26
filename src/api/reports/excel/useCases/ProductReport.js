@@ -71,7 +71,7 @@ module.exports = class Report {
             const productSizeType =
               this.mapper.getProductSizeType(actualProduct);
             const images = this.mapper.getImages(actualProduct);
-            const is_active = this.mapper.getIsActive(actualProduct);
+            const isActive = this.mapper.getIsActive(actualProduct);
             this.sheet.addRow({
               itemNumber,
               sku,
@@ -87,7 +87,7 @@ module.exports = class Report {
               discount,
               productSizeType,
               images,
-              is_active,
+              isActive,
             });
           }
         });
