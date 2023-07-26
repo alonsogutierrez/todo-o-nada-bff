@@ -136,7 +136,7 @@ const getImages = (product) => {
 
 const getIsActive = (product) => {
   const { is_active } = product;
-  return is_active;
+  return is_active ? 'True' : 'False';
 };
 
 module.exports = {
