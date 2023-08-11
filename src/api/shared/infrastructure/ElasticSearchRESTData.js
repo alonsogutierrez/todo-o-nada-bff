@@ -6,9 +6,9 @@ const SERVICES = {
   ELASTICSEARCH_API: process.env.ELASTIC_SEARCH_URL,
 };
 
-const USER_CREDENTIALS = {
-  ELASTIC_SEARCH_USERNAME: process.env.ELASTIC_SEARCH_USER,
-  ELASTIC_SEARCH_PASSWORD: process.env.ELASTIC_SEARCH_PASSWORD,
+const PROXY_CREDENTIALS = {
+  USER: process.env.PROXY_USER,
+  PASSWORD: process.env.PROXY_PASSWORD,
 };
 
 const RESOURCES = {
@@ -22,11 +22,7 @@ const RESOURCES = {
 };
 
 const elasticSearchClient = new Client({
-  node: SERVICES.ELASTICSEARCH_API,
-  /*auth: {
-    username: USER_CREDENTIALS.ELASTIC_SEARCH_USERNAME,
-    password: USER_CREDENTIALS.ELASTIC_SEARCH_PASSWORD,
-  },*/
+  node: `http://${PROXY_CREDENTIALS.USER}:${PROXY_CREDENTIALS.PASSWORD}@${SERVICES.ELASTICSEARCH_API}`,
   maxRetries: 8,
   requestTimeout: 30 * 1000,
 });
