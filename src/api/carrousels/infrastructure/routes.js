@@ -8,7 +8,6 @@ const router = express.Router();
 
 router[GETCarrousels.method.toLocaleLowerCase()](
   GETCarrousels.route,
-  [auth],
   GETCarrousels.action
 );
 
