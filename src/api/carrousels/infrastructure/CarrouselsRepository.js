@@ -13,8 +13,12 @@ const findOne = async () => {
 
 const save = async (carrouselsData) => {
   try {
-    const carrousels = new Carrousels(carrouselsData);
-    return await carrousels.save();
+    const actualCarrousel = findOne();
+    const carrouselsUpdated = await Carrousels.updateOne(
+      actualCarrousel._id,
+      carrouselsData
+    );
+    return carrouselsUpdated;
   } catch (err) {
     throw new Error(`Can't save carrousels in repository: ${err.message}`);
   }

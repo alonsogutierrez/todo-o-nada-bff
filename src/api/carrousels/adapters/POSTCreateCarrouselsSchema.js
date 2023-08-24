@@ -3,13 +3,16 @@ const createBannersSchema = {
   description: 'describes properties required to create carrousels',
   type: 'object',
   properties: {
-    _id: {
-      type: 'string',
-      description: 'code that identifies each carrousels',
-    },
-    _source: {
+    products: {
       type: 'object',
-      description: 'object that contains all carrousel data',
+      description: 'products carrousels',
+    },
+    carrousels: {
+      type: 'object',
+      description: 'object that contains all carrousels data',
+    },
+    carrouselsOrder: {
+      type: 'array',
     },
   },
 };
