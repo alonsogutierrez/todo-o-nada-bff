@@ -1,7 +1,7 @@
 const HTTPCodes = require('http-status-codes');
 const CarrouselsUseCases = require('../useCases/carrousels');
 
-const isValidQuery = require('../adapters/POSTCreateCarrousels.validator');
+const isValidQuery = require('../adapters/POSTCreateCarrousels.validator.js');
 
 const logger = console;
 
