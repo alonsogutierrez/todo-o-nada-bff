@@ -1,7 +1,7 @@
 {
   "name": "todo-o-nada-tatto-art-bff",
   "version": "1.0.0",
-  "description": "Todo o nada tatto art bff",
+  "description": "Todo o Nada Tattoo Art BFF",
   "main": "index.js",
   "engines": {
     "node": "14.17.2",
