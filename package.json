@@ -1,7 +1,7 @@
 {
   "name": "todo-o-nada-tatto-art-bff",
   "version": "1.0.0",
-  "description": "Todo o nada tatto art bff",
+  "description": "Todo o Nada Tattoo Art BFF",
   "main": "index.js",
   "engines": {
     "node": "14.17.2",
@@ -13,7 +13,7 @@
     "prod": "env-cmd -f ./src/config/prod.env node src/index.js",
     "test": "npm run test"
   },
-  "author": "GG Team - Alonso Gutiérrez - Cristian Gutiérrez",
+  "author": "ProDev Perspectives",
   "license": "ISC",
   "dependencies": {
     "@elastic/elasticsearch": "7.13.0",
