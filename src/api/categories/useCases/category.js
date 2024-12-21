@@ -35,7 +35,8 @@ const getCategories = async (categoriesConfig) => {
       "unisex",
       "hardcore",
       "merch",
-      "decohogar",
+      "decohogart",
+      "todo-o-nada-sergrafias",
     ].sort();
 
     return categoriesResponse;
@@ -68,7 +69,8 @@ const createCategories = async (categoriesConfig) => {
       "liquidaciones",
       "hardcore",
       "merch",
-      "decohogar",
+      "decohogart",
+      "todo-o-nada-sergrafias",
     ];
 
     return categoriesResponse;
@@ -284,7 +286,13 @@ const getCategoriesNavLinks = async () => {
       },
       {
         path: "/category/decohogar",
-        menu_title: "Decohogar",
+        menu_title: "DecohogART",
+        icon: "arrow_right_alt",
+        child_routes: null,
+      },
+      {
+        path: "/category/todo-o-nada-sergrafias",
+        menu_title: "Todo o Nada Serigrafías",
         icon: "arrow_right_alt",
         child_routes: null,
       },
